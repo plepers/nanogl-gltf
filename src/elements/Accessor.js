@@ -193,7 +193,7 @@ export default class Accessor extends BaseElement {
       this._strideElem  = this.numComps;
     } else {
       this._stride      = this.bufferView.byteStride;
-      this._strideElem  = this._stride / this.numComps;
+      this._strideElem  = this._stride / Arr.BYTES_PER_ELEMENT;
       Assert.isTrue( this._strideElem === Math.round( this._strideElem ) );
     }
 
