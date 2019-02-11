@@ -1,0 +1,6 @@
+[submodule "test/samples/models"]
+	path = test/samples/models
+	url = git@github.com:KhronosGroup/glTF-Sample-Models.git
+[submodule "test/samples/generator"]
+	path = test/samples/generator
+	url = git@github.com:KhronosGroup/glTF-Asset-Generator.git
