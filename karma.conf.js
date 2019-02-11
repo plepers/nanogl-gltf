@@ -27,7 +27,7 @@ module.exports = function(config) {
       ],
   
       proxies: {
-        '/samples/': '/base/test/samples/2.0/'
+        '/samples/': '/base/test/samples/'
       },
 
 

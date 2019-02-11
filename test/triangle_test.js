@@ -7,7 +7,7 @@ describe("Triangle", function () {
   const gltf= new Gltf();
 
   before(function () {
-    return gltf.load('samples/Triangle/glTF/Triangle.gltf')
+    return gltf.load('samples/models/2.0/Triangle/glTF/Triangle.gltf')
   });
   
 
