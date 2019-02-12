@@ -4,14 +4,15 @@ import when   from 'when'
 import UTF8   from 'lib/utf8-decoder'
 
 
-import { ALL_TYPES, TYPE_BUFFER, TYPE_BUFFERVIEW } from './consts';
-import Extensions from './extensions';
-import BaseElement from './elements/BaseElement';
-import Accessor from './elements/Accessor';
-import BufferView from './elements/BufferView';
-import Buffer from './elements/Buffer';
+import { ROOT_TYPES, ALL_TYPES } from './consts';
 
-import Assert from './lib/assert';
+import Extensions    from './extensions'             ;
+import BaseElement   from './elements/BaseElement'   ;
+import Accessor      from './elements/Accessor'      ;
+import BufferView    from './elements/BufferView'    ;
+import Buffer        from './elements/Buffer'        ;
+import createElement from './elements/ElementFactory';
+import Animation     from './elements/Animation'     ;
 
 
 
@@ -21,6 +22,7 @@ const JSON_MAGIC = 0x4E4F534A; // "JSON"
 const GLB_HEADER_SIZE = 20;
 
 
+/** Gltf file representation */
 export default class Gltf{
   
 
@@ -30,19 +32,65 @@ export default class Gltf{
 
     this._extensions = new Extensions();
 
-    this.buffers     = [];
+    /**
+     * @type {Array<Buffer>}
+     * @description gltf buffer
+     */
+    this.buffers     = null;
+
+    /**
+     * @type {Array<BufferView>}
+     * @description gltf bufferViews
+     */
     this.bufferViews = null;
+
+
+    /**
+     * @type {Array<Accessor>}
+     * @description gltf accessors
+     */
     this.accessors   = null;
+
+    /**
+     * @type {Array<Animation>}
+     * @description gltf animations
+     */
+    this.animations   = null;
+
+    for( var t of ALL_TYPES )
+      this[t] = []
+    
     
 
   }
-
 
   getAllElements(){
     return ALL_TYPES.reduce( 
       (a,k)=>a.concat( this[k] ),
       []
     );
+  }
+
+  /**
+   * 
+   * @param {BaseElement} element 
+   */
+  addElement( element ){
+    const a = this[element.elementType];
+    if( a.indexOf( element ) === -1 ){
+      a.push( element );
+    }
+  }
+
+
+  /**
+   * 
+   * @param {Array<BaseElement>} elements
+   */
+  addElements( elements ){
+    for (var e of elements) {
+      this.addElement( e );
+    }
   }
 
   
@@ -97,7 +145,7 @@ export default class Gltf{
   loadBuffers = ()=>{
     
     for (var i = this.buffers.length; i < this._data.buffers.length; i++) {
-      this.buffers[i] = new Buffer( this, this._data.buffers[i] )
+      this.addElement( new Buffer( this, this._data.buffers[i] ) )
     }
 
     return when.map( this.buffers, b=>b.load() );
@@ -107,17 +155,15 @@ export default class Gltf{
 
   parse = ()=>{
 
+    const rawData = this._data;
+    
+    for( const type of ROOT_TYPES ){
+      const data = rawData[type];
+      const Def = createElement( type );
+      if( data )
+        data.forEach( d=>this.addElement( new Def(this, d) ) );
+    }
 
-    this.bufferViews = this._data.bufferViews.map( d=>new BufferView  (this, d) );
-    this.accessors   = this._data.accessors  .map( d=>new Accessor    (this, d) );
-
-    // for( var t of ALL_TYPES ){
-
-    //   var _Class = BaseElement.getDefinition( t );
-    //   this[t] = this._data[t].map( 
-    //     d=>new _Class( this, d )
-    //   )
-    // }
 
     for( var e of this.getAllElements() ){
 

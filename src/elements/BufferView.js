@@ -6,6 +6,8 @@ import Ref from '../Ref';
 
 export default class BufferView extends BaseElement {
 
+  static TYPE = TYPE_BUFFERVIEW;
+
   constructor( gltf, data ){
 
     super( gltf, data );
@@ -38,5 +40,4 @@ export default class BufferView extends BaseElement {
 }
 
  
-BaseElement._registerDefinition( TYPE_BUFFERVIEW, BufferView );
 

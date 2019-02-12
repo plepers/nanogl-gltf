@@ -1,20 +1,24 @@
-import Assert from '../lib/assert';
+/**
+ * @typedef {import("../index").default} Gltf
+ */
+
+ import Assert from '../lib/assert';
 
 const _defs = {};
 
+
+
+
+
 export default class BaseElement {
 
-  static _registerDefinition( type, _Class ){
-    Assert.isUndefined( _defs[type] )
-    _defs[type] = _Class;
-  }
-  
-  static getDefinition( type ){
-    Assert.isDefined( _defs[type] )
-    return _defs[type];
-  }
+  static TYPE = 'toto';
 
-
+  /**
+   * 
+   * @param {Gltf} gltf 
+   * @param {any} data 
+   */
   constructor( gltf, data ){
     this.gltf = gltf;
 
@@ -22,6 +26,10 @@ export default class BaseElement {
     this.extras     = data.extras;
     this.extensions = data.extensions;
 
+  }
+
+  get elementType(){
+    return this.constructor.TYPE;
   }
 
   resolveReferences(){

@@ -27,10 +27,10 @@ const ARRAY_TYPES = {
 
 //https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#animations
 const NORMALIZE_FUNCS = {
-  5120 : function(c){ Math.max(c / 127.0, -1.0)	},
-  5121 : function(c){ c / 255.0	},
-  5122 : function(c){ Math.max(c / 32767.0, -1.0)	},
-  5123 : function(c){ c / 65535.0	},
+  5120 : c => Math.max(c / 127.0, -1.0)	,
+  5121 : c => c / 255.0	,
+  5122 : c => Math.max(c / 32767.0, -1.0)	,
+  5123 : c => c / 65535.0	,
   5125:  null,
   5126:  null,
 }
@@ -132,6 +132,10 @@ class Sparse{
 
 export default class Accessor extends BaseElement {
 
+
+  static TYPE = TYPE_ACCESSOR
+
+
   constructor( gltf, data ){
     super( gltf, data );
 
@@ -232,7 +236,7 @@ export default class Accessor extends BaseElement {
     }
 
     if( normalized ){
-      this.returnValue( index );
+      this.getRawValue( this._valueHolder, index );
       this._normalize( out, this._valueHolder );
     } else {
       this.getRawValue( out, index );
@@ -270,7 +274,3 @@ export default class Accessor extends BaseElement {
 
 
 }
-
-
-BaseElement._registerDefinition( TYPE_ACCESSOR, Accessor );
-

@@ -28,15 +28,15 @@ describe("Interleaved", function () {
       // 3 Float32Array( [0.5, 0.5, 0] )
       
       accessor.getValue(holder, 1)
-      expect(holder[0]).to.be.equal(-.5);
-      expect(holder[1]).to.be.equal(-.5);
-      expect(holder[2]).to.be.equal(0);
+      expect(holder[0]).to.equal(-.5);
+      expect(holder[1]).to.equal(-.5);
+      expect(holder[2]).to.equal(0);
       
 
       accessor.getValue(holder, 3)
-      expect(holder[0]).to.be.equal(.5);
-      expect(holder[1]).to.be.equal(.5);
-      expect(holder[2]).to.be.equal(0);
+      expect(holder[0]).to.equal(.5);
+      expect(holder[1]).to.equal(.5);
+      expect(holder[2]).to.equal(0);
       
 
     });
@@ -50,15 +50,15 @@ describe("Interleaved", function () {
       const holder = accessor.createElementHolder();
 
       accessor.getValue(holder, 1)
-      expect(holder[0]).to.be.equal(1);
-      expect(holder[1]).to.be.equal(0);
-      expect(holder[2]).to.be.equal(0);
+      expect(holder[0]).to.equal(1);
+      expect(holder[1]).to.equal(0);
+      expect(holder[2]).to.equal(0);
       
 
       accessor.getValue(holder, 3)
-      expect(holder[0]).to.be.equal(0);
-      expect(holder[1]).to.be.equal(0);
-      expect(holder[2]).to.be.equal(1);
+      expect(holder[0]).to.equal(0);
+      expect(holder[1]).to.equal(0);
+      expect(holder[2]).to.equal(1);
       
 
     });
@@ -69,13 +69,13 @@ describe("Interleaved", function () {
       const holder = accessor.createElementHolder();
 
       accessor.getValue(holder, 1)
-      expect(holder[0]).to.be.equal(0);
-      expect(holder[1]).to.be.equal(1);
+      expect(holder[0]).to.equal(0);
+      expect(holder[1]).to.equal(1);
       
 
       accessor.getValue(holder, 3)
-      expect(holder[0]).to.be.equal(1);
-      expect(holder[1]).to.be.equal(0);
+      expect(holder[0]).to.equal(1);
+      expect(holder[1]).to.equal(0);
       
 
     });
@@ -85,17 +85,17 @@ describe("Interleaved", function () {
     //   const accessor = gltf.accessors[1]
     //   const holder = accessor.createElementHolder();
     //   accessor.getValue( holder, 0 )
-    //   expect(holder[0]).to.be.equal(0);
-    //   expect(holder[1]).to.be.equal(0);
-    //   expect(holder[2]).to.be.equal(0);
+    //   expect(holder[0]).to.equal(0);
+    //   expect(holder[1]).to.equal(0);
+    //   expect(holder[2]).to.equal(0);
     //   accessor.getValue( holder, 1 )
-    //   expect(holder[0]).to.be.equal(1);
-    //   expect(holder[1]).to.be.equal(0);
-    //   expect(holder[2]).to.be.equal(0);
+    //   expect(holder[0]).to.equal(1);
+    //   expect(holder[1]).to.equal(0);
+    //   expect(holder[2]).to.equal(0);
     //   accessor.getValue( holder, 2 )
-    //   expect(holder[0]).to.be.equal(0);
-    //   expect(holder[1]).to.be.equal(1);
-    //   expect(holder[2]).to.be.equal(0);
+    //   expect(holder[0]).to.equal(0);
+    //   expect(holder[1]).to.equal(1);
+    //   expect(holder[2]).to.equal(0);
     // });
 
 

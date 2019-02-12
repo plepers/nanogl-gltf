@@ -5,6 +5,8 @@ import {loadBytes} from 'lib/net'
 
 export default class Buffer extends BaseElement {
 
+  static TYPE = TYPE_BUFFER;
+
   constructor( gltf, data ){
     super( gltf, data );
 
@@ -23,14 +25,10 @@ export default class Buffer extends BaseElement {
 
     const uri = this.gltf.resolveUri( this.uri );
     return loadBytes( uri )
-      .then( b=>{
-        this._bytes = b
-        console.log( this, b )
-       } );
+      .then( b=>this._bytes = b );
   }
 
   
 
 }
 
-BaseElement._registerDefinition( TYPE_BUFFER, Buffer );
