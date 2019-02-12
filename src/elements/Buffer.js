@@ -1,3 +1,4 @@
+//@ts-check
 
 import { TYPE_BUFFER } from '../consts';
 import BaseElement from './BaseElement';
@@ -16,6 +17,7 @@ export default class Buffer extends BaseElement {
 
     
     this._byteOffset=0;
+
   }
 
   load(){

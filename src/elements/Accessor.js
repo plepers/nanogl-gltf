@@ -1,3 +1,10 @@
+
+//@ts-check
+
+/**
+ * @typedef {Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array | Uint8ClampedArray | Float32Array | Float64Array} TypedArray
+ */
+
 import BaseElement from './BaseElement';
 import Ref from '../Ref';
 import { TYPE_BUFFERVIEW, TYPE_ACCESSOR } from '../consts';
@@ -16,7 +23,7 @@ const TYPE_SIZE_MAP = {
 }
 
 const ARRAY_TYPES = {
-  5120:  Uint8Array, // force unsigned???
+  5120:  Int8Array, // force unsigned???
   5121:  Uint8Array,
   5122:  Int16Array,
   5123:  Uint16Array,
@@ -213,7 +220,9 @@ export default class Accessor extends BaseElement {
     }
   }
 
-  
+  /**
+   * @return {TypedArray} 
+   */
   createElementHolder(normalized = this.normalized){
     if( normalized ) 
       return new Float32Array( this.numComps );
@@ -224,7 +233,7 @@ export default class Accessor extends BaseElement {
 
   /**
    * Copy accessor value at the given index to output array
-   * @param {Array} out output value
+   * @param {TypedArray} out output value
    * @param {number} index 
    * @param {boolean} normalized 
    */
@@ -243,7 +252,11 @@ export default class Accessor extends BaseElement {
     }
   }
 
-
+  /**
+   * 
+   * @param {TypedArray} out output value
+   * @param {TypedArray} raw 
+   */
   _normalize( out, raw ){
     const fn = this._normalizeFunc;
     const ncomps = this.numComps;
@@ -255,7 +268,7 @@ export default class Accessor extends BaseElement {
 
   /**
    * Copy accessor value at the given index to output array. Skip sparse resolve
-   * @param {Array} out output value
+   * @param {TypedArray} out output value
    * @param {number} index 
    */
   getRawValue( out, index ){

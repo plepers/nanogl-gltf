@@ -1,3 +1,5 @@
+//@ts-check
+
 import Assert from './lib/assert';
 
 

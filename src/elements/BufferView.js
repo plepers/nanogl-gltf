@@ -1,3 +1,4 @@
+//@ts-check
 
 import BaseElement from './BaseElement';
 import { TYPE_BUFFER, TYPE_BUFFERVIEW } from '../consts';

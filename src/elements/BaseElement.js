@@ -1,12 +1,8 @@
+//@ts-check
+
 /**
  * @typedef {import("../index").default} Gltf
  */
-
- import Assert from '../lib/assert';
-
-const _defs = {};
-
-
 
 
 
@@ -28,9 +24,13 @@ export default class BaseElement {
 
   }
 
+  /**
+   * @return {string} type identifier for this element
+   */
   get elementType(){
-    return this.constructor.TYPE;
+    return this.constructor['TYPE'];
   }
+
 
   resolveReferences(){
     // abstract

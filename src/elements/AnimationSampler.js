@@ -1,3 +1,11 @@
+//@ts-check
+/**
+ * @typedef {import("./Accessor").default} Accessor
+ * @typedef {import("./Animation").default} Animation
+ * @typedef {import("../index").default} Gltf
+ */
+
+
 
 import BaseElement from './BaseElement';
 import { TYPE_ANIMATION_SAMPLER, TYPE_ACCESSOR } from '../consts';
@@ -14,6 +22,12 @@ export default class AnimationSampler extends BaseElement {
 
   static TYPE = TYPE_ANIMATION_SAMPLER
 
+  /**
+   * 
+   * @param {Gltf} gltf 
+   * @param {any} data 
+   * @param {Animation} animation 
+   */
   constructor( gltf, data, animation ){
     super( gltf, data );
 
@@ -45,6 +59,10 @@ export default class AnimationSampler extends BaseElement {
     // VALIDATION  : input must have min max
     this.input  = this.$input .resolve(); 
     this.output = this.$output.resolve();
+
+    
+    this.tmp1 = this.output.createElementHolder()
+    this.tmp2 = this.output.createElementHolder()
   }
 
 
@@ -54,7 +72,6 @@ export default class AnimationSampler extends BaseElement {
 
 
   getValueAtTime( out, t ){
-
 
     // get index for T
     const min = this.input.min[0];
@@ -91,9 +108,31 @@ export default class AnimationSampler extends BaseElement {
         }
         index--;
       }
+      
+      
+      
+      if( this.interpolation === MODE_LINEAR )
+      {
+        var t0 = TIME[0]
+        this.output.getValue( this.tmp1, index );
+        this.output.getValue( this.tmp2, index+1 );
+        this.input.getRawValue( TIME, index+1 );
+        
+        const p = (t-t0)/(TIME[0]-t0)
+        // lerp
+        
+        // or slerp
 
 
-      this.output.getValue( out, index );
+      }
+      else if( this.interpolation === MODE_STEP )
+      {
+        this.output.getValue( out, index );
+      } 
+      else 
+      {
+        // implements cubic  spline 
+      }
 
     }
 

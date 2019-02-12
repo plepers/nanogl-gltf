@@ -1,17 +1,22 @@
+//@ts-check
+
+/**
+ * @typedef {import("./elements/AnimationChannel").default} AnimationChannel
+ * @typedef {import("./elements/AnimationSampler").default} AnimationSampler
+ */
+
+
 import * as Net from 'lib/net'
 import when   from 'when'
 
 import UTF8   from 'lib/utf8-decoder'
 
 
-import { ROOT_TYPES, ALL_TYPES } from './consts';
-
 import Extensions    from './extensions'             ;
 import BaseElement   from './elements/BaseElement'   ;
 import Accessor      from './elements/Accessor'      ;
 import BufferView    from './elements/BufferView'    ;
 import Buffer        from './elements/Buffer'        ;
-import createElement from './elements/ElementFactory';
 import Animation     from './elements/Animation'     ;
 
 
@@ -34,57 +39,66 @@ export default class Gltf{
 
     /**
      * @type {Array<Buffer>}
-     * @description gltf buffer
+     * @description gltf buffers
      */
-    this.buffers     = null;
+    this.buffers     = [];
 
     /**
      * @type {Array<BufferView>}
      * @description gltf bufferViews
      */
-    this.bufferViews = null;
-
+    this.bufferViews = [];
 
     /**
      * @type {Array<Accessor>}
      * @description gltf accessors
      */
-    this.accessors   = null;
+    this.accessors   = [];
 
     /**
      * @type {Array<Animation>}
      * @description gltf animations
      */
-    this.animations   = null;
+    this.animations   = [];
 
-    for( var t of ALL_TYPES )
-      this[t] = []
+    /**
+     * @type {Array<AnimationSampler>}
+     */
+    this.animationSamplers = [];
     
+    /**
+     * @type {Array<AnimationChannel>}
+     */
+    this.animationChannels = [];
     
+    /**
+     * @type {Array<BaseElement>}
+     * @description all gltf elements
+     */
+    this._elements = []
 
-  }
-
-  getAllElements(){
-    return ALL_TYPES.reduce( 
-      (a,k)=>a.concat( this[k] ),
-      []
-    );
   }
 
   /**
-   * 
+   * @return {Array<BaseElement>} all BaseElements owned by the gltf
+   */
+  getAllElements(){
+    return this._elements;
+  }
+
+  /**
    * @param {BaseElement} element 
    */
   addElement( element ){
     const a = this[element.elementType];
     if( a.indexOf( element ) === -1 ){
       a.push( element );
+      this._elements.push( element );
     }
   }
 
 
   /**
-   * 
    * @param {Array<BaseElement>} elements
    */
   addElements( elements ){
@@ -93,7 +107,9 @@ export default class Gltf{
     }
   }
 
-  
+  /**
+   * @param {string} url 
+   */
   load( url ){
 
     this._url = url;
@@ -155,23 +171,22 @@ export default class Gltf{
 
   parse = ()=>{
 
-    const rawData = this._data;
-    
-    for( const type of ROOT_TYPES ){
-      const data = rawData[type];
-      const Def = createElement( type );
-      if( data )
-        data.forEach( d=>this.addElement( new Def(this, d) ) );
-    }
-
+    this._parseElements( 'bufferViews' , BufferView  );
+    this._parseElements( 'accessors'   , Accessor    );
+    this._parseElements( 'animations'  , Animation   );
 
     for( var e of this.getAllElements() ){
-
       this._extensions.processElement( e );
       e.resolveReferences();
     }
 
+  }
 
+
+  _parseElements( type, _Class ){
+    if( this._data[type] ){
+      this._data[type].forEach( d=>this.addElement( new _Class(this, d) ) );
+    }
   }
 
 

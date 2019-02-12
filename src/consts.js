@@ -1,4 +1,4 @@
-
+//@ts-check
 
 export const TYPE_BUFFER              = 'buffers';
 export const TYPE_BUFFERVIEW          = 'bufferViews';
@@ -6,8 +6,8 @@ export const TYPE_ACCESSOR            = 'accessors';
 export const TYPE_ANIMATION           = 'animations';
 export const TYPE_NODE                = 'nodes';
 
-export const TYPE_ANIMATION_SAMPLER   = 'samplers';
-export const TYPE_ANIMATION_CHANNEL   = 'channels';
+export const TYPE_ANIMATION_SAMPLER   = 'animationSamplers';
+export const TYPE_ANIMATION_CHANNEL   = 'animationChannels';
 
 export const ROOT_TYPES = [
   TYPE_BUFFERVIEW,

@@ -1,3 +1,4 @@
+//@ts-check
 
 import BaseElement from './BaseElement';
 import { TYPE_ANIMATION } from '../consts';
@@ -8,27 +9,33 @@ export default class Animation extends BaseElement {
 
   static TYPE = TYPE_ANIMATION;
 
-  constructor( gltf, data ){
-    super( gltf, data );
+  constructor(gltf, data) {
+
+    super(gltf, data);
 
     /**
      * @type {Array<AnimationSampler>}
-     * @description samplers of this animation
      */
-    this.samplers = data.samplers.map( 
-      d=>new AnimationSampler(gltf, d, this ) 
-    );
+    this.samplers = null;
 
     /**
      * @type {Array<AnimationChannel>}
-     * @description channels of this animation
      */
-    this.channels = data.channels.map( 
-      d=>new AnimationChannel(gltf, d, this ) 
-    );
+    this.channels = null;
 
-    this.gltf.addElements( this.channels );
-    this.gltf.addElements( this.samplers );
+
+
+    this.samplers = data.samplers.map(
+      d => new AnimationSampler(gltf, d, this)
+    );
+    
+    this.gltf.addElements(this.samplers);
+
+    this.channels = data.channels.map(
+      d => new AnimationChannel(gltf, d, this)
+    );
+    
+    this.gltf.addElements(this.channels);
 
   }
 
@@ -40,7 +47,7 @@ export default class Animation extends BaseElement {
    * @param {number} i
    * @returns {AnimationChannel} 
    */
-  getChannel(i){
+  getChannel(i) {
     return this.channels[i];
   }
 
@@ -49,7 +56,7 @@ export default class Animation extends BaseElement {
    * @param {number} i
    * @returns {AnimationSampler} 
    */
-  getSampler(i){
+  getSampler(i) {
     return this.samplers[i];
   }
 

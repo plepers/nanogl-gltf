@@ -1,11 +1,14 @@
+//@ts-check
+
+/**
+ * @typedef {import("../index").default} Gltf
+ * @typedef {import("./Animation").default} Animation
+ */
 
 import BaseElement from './BaseElement';
 import { TYPE_ANIMATION_CHANNEL, TYPE_NODE } from '../consts';
 import Ref from '../Ref';
 
-/**
- * @typedef {import("./Animation").default} Animation
- */
 
 
 
