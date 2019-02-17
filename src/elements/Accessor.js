@@ -67,6 +67,7 @@ function getSizeForComponentType( t )
 
 class Sparse{
 
+
   constructor( accessor, data ){
     this.accessor = accessor;
 
@@ -116,23 +117,26 @@ class Sparse{
   }
 
 
-  getValue( out, index ){
-    this.accessor.getRawValue( out, index );
-
+  getRawValue( out, index ){
     const isSparse = this.indicesSet.has( index );
     if( isSparse ){
-      const delta = this.values.returnValue( this.indicesMap.get(index) )
-      this._apply( out, delta )
+      this.values.getRawValue( out, this.indicesMap.get(index) );
+    }else {
+      this.accessor.getRawValue( out, index );
     }
+  }
+  
+  getRawScalar(index) {
+    const isSparse = this.indicesSet.has( index );
+    if( isSparse ){
+      return this.values.getRawScalar( this.indicesMap.get(index) )
+    } else {
+      return this.accessor.getRawScalar( index );
+    }
+
   }
 
 
-  _apply(out, delta){
-    const ncomps = this.accessor.numComps;
-    for (var i = 0; i < ncomps; i++) {
-      out[i] = delta[i];
-    }
-  }
 
 }
 
@@ -154,13 +158,18 @@ export default class Accessor extends BaseElement {
       this.$bufferView = new Ref( gltf, TYPE_BUFFERVIEW, data.bufferView );
     }
 
-    this.byteOffset     = data.byteOffset;
+    const { 
+      byteOffset  = 0,
+      normalized  = false,
+    } = data;
+
     this.componentType  = data.componentType;
-    this.normalized     = data.normalized;
     this.count          = data.count;
     this.type           = data.type;
     this.max            = data.max;
     this.min            = data.min;
+    this.byteOffset     = byteOffset;
+    this.normalized     = normalized;
 
     this.sparse = null;
     if( data.sparse !== undefined ){
@@ -220,6 +229,8 @@ export default class Accessor extends BaseElement {
     }
   }
 
+
+  
   /**
    * @return {TypedArray} 
    */
@@ -231,6 +242,42 @@ export default class Accessor extends BaseElement {
   }
 
 
+
+
+  /**
+   * Copy accessor value at the given index to output array
+   * @param {number} index 
+   * @param {boolean} normalized 
+   */
+  getScalar( index, normalized = this.normalized ){
+    
+    let s;
+    
+    if( this.sparse !== null ){
+      s = this.sparse.getRawScalar( index );
+    }else{
+      s = this.getRawScalar( index );
+    }
+
+    if( normalized ){
+      s = this._normalizeFunc( s );
+    } 
+    
+    return s;
+
+  }
+
+  /**
+   * Copy accessor value at the given index to output array. Skip sparse resolve
+   * @param {number} index 
+   */
+  getRawScalar( index ){
+    const offset = this._strideElem * index;
+    return this._array[offset];
+  }
+
+
+
   /**
    * Copy accessor value at the given index to output array
    * @param {TypedArray} out output value
@@ -239,32 +286,19 @@ export default class Accessor extends BaseElement {
    */
   getValue( out, index, normalized = this.normalized ){
 
+    const _out = normalized ? this._valueHolder : out;
+
     if( this.sparse !== null ){
-      this.sparse.getValue( out, index );
-      return;
+      this.sparse.getRawValue( _out, index );
+    } else {
+      this.getRawValue( _out, index );
     }
 
     if( normalized ){
-      this.getRawValue( this._valueHolder, index );
-      this._normalize( out, this._valueHolder );
-    } else {
-      this.getRawValue( out, index );
+      this._normalize( out, _out );
     }
-  }
 
-  /**
-   * 
-   * @param {TypedArray} out output value
-   * @param {TypedArray} raw 
-   */
-  _normalize( out, raw ){
-    const fn = this._normalizeFunc;
-    const ncomps = this.numComps;
-    for (var i = 0; i < ncomps; i++) {
-      out[i] = fn( raw[i] );
-    }
   }
-
 
   /**
    * Copy accessor value at the given index to output array. Skip sparse resolve
@@ -280,10 +314,25 @@ export default class Accessor extends BaseElement {
   }
 
 
-  returnValue(index){
-    this.getValue( this._valueHolder, index );
-    return this._valueHolder;
+  // returnValue(index){
+  //   this.getValue( this._valueHolder, index );
+  //   return this._valueHolder;
+  // }
+
+  /**
+   * 
+   * @param {TypedArray} out output value
+   * @param {TypedArray} raw 
+   */
+  _normalize( out, raw ){
+    const fn = this._normalizeFunc;
+    const ncomps = this.numComps;
+    for (var i = 0; i < ncomps; i++) {
+      out[i] = fn( raw[i] );
+    }
   }
+
+
 
 
 }

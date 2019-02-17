@@ -33,6 +33,18 @@ describe("Triangle", function () {
 
     });
 
+    it("not sparse positions ok", function () {
+      const accessor = gltf.accessors[1]
+      const holder = accessor.createElementHolder();
+
+      accessor.getValue(holder, 9)
+      expect(holder[0]).to.equal(2);
+      expect(holder[1]).to.equal(1);
+      expect(holder[2]).to.equal(0);
+
+
+    });
+
 
     // it("positions getValues ok", function () {
     //   const accessor = gltf.accessors[1]

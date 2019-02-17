@@ -13,7 +13,7 @@ describe("Interleaved", function () {
 
 
 
-  describe("non normalized", function () {
+  describe("getValue non normalized", function () {
 
 
     it("positions ok", function () {
@@ -100,5 +100,54 @@ describe("Interleaved", function () {
 
 
   });
+
+
+
+  describe("getScalar non normalized", function () {
+
+
+    it("positions ok", function () {
+      const accessor = gltf.accessors[0]
+      let s;
+      
+      s = accessor.getScalar(1)
+      expect(s).to.equal(-.5);
+      
+      s = accessor.getScalar(3)
+      expect(s).to.equal(.5);
+      
+
+    });
+
+    it("colors ok", function () {
+      const accessor = gltf.accessors[1]
+      let s;
+      
+      s = accessor.getScalar(1)
+      expect(s).to.equal(1);
+      
+      s = accessor.getScalar(3)
+      expect(s).to.equal(0);
+      
+      
+
+    });
+
+    it("uvs ok", function () {
+      const accessor = gltf.accessors[2]
+      let s;
+      
+      s = accessor.getScalar(1)
+      expect(s).to.equal(0);
+      
+      s = accessor.getScalar(3)
+      expect(s).to.equal(1);
+      
+
+    });
+
+
+  });
+
 
 });
