@@ -214,6 +214,7 @@ class LinearInterpolator extends Interpolator {
 
 
 
+// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#appendix-c-spline-interpolation
 
 class CubicSplineInterpolator extends Interpolator {
 
@@ -325,12 +326,6 @@ export default class AnimationSampler extends BaseElement {
     this.output = this.$output.resolve();
 
     this.interpolator = InterpolatorFactory( this );
-
-
-    this.tmp1 = this.output.createElementHolder()
-    this.tmp2 = this.output.createElementHolder()
-    this.tmp3 = this.output.createElementHolder()
-    this.tmp4 = this.output.createElementHolder()
   }
 
 
@@ -342,97 +337,6 @@ export default class AnimationSampler extends BaseElement {
   getValueAtTime(out, t) {
 
     this.interpolator.evaluate( out, t );
-    /*
-    // get index for T
-    const min = this.input.min[0];
-    const max = this.input.max[0];
-    const fcount = this.input.count;
-
-    let index;
-
-    if (t >= max) {
-      this.output.getValue(out, fcount - 1);
-    } else if (t <= min) {
-      this.output.getValue(out, 0);
-    }
-    else {
-      // guess frame index base of min max input times
-      index = Math.floor((t - min) / (max - min) * (fcount - 1))
-
-      //              i  t
-      // t0    t1    t2     t3    t4
-
-      let t0 = this.input.getRawScalar(index)
-
-      if (t0 >= t) {
-        // overshoot index, decr
-        while (t0 > t && index >= 0) {
-          t0 = this.input.getRawScalar(--index);
-        }
-      } else {
-        let t1 = t0;
-        while (t1 < t && index < fcount) {
-          t0 = t1;
-          t1 = this.input.getRawScalar(++index);
-        }
-        index--;
-      }
-
-
-
-      if (this.interpolation === MODE_LINEAR) {
-        const ncomps = this.tmp1.length;
-
-        this.output.getValue(this.tmp1, index);
-        this.output.getValue(this.tmp2, index + 1);
-        const t1 = this.input.getRawScalar(index + 1);
-
-        const p = (t - t0) / (t1 - t0);
-        const invp = 1.0 - p;
-
-        if (ncomps === 4) {
-          quat.slerp(out, this.tmp1, this.tmp2, p);
-        } else {
-
-          for (let i = 0; i < ncomps; i++) {
-            out[i] = this.tmp1[i] * invp + this.tmp2[i] * p;
-          }
-
-        }
-
-
-      }
-      else if (this.interpolation === MODE_STEP) {
-        this.output.getValue(out, index);
-      }
-      else if (this.interpolation === MODE_CUBICSPLINE) {
-        // https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#appendix-c-spline-interpolation
-
-        const outB0 = this.tmp1;
-        const outV0 = this.tmp2;
-        const outV1 = this.tmp3;
-        const outA1 = this.tmp4;
-
-        this.output.getValue(outV0, index * 3 + 1);
-        this.output.getValue(outB0, index * 3 + 2);
-        this.output.getValue(outA1, index * 3 + 3);
-        this.output.getValue(outV1, index * 3 + 4);
-
-        const t1 = this.input.getRawScalar(index + 1);
-        const dt = t1 - t0
-        const tt = (t - t0) / dt;
-
-        cubicSplineInterpolation(out, tt, dt, outV0, outB0, outA1, outV1);
-
-        if (outB0.length === 4) {
-          quat.normalize(out, out);
-        }
-
-      }
-
-    }
-    */
-
 
   }
 

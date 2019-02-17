@@ -166,10 +166,12 @@ export default class Accessor extends BaseElement {
     this.componentType  = data.componentType;
     this.count          = data.count;
     this.type           = data.type;
+
     this.max            = data.max;
     this.min            = data.min;
-    this.byteOffset     = byteOffset;
+
     this.normalized     = normalized;
+    this.byteOffset     = byteOffset;
 
     this.sparse = null;
     if( data.sparse !== undefined ){

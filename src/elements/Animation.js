@@ -40,6 +40,12 @@ export default class Animation extends BaseElement {
   }
 
 
+  update( t ){
+    for (var channel of this.channels ) {
+      channel.update( t );
+    }
+  }
+
 
 
   /**
