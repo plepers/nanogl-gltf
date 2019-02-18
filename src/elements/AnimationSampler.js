@@ -326,6 +326,7 @@ export default class AnimationSampler extends BaseElement {
     this.output = this.$output.resolve();
 
     this.interpolator = InterpolatorFactory( this );
+    
   }
 
 

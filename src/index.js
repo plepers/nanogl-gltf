@@ -172,7 +172,9 @@ export default class Gltf{
   parse = ()=>{
 
     this._parseElements( 'bufferViews' , BufferView  );
+    
     this._parseElements( 'accessors'   , Accessor    );
+
     this._parseElements( 'animations'  , Animation   );
 
     for( var e of this.getAllElements() ){

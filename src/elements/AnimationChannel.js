@@ -73,6 +73,7 @@ export default class AnimationChannel extends BaseElement {
     this.animation = animation;
     this.sampler = animation.getSampler(data.sampler);
     this.path = data.target.path;
+    this.applyFunction = getApplyFunctionFromPath( this.path );
 
     if (data.node !== undefined) {
       this._active = true;
@@ -80,15 +81,15 @@ export default class AnimationChannel extends BaseElement {
     }
 
     this.node = null;
-
-    this.applyFunction = getApplyFunctionFromPath( this.path );
+    this.valueHolder = null;
   }
   
   
   resolveReferences() {
     if (this._active)
       this.node = this.$node.resolve();
-      
+
+    // TODO: ensure sampler is resolved here
     this.valueHolder = this.sampler.createElementHolder();
   }
 
