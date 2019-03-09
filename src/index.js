@@ -1,10 +1,5 @@
 //@ts-check
 
-/**
- * @typedef {import("./elements/AnimationChannel").default} AnimationChannel
- * @typedef {import("./elements/AnimationSampler").default} AnimationSampler
- */
-
 
 import * as Net from 'lib/net'
 import when   from 'when'
@@ -13,13 +8,18 @@ import UTF8   from 'lib/utf8-decoder'
 
 
 import Extensions    from './extensions'             ;
-import BaseElement   from './elements/BaseElement'   ;
 import Accessor      from './elements/Accessor'      ;
 import BufferView    from './elements/BufferView'    ;
 import Buffer        from './elements/Buffer'        ;
 import Animation     from './elements/Animation'     ;
 
 
+
+/**
+ * @typedef {import("./elements/AnimationChannel").default} AnimationChannel
+ * @typedef {import("./elements/AnimationSampler").default} AnimationSampler
+ * @typedef {Accessor|Buffer|BufferView|AnimationChannel|AnimationSampler} AnyElement
+ */
 
 
 const MAGIC      = 0x46546C67; // "glTF"
@@ -72,7 +72,7 @@ export default class Gltf{
     this.animationChannels = [];
     
     /**
-     * @type {Array<BaseElement>}
+     * @type {Array<AnyElement>}
      * @description all gltf elements
      */
     this._elements = []
@@ -80,14 +80,14 @@ export default class Gltf{
   }
 
   /**
-   * @return {Array<BaseElement>} all BaseElements owned by the gltf
+   * @return {Array<AnyElement>} all BaseElements owned by the gltf
    */
   getAllElements(){
     return this._elements;
   }
 
   /**
-   * @param {BaseElement} element 
+   * @param {AnyElement} element 
    */
   addElement( element ){
     const a = this[element.elementType];
@@ -99,12 +99,22 @@ export default class Gltf{
 
 
   /**
-   * @param {Array<BaseElement>} elements
+   * @param {Array<AnyElement>} elements
    */
   addElements( elements ){
     for (var e of elements) {
       this.addElement( e );
     }
+  }
+
+  /**
+   * 
+   * @param {string} type 
+   * @param {number} index 
+   * @returns {AnyElement}
+   */
+  getElement( type, index ){
+    return this[type][index];
   }
 
   /**
@@ -138,16 +148,15 @@ export default class Gltf{
 
   unpackGlb( buffer ){
 
-    const u32 = new Uint32Array( buffer, 0, 5 );
+    const [version, , jsonSize, magic ] = new Uint32Array( buffer, 0, 5 );
     // Check that the version is 2
-    if (u32[1] !== 2) 
+    if (version !== 2) 
       throw new Error('Binary glTF version is not 2');
     
     // Check that the scene format is 0, indicating that it is JSON
-    if ( u32[4] !== JSON_MAGIC )
+    if ( magic !== JSON_MAGIC )
         throw new Error('Binary glTF scene format is not JSON');
     
-    const jsonSize = u32[3]; 
     const scene = UTF8( new Uint8Array( buffer,  GLB_HEADER_SIZE, jsonSize ) );
     this._data = JSON.parse( scene );
 
@@ -177,10 +186,7 @@ export default class Gltf{
 
     this._parseElements( 'animations'  , Animation   );
 
-    for( var e of this.getAllElements() ){
-      this._extensions.processElement( e );
-      e.resolveReferences();
-    }
+
 
   }
 

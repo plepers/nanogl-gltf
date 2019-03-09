@@ -8,7 +8,13 @@ import Ref from 'Ref';
 
 class Attribute {
 
-  constructor( semantic, accessor )
+  constructor( semantic, accessor ){
+
+    this.semantic = semantic;
+    this.accessor = accessor;
+
+  }
+
 }
 
 export default class Primitive extends BaseElement {
@@ -22,8 +28,8 @@ export default class Primitive extends BaseElement {
     if( data.material )
       this.$material = new Ref( gltf, TYPE_MATERIAL, data.material );
 
-    this.attributes = 
-
+    this.attributes = [];
+    
   }
   
 

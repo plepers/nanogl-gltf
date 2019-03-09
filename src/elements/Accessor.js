@@ -93,21 +93,15 @@ class Sparse{
       type         : accessor.type
     });
     
-    this.indicesSet = null;
-    this.indicesMap = null;
-  }
-  
-  
-  resolveReferences(){
+
     const iset = this.indicesSet = new Set();
     const imap = this.indicesMap = new Map();
-    const indices = this.indices;
 
-    this.indices.resolveReferences();
-    this.values .resolveReferences();
-    
+
+    const indices = this.indices;
     const count = indices.count;
     const holder = indices.createElementHolder();
+    
     for (var i = 0; i < count; i++) {
       indices.getValue(holder, i )
       iset.add( holder[0] );
@@ -115,6 +109,8 @@ class Sparse{
     }
 
   }
+  
+  
 
 
   getRawValue( out, index ){
@@ -150,28 +146,31 @@ export default class Accessor extends BaseElement {
   constructor( gltf, data ){
     super( gltf, data );
 
-
-    this.$bufferView    = null;
-    this.bufferView     = null;
-
-    if( data.bufferView !== undefined ){
-      this.$bufferView = new Ref( gltf, TYPE_BUFFERVIEW, data.bufferView );
-    }
-
+    
     const { 
       byteOffset  = 0,
       normalized  = false,
     } = data;
 
+    this.normalized     = normalized;
+    this.byteOffset     = byteOffset;
+    
     this.componentType  = data.componentType;
     this.count          = data.count;
     this.type           = data.type;
-
     this.max            = data.max;
     this.min            = data.min;
+    
+    
+    
+    const Arr = getArrayForDataType(this.componentType);
 
-    this.normalized     = normalized;
-    this.byteOffset     = byteOffset;
+    if( data.bufferView !== undefined ){
+      this.bufferView     = this.gltf.getElement( TYPE_BUFFERVIEW, data.bufferView );
+    } else {
+      this.bufferView = new Arr( this.count * this.numComps );
+    }
+
 
     this.sparse = null;
     if( data.sparse !== undefined ){
@@ -181,6 +180,17 @@ export default class Accessor extends BaseElement {
     this._valueHolder = this.createElementHolder();
     this._stride = 0;
     this._normalizeFunc = NORMALIZE_FUNCS[this.componentType];
+
+    if( this.bufferView.byteStride === 0 ){
+      this._stride      = this.numComps * this.bytesPerElem;
+      this._strideElem  = this.numComps;
+    } else {
+      this._stride      = this.bufferView.byteStride;
+      this._strideElem  = this._stride / Arr.BYTES_PER_ELEMENT;
+      Assert.isTrue( this._strideElem === Math.round( this._strideElem ) );
+    }
+  
+    this._array = new Arr( this.bufferView.buffer._bytes, this.byteOffset + this.bufferView.getByteOffset(), this.count * this._strideElem );
 
   }
 
@@ -194,33 +204,6 @@ export default class Accessor extends BaseElement {
   }
  
 
-
-  resolveReferences(){
-
-    const Arr = getArrayForDataType(this.componentType);
-
-    if( this.$bufferView !== null ){
-      this.bufferView = this.$bufferView.resolve();
-    } else {
-      // sparse init
-      this.bufferView = new Arr( this.count * this.numComps );
-    }
-    
-    if( this.sparse ){
-      this.sparse.resolveReferences();
-    }
-
-    if( this.bufferView.byteStride === 0 ){
-      this._stride      = this.numComps * this.bytesPerElem;
-      this._strideElem  = this.numComps;
-    } else {
-      this._stride      = this.bufferView.byteStride;
-      this._strideElem  = this._stride / Arr.BYTES_PER_ELEMENT;
-      Assert.isTrue( this._strideElem === Math.round( this._strideElem ) );
-    }
-
-    this._array = new Arr( this.bufferView.buffer._bytes, this.byteOffset + this.bufferView.getByteOffset(), this.count * this._strideElem );
-  }
 
 
   *[Symbol.iterator](){
@@ -315,11 +298,6 @@ export default class Accessor extends BaseElement {
     }
   }
 
-
-  // returnValue(index){
-  //   this.getValue( this._valueHolder, index );
-  //   return this._valueHolder;
-  // }
 
   /**
    * 

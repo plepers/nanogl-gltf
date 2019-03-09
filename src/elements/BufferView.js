@@ -25,14 +25,10 @@ export default class BufferView extends BaseElement {
     this.byteStride = byteStride;
     this.target     = target;
 
-    this.$buffer = new Ref( gltf, TYPE_BUFFER, data.buffer );
-    this.buffer  = null;
+    this.buffer  = this.gltf.getElement( TYPE_BUFFER, data.buffer );
 
   }
 
-  resolveReferences(){
-    this.buffer = this.$buffer.resolve(); 
-  }
 
   getByteOffset(){
     return this.byteOffset + this.buffer._byteOffset;

@@ -300,33 +300,19 @@ export default class AnimationSampler extends BaseElement {
 
     this.interpolation = data.interpolation || MODE_LINEAR;
 
-    this.$input = new Ref(gltf, TYPE_ACCESSOR, data.input);
-    this.$output = new Ref(gltf, TYPE_ACCESSOR, data.output);
-
     /**
      * @type {Accessor}
      * @description sampler input accessor
      */
-    this.input = null;
-
+    this.input = this.gltf.getElement( TYPE_ACCESSOR, data.input );
 
     /**
      * @type {Accessor}
      * @description sampler output accessor
      */
-    this.output = null;
-
-  }
-
-
-  resolveReferences() {
-    // VALIDATION  : input componentType must be FLOAT
-    // VALIDATION  : input must have min max
-    this.input = this.$input.resolve();
-    this.output = this.$output.resolve();
+    this.output = this.gltf.getElement( TYPE_ACCESSOR, data.output );
 
     this.interpolator = InterpolatorFactory( this );
-    
   }
 
 
