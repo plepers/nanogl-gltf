@@ -1,38 +1,49 @@
-//@ts-check
+//@flow
 
 import BaseElement from './BaseElement';
 import { TYPE_BUFFER, TYPE_BUFFERVIEW } from '../consts';
 import Ref from '../Ref';
 
+import type {ElementType} from '../consts'
+import type  Gltf         from '../index'
+import type  Buffer       from './Buffer'
 
 export default class BufferView extends BaseElement {
 
-  static TYPE = TYPE_BUFFERVIEW;
+  static TYPE : ElementType = TYPE_BUFFERVIEW;
 
-  constructor( gltf, data ){
+  byteOffset : number;
+  byteLength : number;
+  byteStride : number;
+  target     : number;
+  buffer     : Buffer;
+
+  constructor( gltf:Gltf , data:any ){
 
     super( gltf, data );
 
     const {
-      byteOffset = 0,
       byteLength,
+      byteOffset = 0,
       byteStride = 0,
-      target = 0
+      target     = 0
     } = data;
 
-    this.byteOffset = byteOffset;
     this.byteLength = byteLength;
+    this.byteOffset = byteOffset;
     this.byteStride = byteStride;
     this.target     = target;
 
-    this.buffer  = this.gltf.getElement( TYPE_BUFFER, data.buffer );
+    this.buffer  = this.gltf.getElement<Buffer>( TYPE_BUFFER, data.buffer );
 
   }
 
 
-  getByteOffset(){
+  getByteOffset():number{
     return this.byteOffset + this.buffer._byteOffset;
   }
+
+ 
 
 }
 

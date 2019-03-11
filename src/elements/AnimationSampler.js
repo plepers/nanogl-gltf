@@ -1,10 +1,4 @@
-
-/**
- * @typedef {import("./Accessor").default} Accessor
- * @typedef {import("./Animation").default} Animation
- * @typedef {import("../index").default} Gltf
- */
-
+//@flow
 
 
 import BaseElement from './BaseElement';
@@ -13,9 +7,18 @@ import Ref from '../Ref';
 import { quat } from 'gl-matrix';
 
 
-const MODE_LINEAR = 'LINEAR';
-const MODE_STEP = 'STEP';
-const MODE_CUBICSPLINE = 'CUBICSPLINE';
+import type Gltf from '../index'
+import type Accessor from './Accessor'
+import type Animation from './Animation'
+import type {TypedArray} from '../consts'
+
+type LerpFunc = (out:TypedArray, a:TypedArray, b:TypedArray, p:number )=>void;
+
+type InterpolationType = 'LINEAR' | 'STEP' | 'CUBICSPLINE';
+
+const MODE_LINEAR      : InterpolationType = 'LINEAR';
+const MODE_STEP        : InterpolationType = 'STEP';
+const MODE_CUBICSPLINE : InterpolationType = 'CUBICSPLINE';
 
 
 
@@ -41,7 +44,15 @@ function cubicSplineInterpolation(out, t, dt, v0, b0, a1, v1) {
 
 class SampleInterval {
 
-  constructor(input) {
+
+  frame   : number;
+  t0      : number;
+  t1      : number;
+  inBound : boolean;
+  _fMax   : number;
+
+
+  constructor(input:Accessor) {
     this.frame = 0;
     this.t0 = input.getRawScalar(0);
     this.t1 = input.getRawScalar(1);
@@ -49,18 +60,15 @@ class SampleInterval {
     this._fMax = input.count-1;
   }
 
-  /**
-   * return -1 if t before interval, 1 if after , 0 if inside
-   * @param {number} t 
-   */
-  contain(t) {
+
+  contain(t:number):number {
     if (t < this.t0) return -1
     if (t >= this.t1) return 1;
     return 0;
   }
 
 
-  normalizedFrame(){
+  normalizedFrame():number{
     return Math.min( Math.max( this.frame, 0 ) , this._fMax );
   }
 
@@ -71,16 +79,18 @@ class SampleInterval {
 
 class Interpolator {
 
-  /**
-   * @param {AnimationSampler} sampler 
-   */
-  constructor(sampler) {
+
+  sampler : AnimationSampler;
+  interval: SampleInterval  ;
+
+
+  constructor(sampler:AnimationSampler) {
     this.sampler = sampler;
     this.interval = new SampleInterval(sampler.input);
   }
 
 
-  resolveInterval(t) {
+  resolveInterval(t:number) {
 
     const interval = this.interval;
     const input = this.sampler.input;
@@ -137,7 +147,7 @@ class Interpolator {
   }
 
 
-  evaluate(out, t) {
+  evaluate(out:TypedArray, t:number) {
     //abstract
   }
 
@@ -147,7 +157,7 @@ class Interpolator {
 
 class StepInterpolator extends Interpolator {
 
-  evaluate(out, t) {
+  evaluate(out:TypedArray, t:number) {
     this.resolveInterval(t);
     this.sampler.output.getValue(out, this.interval.normalizedFrame());
   }
@@ -157,7 +167,7 @@ class StepInterpolator extends Interpolator {
 
 
 
-function LERP_N(out, a, b, p) {
+function LERP_N(out:TypedArray, a:TypedArray, b:TypedArray, p:number ){
   const n = a.length;
   const invp = 1.0 - p;
   for (var i = 0; i < n; i++) {
@@ -165,11 +175,11 @@ function LERP_N(out, a, b, p) {
   }
 }
 
-function LERP1(out, a, b, p) {
+function LERP1( out:TypedArray, a:TypedArray, b:TypedArray, p:number ){
   out[0] = a[0] * (1.0 - p) + b[0] * p;
 }
 
-function getLerpFunction(numComps) {
+function getLerpFunction( numComps : number ) : LerpFunc {
   switch (numComps) {
     case 1:
       return LERP1
@@ -185,14 +195,18 @@ function getLerpFunction(numComps) {
 
 class LinearInterpolator extends Interpolator {
 
-  constructor(sampler) {
+  val0 : TypedArray;
+  val1 : TypedArray;
+  lerpFunc : LerpFunc;
+
+  constructor(sampler : AnimationSampler) {
     super(sampler);
     this.val0 = sampler.output.createElementHolder();
     this.val1 = sampler.output.createElementHolder();
     this.lerpFunc = getLerpFunction(this.val0.length);
   }
 
-  evaluate(out, t) {
+  evaluate(out:TypedArray, t:number) {
     this.resolveInterval(t);
 
     const output = this.sampler.output;
@@ -218,7 +232,15 @@ class LinearInterpolator extends Interpolator {
 
 class CubicSplineInterpolator extends Interpolator {
 
-  constructor(sampler) {
+
+  val0 : TypedArray;
+  val1 : TypedArray;
+  val2 : TypedArray;
+  val3 : TypedArray;
+
+  assumeQuat : boolean;
+
+  constructor(sampler : AnimationSampler) {
     super(sampler);
     this.val0 = sampler.output.createElementHolder();
     this.val1 = sampler.output.createElementHolder();
@@ -228,7 +250,7 @@ class CubicSplineInterpolator extends Interpolator {
     this.assumeQuat = (this.val0.length === 4);
   }
 
-  evaluate(out, t) {
+  evaluate(out:TypedArray, t:number) {
     this.resolveInterval(t);
 
     const output = this.sampler.output;
@@ -263,7 +285,7 @@ class CubicSplineInterpolator extends Interpolator {
 
 
 
-function InterpolatorFactory(sampler) {
+function InterpolatorFactory(sampler:AnimationSampler) : Interpolator {
   switch (sampler.interpolation) {
     case MODE_STEP:
       return new StepInterpolator(sampler);
@@ -287,44 +309,34 @@ export default class AnimationSampler extends BaseElement {
 
   static TYPE = TYPE_ANIMATION_SAMPLER
 
-  /**
-   * 
-   * @param {Gltf} gltf 
-   * @param {any} data 
-   * @param {Animation} animation 
-   */
-  constructor(gltf, data, animation) {
+
+  animation     :Animation         ;
+  interpolation :InterpolationType ;
+  input         :Accessor          ;
+  output        :Accessor          ;
+  interpolator  :Interpolator      ;
+
+
+  constructor( gltf:Gltf, data:any, animation:Animation ) {
     super(gltf, data);
 
     this.animation = animation;
 
-    this.interpolation = data.interpolation || MODE_LINEAR;
-
-    /**
-     * @type {Accessor}
-     * @description sampler input accessor
-     */
     this.input = this.gltf.getElement( TYPE_ACCESSOR, data.input );
-
-    /**
-     * @type {Accessor}
-     * @description sampler output accessor
-     */
     this.output = this.gltf.getElement( TYPE_ACCESSOR, data.output );
 
-    this.interpolator = InterpolatorFactory( this );
+    this.interpolation = data.interpolation || MODE_LINEAR;
+    this.interpolator  = InterpolatorFactory( this );
   }
 
 
-  createElementHolder() {
+  createElementHolder():TypedArray {
     return this.output.createElementHolder();
   }
 
 
-  getValueAtTime(out, t) {
-
+  evaluate(out:TypedArray, t:number) {
     this.interpolator.evaluate( out, t );
-
   }
 
 }

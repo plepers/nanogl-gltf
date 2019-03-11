@@ -1,24 +1,25 @@
-//@ts-check
+//@flow
 
-/**
- * @typedef {import("../index").default} Gltf
- * @typedef {import("./Animation").default} Animation
- */
 
 import BaseElement from './BaseElement';
 import { TYPE_ANIMATION_CHANNEL, TYPE_NODE } from '../consts';
 import Ref from '../Ref';
 
 
+import type Gltf from '../index'
+import type Animation from './Animation'
+import type AnimationSampler from './AnimationSampler'
+import type Node from './Node'
+import type {TypedArray} from '../consts'
 
-
-
+type applyFunc = (node:any, value:any)=>void
 
 
 const PATH_TRANSLATION = 'translation';
 const PATH_ROTATION    = 'rotation'   ;
 const PATH_SCALE       = 'scale'      ;
 const PATH_WEIGHTS     = 'weights'    ;
+
 
 
 function applyTranslation(node, value) {
@@ -58,13 +59,15 @@ export default class AnimationChannel extends BaseElement {
 
   static TYPE = TYPE_ANIMATION_CHANNEL
 
-  /**
-   * 
-   * @param {Gltf} gltf 
-   * @param {any} data 
-   * @param {Animation} animation 
-   */
-  constructor(gltf, data, animation) {
+  _active   : boolean         ;
+  animation : Animation       ;
+  sampler   : AnimationSampler;
+  path      : string          ;
+  applyFunction: applyFunc;
+  node      : ?Node;
+  valueHolder : TypedArray;
+
+  constructor(gltf : Gltf, data:any, animation:Animation) {
 
     super(gltf, data);
 
@@ -75,28 +78,21 @@ export default class AnimationChannel extends BaseElement {
     this.path = data.target.path;
     this.applyFunction = getApplyFunctionFromPath( this.path );
 
-    if (data.node !== undefined) {
+
+    if( data.target.node !== undefined ){
       this._active = true;
-      this.$node = new Ref(gltf, TYPE_NODE, data.target.node);
+      this.node = gltf.getElement<Node>( TYPE_NODE, data.target.node);
     }
 
-    this.node = null;
-    this.valueHolder = null;
-  }
-  
-  
-  resolveReferences() {
-    if (this._active)
-      this.node = this.$node.resolve();
-
-    // TODO: ensure sampler is resolved here
     this.valueHolder = this.sampler.createElementHolder();
   }
+  
+ 
 
 
-  update(t) {
+  update(t:number) {
     if (this._active) {
-      this.sampler.getValueAtTime(this.valueHolder, t);
+      this.sampler.evaluate(this.valueHolder, t);
       this.applyFunction( this.node, this.valueHolder );
     }
   }

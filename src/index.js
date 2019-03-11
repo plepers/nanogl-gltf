@@ -1,25 +1,31 @@
-//@ts-check
+// @flow
 
 
-import * as Net from 'lib/net'
+import * as Net from './lib/net'
 import when   from 'when'
 
-import UTF8   from 'lib/utf8-decoder'
+import UTF8   from './lib/utf8-decoder'
 
 
-import Extensions    from './extensions'             ;
-import Accessor      from './elements/Accessor'      ;
-import BufferView    from './elements/BufferView'    ;
-import Buffer        from './elements/Buffer'        ;
-import Animation     from './elements/Animation'     ;
+import Extensions from './extensions'          ;
+import Accessor   from './elements/Accessor'   ;
+import BufferView from './elements/BufferView' ;
+import Buffer     from './elements/Buffer'     ;
+import Animation  from './elements/Animation'  ;
+import Node       from './elements/Node'       ;
+import Material   from './elements/Material'   ;
+import Mesh       from './elements/Mesh'       ;
+import Skin       from './elements/Skin'       ;
+import Camera     from './elements/Camera'     ;
+
+import { TYPE_ANIMATION_CHANNEL,TYPE_ANIMATION_SAMPLER,TYPE_ACCESSOR,TYPE_BUFFERVIEW, TYPE_BUFFER, TYPE_ANIMATION, TYPE_MESH, TYPE_PRIMITIVE, TYPE_NODE, TYPE_MATERIAL } from './consts';
+
+import type AnimationSampler from './elements/AnimationSampler';
+import type AnimationChannel from './elements/AnimationChannel';
+import type BaseElement      from './elements/BaseElement';
+import type {ElementType}    from './consts';
 
 
-
-/**
- * @typedef {import("./elements/AnimationChannel").default} AnimationChannel
- * @typedef {import("./elements/AnimationSampler").default} AnimationSampler
- * @typedef {Accessor|Buffer|BufferView|AnimationChannel|AnimationSampler} AnyElement
- */
 
 
 const MAGIC      = 0x46546C67; // "glTF"
@@ -27,9 +33,19 @@ const JSON_MAGIC = 0x4E4F534A; // "JSON"
 const GLB_HEADER_SIZE = 20;
 
 
+
 /** Gltf file representation */
 export default class Gltf{
   
+  _url        : ?string
+  _baseDir    : string
+  _data       : Object
+  _extensions :Extensions
+  
+
+  _elements         : BaseElement[];
+
+  _byType           : Map<ElementType, BaseElement[]>;
 
   constructor(){
     this._url        = null;
@@ -37,60 +53,55 @@ export default class Gltf{
 
     this._extensions = new Extensions();
 
-    /**
-     * @type {Array<Buffer>}
-     * @description gltf buffers
-     */
-    this.buffers     = [];
 
-    /**
-     * @type {Array<BufferView>}
-     * @description gltf bufferViews
-     */
-    this.bufferViews = [];
+    this._byType = new Map<ElementType, BaseElement[]>([
+      [TYPE_BUFFER            , [] ],
+      [TYPE_BUFFERVIEW        , [] ],
+      [TYPE_ACCESSOR          , [] ],
+      [TYPE_ANIMATION         , [] ],
+      [TYPE_ANIMATION_SAMPLER , [] ],
+      [TYPE_ANIMATION_CHANNEL , [] ],
+      [TYPE_MESH              , [] ],
+      [TYPE_PRIMITIVE         , [] ],
+      [TYPE_NODE              , [] ],
+      [TYPE_MATERIAL          , [] ],
+    ])
 
-    /**
-     * @type {Array<Accessor>}
-     * @description gltf accessors
-     */
-    this.accessors   = [];
-
-    /**
-     * @type {Array<Animation>}
-     * @description gltf animations
-     */
-    this.animations   = [];
-
-    /**
-     * @type {Array<AnimationSampler>}
-     */
-    this.animationSamplers = [];
-    
-    /**
-     * @type {Array<AnimationChannel>}
-     */
-    this.animationChannels = [];
-    
-    /**
-     * @type {Array<AnyElement>}
-     * @description all gltf elements
-     */
     this._elements = []
 
   }
 
-  /**
-   * @return {Array<AnyElement>} all BaseElements owned by the gltf
-   */
-  getAllElements(){
+
+  get accessors():Accessor[]{
+    return this._getTypeHolder<Accessor>(TYPE_ACCESSOR);
+  }
+
+  get animations():Animation[]{
+    return this._getTypeHolder<Animation>(TYPE_ANIMATION);
+  }
+
+  get buffers():Buffer[]{
+    return this._getTypeHolder<Buffer>(TYPE_BUFFER);
+  }
+
+  get bufferViews():BufferView[]{
+    return this._getTypeHolder<BufferView>(TYPE_BUFFERVIEW);
+  }
+
+
+  _getTypeHolder<T:BaseElement>( type : ElementType ) : T[] {
+    const h:any = this._byType.get( type );
+    return (h:T[]);
+  }
+  
+
+  getAllElements() : BaseElement[]{
     return this._elements;
   }
 
-  /**
-   * @param {AnyElement} element 
-   */
-  addElement( element ){
-    const a = this[element.elementType];
+
+  addElement( element : BaseElement ){
+    const a: BaseElement[] = this._getTypeHolder( element.elementType );
     if( a.indexOf( element ) === -1 ){
       a.push( element );
       this._elements.push( element );
@@ -98,29 +109,21 @@ export default class Gltf{
   }
 
 
-  /**
-   * @param {Array<AnyElement>} elements
-   */
-  addElements( elements ){
+ 
+  addElements( elements : BaseElement[] ){
     for (var e of elements) {
       this.addElement( e );
     }
   }
 
-  /**
-   * 
-   * @param {string} type 
-   * @param {number} index 
-   * @returns {AnyElement}
-   */
-  getElement( type, index ){
-    return this[type][index];
+ 
+  getElement<T:BaseElement>( type:ElementType, index:number ) : T {
+    const v : any = this._getTypeHolder(type)[index]; 
+    return ( v : T );
   }
 
-  /**
-   * @param {string} url 
-   */
-  load( url ){
+
+  load( url : string ): Promise<any>{
 
     this._url = url;
     this._baseDir = Net.baseDir( url );
@@ -133,7 +136,7 @@ export default class Gltf{
   }
 
 
-  unpack = ( buffer )=>{
+  unpack = ( buffer: ArrayBuffer )=>{
     const magic = new Uint32Array( buffer, 0, 1 )[0];
     
     if( magic === MAGIC ){ 
@@ -146,7 +149,7 @@ export default class Gltf{
   }
 
 
-  unpackGlb( buffer ){
+  unpackGlb( buffer : ArrayBuffer ){
 
     const [version, , jsonSize, magic ] = new Uint32Array( buffer, 0, 5 );
     // Check that the version is 2
@@ -162,36 +165,39 @@ export default class Gltf{
 
     const mbuffer = new Buffer( this, {} );
     mbuffer._bytes = buffer.slice( GLB_HEADER_SIZE + jsonSize + 8 );
-    this.buffers.push( mbuffer );
+    this.addElement( mbuffer )
 
   }
 
 
   loadBuffers = ()=>{
-    
-    for (var i = this.buffers.length; i < this._data.buffers.length; i++) {
+    const buffers : BaseElement[] = this._getTypeHolder(TYPE_BUFFER);
+    for (var i = buffers.length; i < this._data.buffers.length; i++) {
       this.addElement( new Buffer( this, this._data.buffers[i] ) )
     }
-
-    return when.map( this.buffers, b=>b.load() );
+    
+    return when.map( buffers, b=>b.load() );
 
   }
 
 
   parse = ()=>{
 
-    this._parseElements( 'bufferViews' , BufferView  );
-    
-    this._parseElements( 'accessors'   , Accessor    );
+    this._parseElements( 'bufferViews' , BufferView );
+    this._parseElements( 'accessors'   , Accessor   );
+    this._parseElements( 'nodes'       , Node       );
+    this._parseElements( 'animations'  , Animation  );
+    this._parseElements( 'skins'       , Skin       );
+    this._parseElements( 'meshes'      , Mesh       );
+    this._parseElements( 'cameras'     , Camera     );
+    this._parseElements( 'materials'   , Material   );
 
-    this._parseElements( 'animations'  , Animation   );
-
-
+    // resolve nodes refs
 
   }
 
 
-  _parseElements( type, _Class ){
+  _parseElements( type:ElementType, _Class:Class<BaseElement> ){
     if( this._data[type] ){
       this._data[type].forEach( d=>this.addElement( new _Class(this, d) ) );
     }
@@ -199,7 +205,7 @@ export default class Gltf{
 
 
 
-  resolveUri( uri ){
+  resolveUri( uri : string ) : string {
     return this._baseDir + uri;
   }
 

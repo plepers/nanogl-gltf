@@ -1,29 +1,22 @@
-//@ts-check
+//@flow
 
 import BaseElement from './BaseElement';
 import { TYPE_ANIMATION } from '../consts';
 import AnimationChannel from './AnimationChannel';
 import AnimationSampler from './AnimationSampler';
 
+import type Gltf from '../index'
+
 export default class Animation extends BaseElement {
 
   static TYPE = TYPE_ANIMATION;
 
-  constructor(gltf, data) {
+  samplers : AnimationSampler[]
+  channels : AnimationChannel[]
+
+  constructor(gltf : Gltf, data : any) {
 
     super(gltf, data);
-
-    /**
-     * @type {Array<AnimationSampler>}
-     */
-    this.samplers = null;
-
-    /**
-     * @type {Array<AnimationChannel>}
-     */
-    this.channels = null;
-
-
 
     this.samplers = data.samplers.map(
       d => new AnimationSampler(gltf, d, this)
@@ -40,7 +33,7 @@ export default class Animation extends BaseElement {
   }
 
 
-  update( t ){
+  update( t :number ){
     for (var channel of this.channels ) {
       channel.update( t );
     }
@@ -53,7 +46,7 @@ export default class Animation extends BaseElement {
    * @param {number} i
    * @returns {AnimationChannel} 
    */
-  getChannel(i) {
+  getChannel(i:number) {
     return this.channels[i];
   }
 
@@ -62,7 +55,7 @@ export default class Animation extends BaseElement {
    * @param {number} i
    * @returns {AnimationSampler} 
    */
-  getSampler(i) {
+  getSampler(i:number) {
     return this.samplers[i];
   }
 

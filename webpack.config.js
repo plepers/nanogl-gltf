@@ -37,7 +37,8 @@ module.exports =
       test: /\.js$/,
       include: [path( 'src' )],
       use: [
-        {loader: "babel-loader" }
+        "babel-loader",
+        "remove-flow-types-loader",
       ]
     }]
   },

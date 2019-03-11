@@ -1,15 +1,19 @@
 
-//@ts-check
+//@flow
 
-/**
- * @typedef {Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array | Uint8ClampedArray | Float32Array | Float64Array} TypedArray
- */
 
 import BaseElement from './BaseElement';
 import Ref from '../Ref';
 import { TYPE_BUFFERVIEW, TYPE_ACCESSOR } from '../consts';
 import Assert from '../lib/assert';
 
+type normalizeFunc = (n:number)=>number;
+type CType = 5120 | 5121 | 5122 | 5123 | 5125 | 5126;
+type VType = 'SCALAR' | 'VEC2' | 'VEC3' | 'VEC4' | 'MAT2' | 'MAT3' | 'MAT4';
+
+import type Gltf from '../index'
+import type BufferView from './BufferView'
+import type {TypedArray} from '../consts'
 
 
 const TYPE_SIZE_MAP = {
@@ -22,42 +26,50 @@ const TYPE_SIZE_MAP = {
   'MAT4':   16
 }
 
-const ARRAY_TYPES = {
-  5120:  Int8Array, // force unsigned???
-  5121:  Uint8Array,
-  5122:  Int16Array,
-  5123:  Uint16Array,
-  5125:  Uint32Array,
-  5126:  Float32Array,
-}
+const ARRAY_TYPES = new Map<CType, Class<TypedArray>>([
+  [5120, Int8Array    ], // force unsigned???
+  [5121, Uint8Array   ],
+  [5122, Int16Array   ],
+  [5123, Uint16Array  ],
+  [5125, Uint32Array  ],
+  [5126, Float32Array ],
+]);
 
 
 //https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#animations
-const NORMALIZE_FUNCS = {
-  5120 : c => Math.max(c / 127.0, -1.0)	,
-  5121 : c => c / 255.0	,
-  5122 : c => Math.max(c / 32767.0, -1.0)	,
-  5123 : c => c / 65535.0	,
-  5125:  null,
-  5126:  null,
+const NORMALIZE_FUNCS = new Map<CType, normalizeFunc>([
+  [5120, c => Math.max(c / 127.0, -1.0)	 ],
+  [5121, c => c / 255.0	 ],
+  [5122, c => Math.max(c / 32767.0, -1.0)	 ],
+  [5123, c => c / 65535.0	 ],
+  [5125, c => c ],
+  [5126, c => c ],
+]);
+
+
+function getNormalizeFunction( t:CType ) : normalizeFunc 
+{
+  const a : any = NORMALIZE_FUNCS.get(t);
+  Assert.isDefined(a);
+  return (a:normalizeFunc);
 }
 
 
-function getArrayForDataType( t )
+function getArrayForDataType( t:CType ) : Class<TypedArray>
 {
-  const a = ARRAY_TYPES[t];
+  const a : any = ARRAY_TYPES.get(t);
   Assert.isDefined(a);
-  return a;
+  return (a:Class<TypedArray>);
 }  
 
 
-function getBytesLengthForDataType( t )
+function getBytesLengthForDataType( t:CType ):number
 {
   return getArrayForDataType(t).BYTES_PER_ELEMENT;
 }  
 
 
-function getSizeForComponentType( t )
+function getSizeForComponentType( t:VType )
 {
   const a = TYPE_SIZE_MAP[t];
   Assert.isDefined(a);
@@ -67,6 +79,12 @@ function getSizeForComponentType( t )
 
 class Sparse{
 
+  accessor:Accessor;
+  indices:Accessor;
+  values:Accessor;
+
+  indicesSet:Set<number>;
+  indicesMap:Map<number, number>;
 
   constructor( accessor, data ){
     this.accessor = accessor;
@@ -103,9 +121,9 @@ class Sparse{
     const holder = indices.createElementHolder();
     
     for (var i = 0; i < count; i++) {
-      indices.getValue(holder, i )
-      iset.add( holder[0] );
-      imap.set( holder[0], i );
+      var j = indices.getScalar( i )
+      iset.add( j );
+      imap.set( j, i );
     }
 
   }
@@ -116,7 +134,7 @@ class Sparse{
   getRawValue( out, index ){
     const isSparse = this.indicesSet.has( index );
     if( isSparse ){
-      this.values.getRawValue( out, this.indicesMap.get(index) );
+      this.values.getRawValue( out, ((this.indicesMap.get(index):any):number) );
     }else {
       this.accessor.getRawValue( out, index );
     }
@@ -125,7 +143,7 @@ class Sparse{
   getRawScalar(index) {
     const isSparse = this.indicesSet.has( index );
     if( isSparse ){
-      return this.values.getRawScalar( this.indicesMap.get(index) )
+      return this.values.getRawScalar( ((this.indicesMap.get(index):any):number) )
     } else {
       return this.accessor.getRawScalar( index );
     }
@@ -142,8 +160,23 @@ export default class Accessor extends BaseElement {
 
   static TYPE = TYPE_ACCESSOR
 
+  normalized     : boolean      ;
+  byteOffset     : number       ;
+  count          : number       ;
+  #stride        : number       ;
+  #strideElem    : number       ;
+  componentType  : CType        ;
+  type           : VType        ;
+  max            : ?number[]    ;
+  min            : ?number[]    ;
+  bufferView     : ?BufferView   ;
+  sparse         : Sparse|null  ;
+  #valueHolder   : TypedArray   ;
+  #array         : TypedArray   ;
+  _normalizeFunc : normalizeFunc;
 
-  constructor( gltf, data ){
+
+  constructor( gltf:Gltf, data:any ){
     super( gltf, data );
 
     
@@ -167,8 +200,22 @@ export default class Accessor extends BaseElement {
 
     if( data.bufferView !== undefined ){
       this.bufferView     = this.gltf.getElement( TYPE_BUFFERVIEW, data.bufferView );
+
+      if( this.bufferView.byteStride === 0 ){
+        this.#stride      = this.numComps * this.bytesPerElem;
+        this.#strideElem  = this.numComps;
+      } else {
+        this.#stride      = this.bufferView.byteStride;
+        this.#strideElem  = this.#stride / Arr.BYTES_PER_ELEMENT;
+        Assert.isTrue( this.#strideElem === Math.round( this.#strideElem ) );
+      }
+      
+      this.#array = new Arr( this.bufferView.buffer._bytes, this.byteOffset + this.bufferView.getByteOffset(), this.count * this.#strideElem );
+
     } else {
-      this.bufferView = new Arr( this.count * this.numComps );
+      this.bufferView     = null;
+      this.#strideElem    = 0;
+      this.#array = this.createElementHolder();
     }
 
 
@@ -177,20 +224,9 @@ export default class Accessor extends BaseElement {
       this.sparse         = new Sparse( this, data.sparse );
     }
 
-    this._valueHolder = this.createElementHolder();
-    this._stride = 0;
-    this._normalizeFunc = NORMALIZE_FUNCS[this.componentType];
-
-    if( this.bufferView.byteStride === 0 ){
-      this._stride      = this.numComps * this.bytesPerElem;
-      this._strideElem  = this.numComps;
-    } else {
-      this._stride      = this.bufferView.byteStride;
-      this._strideElem  = this._stride / Arr.BYTES_PER_ELEMENT;
-      Assert.isTrue( this._strideElem === Math.round( this._strideElem ) );
-    }
-  
-    this._array = new Arr( this.bufferView.buffer._bytes, this.byteOffset + this.bufferView.getByteOffset(), this.count * this._strideElem );
+    this.#valueHolder = this.createElementHolder();
+    this.#stride = 0;
+    this._normalizeFunc = getNormalizeFunction( this.componentType );
 
   }
 
@@ -205,7 +241,7 @@ export default class Accessor extends BaseElement {
  
 
 
-
+  // $FlowFixMe
   *[Symbol.iterator](){
     const holder = this.createElementHolder();
     for (let i=0; i < this.count; i++) {
@@ -219,7 +255,7 @@ export default class Accessor extends BaseElement {
   /**
    * @return {TypedArray} 
    */
-  createElementHolder(normalized = this.normalized){
+  createElementHolder(normalized : boolean = this.normalized) : TypedArray{
     if( normalized ) 
       return new Float32Array( this.numComps );
     else
@@ -234,7 +270,7 @@ export default class Accessor extends BaseElement {
    * @param {number} index 
    * @param {boolean} normalized 
    */
-  getScalar( index, normalized = this.normalized ){
+  getScalar( index :number, normalized : boolean = this.normalized ):number{
     
     let s;
     
@@ -256,9 +292,9 @@ export default class Accessor extends BaseElement {
    * Copy accessor value at the given index to output array. Skip sparse resolve
    * @param {number} index 
    */
-  getRawScalar( index ){
-    const offset = this._strideElem * index;
-    return this._array[offset];
+  getRawScalar( index:number ):number{
+    const offset = this.#strideElem * index;
+    return this.#array[offset];
   }
 
 
@@ -269,9 +305,9 @@ export default class Accessor extends BaseElement {
    * @param {number} index 
    * @param {boolean} normalized 
    */
-  getValue( out, index, normalized = this.normalized ){
+  getValue( out:TypedArray, index:number, normalized:boolean = this.normalized ){
 
-    const _out = normalized ? this._valueHolder : out;
+    const _out = normalized ? this.#valueHolder : out;
 
     if( this.sparse !== null ){
       this.sparse.getRawValue( _out, index );
@@ -285,26 +321,16 @@ export default class Accessor extends BaseElement {
 
   }
 
-  /**
-   * Copy accessor value at the given index to output array. Skip sparse resolve
-   * @param {TypedArray} out output value
-   * @param {number} index 
-   */
-  getRawValue( out, index ){
-    const offset = this._strideElem * index;
+  getRawValue( out:TypedArray, index:number ){
+    const offset = this.#strideElem * index;
     const ncomps = this.numComps;
     for (var i = 0; i < ncomps; i++) {
-      out[i] = this._array[i+offset];
+      out[i] = this.#array[i+offset];
     }
   }
 
 
-  /**
-   * 
-   * @param {TypedArray} out output value
-   * @param {TypedArray} raw 
-   */
-  _normalize( out, raw ){
+  _normalize( out:TypedArray, raw:TypedArray ){
     const fn = this._normalizeFunc;
     const ncomps = this.numComps;
     for (var i = 0; i < ncomps; i++) {

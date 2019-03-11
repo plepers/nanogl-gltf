@@ -41,7 +41,7 @@ describe("Animation Sampler", function () {
     it("t < 0", function () {
       const sampler = gltf.animations[0].channels[0].sampler;
       const out = sampler.createElementHolder();
-      sampler.getValueAtTime( out, -1 )
+      sampler.evaluate( out, -1 )
 
       expectEqualArray( out, new Float32Array([0, 0, 0, 1]))
 
@@ -50,7 +50,7 @@ describe("Animation Sampler", function () {
     it("t > max", function () {
       const sampler = gltf.animations[0].channels[0].sampler;
       const out = sampler.createElementHolder();
-      sampler.getValueAtTime( out, 1000 )
+      sampler.evaluate( out, 1000 )
 
       expectEqualArray( out, new Float32Array([0, 0, 0, 1]))
 
@@ -59,7 +59,7 @@ describe("Animation Sampler", function () {
     it("t = 0", function () {
       const sampler = gltf.animations[0].channels[0].sampler;
       const out = sampler.createElementHolder();
-      sampler.getValueAtTime( out, 0 )
+      sampler.evaluate( out, 0 )
 
       expectEqualArray( out, new Float32Array([0, 0, 0, 1]))
 
@@ -69,7 +69,7 @@ describe("Animation Sampler", function () {
 
       const sampler = gltf.animations[0].channels[0].sampler;
       const out = sampler.createElementHolder();
-      sampler.getValueAtTime( out, 1 )
+      sampler.evaluate( out, 1 )
 
       expectEqualArray( out, new Float32Array([0, 0, 0, 1]))
 
@@ -78,7 +78,7 @@ describe("Animation Sampler", function () {
     it("t = .25", function () {
       const sampler = gltf.animations[0].channels[0].sampler;
       const out = sampler.createElementHolder();
-      sampler.getValueAtTime( out, .25 )
+      sampler.evaluate( out, .25 )
 
       expectEqualArray( out, new Float32Array([ 0, 0, 0.7070, .7070 ]))
 

@@ -55,7 +55,7 @@ describe("Animation Sampler modes ", function () {
       // PLOT
       // ======
       // for (let i = 0; i < 2.0; i += .002) {
-      //   sampler.getValueAtTime(out, i)
+      //   sampler.evaluate(out, i)
       //   arr.push( i + ', '+ out[0] )
       // }
 
@@ -68,7 +68,7 @@ describe("Animation Sampler modes ", function () {
       //   var t = Math.random( ) * 2;
       //   t = Math.round( t*1000)/1000;
 
-      //   sampler.getValueAtTime(out, t)
+      //   sampler.evaluate(out, t)
       //   arr.push( t + ', '+ out[0] )
       // }
 
@@ -76,7 +76,7 @@ describe("Animation Sampler modes ", function () {
       // console.log( lll )
 
       for (const tset of CUBIC_SCALE_TEST_SET) {
-        sampler.getValueAtTime(out, tset[0]);
+        sampler.evaluate(out, tset[0]);
         expect( out[0]).to.be.equal( tset[1] );
       }
 
@@ -106,47 +106,47 @@ describe("Animation Sampler modes ", function () {
 
         
     it("t < min", function () {
-      sampler.getValueAtTime(out, 0)
+      sampler.evaluate(out, 0)
       expectEqualArray( out, new Float32Array([1,1,1]))
     });
       
     it("t = 0", function () {
-      sampler.getValueAtTime(out, F0)
+      sampler.evaluate(out, F0)
       expectEqualArray( out, new Float32Array([1,1,1]))
     });
 
     it("t = EPSILON", function () {
-      sampler.getValueAtTime(out, F0 + EPSILON)
+      sampler.evaluate(out, F0 + EPSILON)
       expectEqualArray( out, new Float32Array([1,1,1]))
     });
 
     it("t = F1-EPSILON", function () {
-      sampler.getValueAtTime(out, F1-EPSILON)
+      sampler.evaluate(out, F1-EPSILON)
       expectEqualArray( out, new Float32Array([1,1,1]))
     });
 
     it("t = F1", function () {
-      sampler.getValueAtTime(out, F1)
+      sampler.evaluate(out, F1)
       expectEqualArray( out, new Float32Array([.5, .5, .5]))
     });
 
     it("t = F1+EPSILON", function () {
-      sampler.getValueAtTime(out, F1+EPSILON)
+      sampler.evaluate(out, F1+EPSILON)
       expectEqualArray( out, new Float32Array([.5, .5, .5]))
     });
 
     it("t = FE-EPSILON", function () {
-      sampler.getValueAtTime(out, FE-EPSILON)
+      sampler.evaluate(out, FE-EPSILON)
       expectEqualArray( out, new Float32Array([.5, .5, .5]))
     });
     
     it("t = FE", function () {
-      sampler.getValueAtTime(out, FE)
+      sampler.evaluate(out, FE)
       expectEqualArray( out, new Float32Array([1,1,1]))
     });
     
     it("t = FE+EPSILON", function () {
-      sampler.getValueAtTime(out, FE+EPSILON)
+      sampler.evaluate(out, FE+EPSILON)
       expectEqualArray( out, new Float32Array([1,1,1]))
     });
 
