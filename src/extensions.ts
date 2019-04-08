@@ -5,6 +5,8 @@ import Assert from './lib/assert';
 
 class Extensions {
 
+  _list : any;
+
   constructor(){
     this._list = {}
   }

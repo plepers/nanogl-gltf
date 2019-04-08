@@ -1,15 +1,15 @@
 
 //@flow
 
-import { TYPE_CAMERA } from '../consts';
+import { ElementType } from '../consts';
 import BaseElement from './BaseElement';
 
-import type Gltf from '../index';
+import Gltf from '../index';
 
 
 export default class Camera extends BaseElement {
 
-  static TYPE = TYPE_CAMERA;
+  static TYPE : ElementType = ElementType.CAMERA;
 
   constructor( gltf: Gltf, data: any ){
 

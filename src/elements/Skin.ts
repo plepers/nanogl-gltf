@@ -1,14 +1,14 @@
 //@flow
 
-import { TYPE_SKIN } from '../consts';
+import { ElementType } from '../consts';
 import BaseElement from './BaseElement';
 
-import type Gltf from '../index';
+import Gltf from '../index';
 
 
 export default class Skin extends BaseElement {
 
-  static TYPE = TYPE_SKIN;
+  static TYPE = ElementType.SKIN;
 
   constructor( gltf: Gltf, data: any ){
 

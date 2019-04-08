@@ -2,15 +2,14 @@
 
 
 import BaseElement from './BaseElement';
-import { TYPE_ANIMATION_SAMPLER, TYPE_ACCESSOR } from '../consts';
-import Ref from '../Ref';
+import { ElementType } from '../consts';
 import { quat } from 'gl-matrix';
 
 
-import type Gltf from '../index'
-import type Accessor from './Accessor'
-import type Animation from './Animation'
-import type {TypedArray} from '../consts'
+import Gltf from '../index'
+import Accessor from './Accessor'
+import Animation from './Animation'
+import {TypedArray} from '../consts'
 
 type LerpFunc = (out:TypedArray, a:TypedArray, b:TypedArray, p:number )=>void;
 
@@ -307,7 +306,7 @@ function InterpolatorFactory(sampler:AnimationSampler) : Interpolator {
 
 export default class AnimationSampler extends BaseElement {
 
-  static TYPE = TYPE_ANIMATION_SAMPLER
+  static TYPE = ElementType.ANIMATION_SAMPLER
 
 
   animation     :Animation         ;
@@ -322,8 +321,8 @@ export default class AnimationSampler extends BaseElement {
 
     this.animation = animation;
 
-    this.input = this.gltf.getElement( TYPE_ACCESSOR, data.input );
-    this.output = this.gltf.getElement( TYPE_ACCESSOR, data.output );
+    this.input = this.gltf.getElement( ElementType.ACCESSOR, data.input );
+    this.output = this.gltf.getElement( ElementType.ACCESSOR, data.output );
 
     this.interpolation = data.interpolation || MODE_LINEAR;
     this.interpolator  = InterpolatorFactory( this );

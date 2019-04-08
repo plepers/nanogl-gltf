@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "lib": ["es2016", "dom"],
+    "target": "es2016",
+    "preserveConstEnums": true,
+    "outDir": "dist",
+    "sourceMap": false
+  },
+  "include": [
+    "src/**/*",
+    "test/*_test.ts"
+  ],
+  "exclude": [
+  ]
+}

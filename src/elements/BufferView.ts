@@ -1,16 +1,14 @@
 //@flow
 
 import BaseElement from './BaseElement';
-import { TYPE_BUFFER, TYPE_BUFFERVIEW } from '../consts';
-import Ref from '../Ref';
+import { ElementType } from '../consts';
 
-import type {ElementType} from '../consts'
-import type  Gltf         from '../index'
-import type  Buffer       from './Buffer'
+import  Gltf         from '../index'
+import  Buffer       from './Buffer'
 
 export default class BufferView extends BaseElement {
 
-  static TYPE : ElementType = TYPE_BUFFERVIEW;
+  static TYPE : ElementType = ElementType.BUFFERVIEW;
 
   byteOffset : number;
   byteLength : number;
@@ -34,7 +32,7 @@ export default class BufferView extends BaseElement {
     this.byteStride = byteStride;
     this.target     = target;
 
-    this.buffer  = this.gltf.getElement<Buffer>( TYPE_BUFFER, data.buffer );
+    this.buffer  = this.gltf.getElement<Buffer>( ElementType.BUFFER, data.buffer );
 
   }
 

@@ -1,20 +1,20 @@
 //@flow
 
-import { TYPE_BUFFER } from '../consts';
+import { ElementType } from '../consts';
 import BaseElement from './BaseElement';
 import {loadBytes} from '../lib/net';
 
-import type Gltf from '../index'
+import Gltf from '../index'
 
 
 export default class Buffer extends BaseElement {
 
-  static TYPE : typeof TYPE_BUFFER = TYPE_BUFFER;
+  static TYPE : ElementType = ElementType.BUFFER;
 
 
   byteLength  :number       ;
   uri         : string      ;
-  _bytes      : ?ArrayBuffer;
+  _bytes      : ArrayBuffer;
   _byteOffset :number       ;
 
   constructor( gltf : Gltf, data : any ){
@@ -29,10 +29,10 @@ export default class Buffer extends BaseElement {
 
   }
 
-  load() : Promise<any>{
+  load(){
     // embed glb buffers
     if( this.uri === undefined ) 
-      return this._bytes;
+      return ( this._bytes );
 
     const uri = this.gltf.resolveUri( this.uri );
     return loadBytes( uri )

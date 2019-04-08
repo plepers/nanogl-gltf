@@ -6,6 +6,6 @@ export function expectEqualArray( v, expected ){
   expect( v.length ).to.equal( expected.length )
   for (let i = 0; i < v.length; i++) {
     if( Math.abs( v[i]-expected[i] ) > 0.000001 )
-      expect().fail(`array not equal : ${v[i]} not ${expected[i]} `)
+      expect().fail(`array not equal : ${v[i]} expected : ${expected[i]} `)
   }
 }

@@ -1,12 +1,12 @@
 //@flow
 
-import { TYPE_PRIMITIVE, TYPE_MATERIAL, TYPE_ACCESSOR } from '../consts';
+import { ElementType } from '../consts';
 import BaseElement from './BaseElement';
 
 
-import type Gltf from '../index'
-import type Accessor from './Accessor'
-import type Material from './Material'
+import Gltf from '../index'
+import Accessor from './Accessor'
+import Material from './Material'
 
 class Attribute {
 
@@ -24,9 +24,9 @@ class Attribute {
 
 export default class Primitive extends BaseElement {
 
-  static TYPE = TYPE_PRIMITIVE;
+  static TYPE :ElementType = ElementType.PRIMITIVE;
   
-  material   : ?Material;
+  material   : Material;
   attributes : Attribute[];
 
 
@@ -35,12 +35,12 @@ export default class Primitive extends BaseElement {
     super( gltf, data );
 
     if( data.material )
-      this.material = this.gltf.getElement( TYPE_MATERIAL, data.material );
+      this.material = this.gltf.getElement( ElementType.MATERIAL, data.material );
 
 
     this.attributes = [];
     for (const attrib in data.attributes ) { 
-      const accessor:Accessor = this.gltf.getElement( TYPE_ACCESSOR, data.attributes[attrib] );
+      const accessor:Accessor = this.gltf.getElement( ElementType.ACCESSOR, data.attributes[attrib] );
       this.attributes.push( new Attribute( attrib, accessor ) );
     }
     

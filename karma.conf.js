@@ -13,17 +13,29 @@ module.exports = function(config) {
   
       // frameworks to use
       // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-      frameworks: [ 'mocha'],
+      frameworks: [ 'mocha', 'karma-typescript'],
   
       // mocha custom option
       client: {
         
       },
+
+      karmaTypescriptConfig:{
+        "compilerOptions": {
+          "moduleResolution": "node",
+          "lib": ["es2016", "dom"],
+          "target": "es2016",
+          "preserveConstEnums": true,
+          "sourceMap": false,
+          "allowJs": true,
+        }
+      },
   
       // list of files / patterns to load in the browser
       files: [
-        'test/entry_point.js',
-        {pattern: 'test/samples/**/*.*', watched: false, included: false, served: true, nocache: false}
+        'test/*.ts',
+        'src/**/*.ts',
+        {pattern: 'test/samples/**/*.*', watched: false, included: false, served: true, nocache: true}
       ],
   
       proxies: {
@@ -42,7 +54,7 @@ module.exports = function(config) {
       // preprocess matching files before serving them to the browser
       // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
       preprocessors: {
-        'test/*.js': [ 'webpack' ]
+        '**/*.ts': 'karma-typescript'
       },
   
       // test results reporter to use

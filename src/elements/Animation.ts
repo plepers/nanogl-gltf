@@ -1,15 +1,15 @@
 //@flow
 
 import BaseElement from './BaseElement';
-import { TYPE_ANIMATION } from '../consts';
+import { ElementType } from '../consts';
 import AnimationChannel from './AnimationChannel';
 import AnimationSampler from './AnimationSampler';
 
-import type Gltf from '../index'
+import Gltf from '../index'
 
 export default class Animation extends BaseElement {
 
-  static TYPE = TYPE_ANIMATION;
+  static TYPE = ElementType.ANIMATION;
 
   samplers : AnimationSampler[]
   channels : AnimationChannel[]
@@ -33,29 +33,19 @@ export default class Animation extends BaseElement {
   }
 
 
-  update( t :number ){
+  evaluate( t :number ){
     for (var channel of this.channels ) {
-      channel.update( t );
+      channel.evaluate( t );
     }
   }
 
 
-
-  /**
-   * 
-   * @param {number} i
-   * @returns {AnimationChannel} 
-   */
-  getChannel(i:number) {
+  getChannel(i:number):AnimationChannel {
     return this.channels[i];
   }
 
-  /**
-   * 
-   * @param {number} i
-   * @returns {AnimationSampler} 
-   */
-  getSampler(i:number) {
+
+  getSampler(i:number):AnimationSampler {
     return this.samplers[i];
   }
 

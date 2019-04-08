@@ -1,16 +1,15 @@
 //@flow
 
-import { TYPE_MATERIAL } from '../consts';
+import { ElementType } from '../consts';
 import BaseElement from './BaseElement';
 
 
-import type Gltf from '../index';
-import type { ElementType } from '../consts';
+import Gltf from '../index';
 
 
 export default class Material extends BaseElement {
 
-  static TYPE : ElementType = TYPE_MATERIAL;
+  static TYPE : ElementType = ElementType.MATERIAL;
 
   constructor( gltf: Gltf, data: any ){
 

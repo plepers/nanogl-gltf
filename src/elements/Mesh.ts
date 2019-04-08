@@ -1,24 +1,22 @@
 //@flow
 
-import { TYPE_MESH } from '../consts';
+import { ElementType } from '../consts';
 import BaseElement from './BaseElement';
 import Primitive from './Primitive';
 
 
-import type Gltf from '../index';
+import Gltf from '../index';
 
 export default class Mesh extends BaseElement {
 
-  static TYPE = TYPE_MESH;
+  static TYPE : ElementType = ElementType.MESH;
 
   primitives : Primitive[];
-  weights    : number[];
+  weights    : Float32Array;
 
   constructor( gltf: Gltf, data: any ){
 
     super( gltf, data );
-
-    
 
     this.primitives = data.primitives.map(
       d => new Primitive(gltf, d)
@@ -26,8 +24,8 @@ export default class Mesh extends BaseElement {
     
     this.gltf.addElements(this.primitives);
 
-
-    this.weights = data.weights;
+    if( data.weights )
+      this.weights = new Float32Array( data.weights );
 
   }
   

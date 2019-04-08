@@ -17,7 +17,7 @@ module.exports =
   devtool:'(none)',
 
   entry: [
-    './src/index.js'
+    './src/index.ts'
   ],
 
   resolve: {
@@ -32,15 +32,16 @@ module.exports =
   module : {
     rules : [
 
-    // JS
+    
     {
-      test: /\.js$/,
-      include: [path( 'src' )],
+      test: /\.ts$/,
       use: [
-        "babel-loader",
-        "remove-flow-types-loader",
+        // "babel-loader",
+        "ts-loader",
       ]
-    }]
+    }
+
+  ]
   },
 
 
@@ -52,12 +53,5 @@ module.exports =
 
 
 
-
-  // temp since tex loader is in dev
-  resolveLoader : {
-    alias: {
-      'nanogl-texture-loader': path('texture-loader')
-    }
-  },
 
 };

@@ -126,7 +126,7 @@ function _getAjax( url, rtype ) {
   xhr.onload = function() {
     deferred.resolve(req);
   };
-  xhr.error = function(e) {
+  xhr.onerror = function(e) {
     deferred.reject( req );
   };
 
