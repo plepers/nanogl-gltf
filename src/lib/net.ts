@@ -68,8 +68,12 @@ export function loadImage( url ){
 }
 
 
-export function baseDir( p ){
-  return p.substr( 0, p.lastIndexOf("/") + 1 );
+export function baseDir( p ) : string[]{
+  const sep = p.lastIndexOf("/");
+  return [
+    p.substr( 0, sep ),
+    p.substr( sep + 1 ),
+  ]
 }
 
 

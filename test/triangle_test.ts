@@ -1,13 +1,14 @@
 import Gltf from '../src'
 import expect from 'expect.js'
+import WebGltfIO from '../src/io/web';
 
 
 describe("Triangle", function () {
 
-  const gltf= new Gltf();
+  let gltf;//= new Gltf();
 
   before(function () {
-    return gltf.load('samples/models/2.0/Triangle/glTF/Triangle.gltf')
+    return WebGltfIO.loadGltf( 'samples/models/2.0/Triangle/glTF/Triangle.gltf' ).then( (res)=>gltf=res )
   });
   
 

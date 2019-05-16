@@ -4,6 +4,7 @@ import { ElementType } from '../src/consts';
 import Node from '../src/elements/Node';
 import { expectEqualArray } from './test-utils';
 import Animation from '../src/elements/Animation';
+import WebGltfIO from '../src/io/web';
 
 
 describe("Node transform", function () {
@@ -13,10 +14,10 @@ describe("Node transform", function () {
   
   describe("translate anim", function () {
     
-    const gltf= new Gltf();
+    let gltf : Gltf;
   
     before(function () {
-      return gltf.load('samples/generator/Output/Animation_Node/Animation_Node_00.gltf')
+      return WebGltfIO.loadGltf('samples/generator/Output/Animation_Node/Animation_Node_00.gltf').then( res=>gltf=res )
     });
 
     it("evaluate t0", function () {
@@ -89,10 +90,10 @@ describe("Node transform", function () {
   describe("rotation anim", function () {
     
     const SIN45 = Math.sin( Math.PI/4 )
-    const gltf= new Gltf();
+    let gltf : Gltf;
   
     before(function () {
-      return gltf.load('samples/generator/Output/Animation_Node/Animation_Node_01.gltf')
+      return WebGltfIO.loadGltf('samples/generator/Output/Animation_Node/Animation_Node_01.gltf').then( res=>gltf=res )
     });
 
     it("evaluate t-10", function () {
@@ -146,10 +147,10 @@ describe("Node transform", function () {
 
   describe("scale anim", function () {
     
-    const gltf= new Gltf();
+    let gltf : Gltf;
   
     before(function () {
-      return gltf.load('samples/generator/Output/Animation_Node/Animation_Node_02.gltf')
+      return WebGltfIO.loadGltf('samples/generator/Output/Animation_Node/Animation_Node_02.gltf').then( res=>gltf=res )
     });
 
     it("evaluate t-10", function () {
@@ -200,10 +201,10 @@ describe("Node transform", function () {
   describe("multiple anim", function () {
     
     const SIN45 = Math.sin( Math.PI/4 )
-    const gltf= new Gltf();
+    let gltf : Gltf;
   
     before(function () {
-      return gltf.load('samples/generator/Output/Animation_NodeMisc/Animation_NodeMisc_07.gltf')
+      return WebGltfIO.loadGltf('samples/generator/Output/Animation_NodeMisc/Animation_NodeMisc_07.gltf').then( res=>gltf=res )
     });
 
     it("evaluate t-10", function () {

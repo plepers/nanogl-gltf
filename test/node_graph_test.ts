@@ -3,6 +3,7 @@ import expect from 'expect.js'
 import { ElementType } from '../src/consts';
 import Node from '../src/elements/Node';
 import { expectEqualArray } from './test-utils';
+import WebGltfIO from '../src/io/web';
 
 
 describe("Node graph", function () {
@@ -12,10 +13,10 @@ describe("Node graph", function () {
   
   describe("no transform", function () {
     
-    const gltf= new Gltf();
+    let gltf:Gltf;
   
     before(function () {
-      return gltf.load('samples/generator/Output/Node_Attribute/Node_Attribute_00.gltf')
+      return WebGltfIO.loadGltf('samples/generator/Output/Node_Attribute/Node_Attribute_00.gltf').then( res=>gltf=res )
     });
 
     it("matrix ok", function () {

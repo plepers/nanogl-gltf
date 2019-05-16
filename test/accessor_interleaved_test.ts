@@ -1,13 +1,14 @@
 import Gltf from '../src'
 import expect from 'expect.js'
+import WebGltfIO from '../src/io/web';
 
 
 describe("Interleaved", function () {
 
-  const gltf = new Gltf();
+  let gltf:Gltf;
 
   before(function () {
-    return gltf.load( 'samples/generator/Output/Buffer_Interleaved/Buffer_Interleaved_00.gltf' )
+    return WebGltfIO.loadGltf( 'samples/generator/Output/Buffer_Interleaved/Buffer_Interleaved_00.gltf' ).then( res=>gltf=res )
   });
 
 

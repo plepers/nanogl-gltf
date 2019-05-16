@@ -28,23 +28,28 @@ export default class Primitive extends BaseElement {
   
   material   : Material;
   attributes : Attribute[];
+  indices    : Accessor;
 
 
   constructor( gltf:Gltf, data:any ){
 
     super( gltf, data );
-
-    if( data.material )
-      this.material = this.gltf.getElement( ElementType.MATERIAL, data.material );
-
-
+    
+    
     this.attributes = [];
     for (const attrib in data.attributes ) { 
       const accessor:Accessor = this.gltf.getElement( ElementType.ACCESSOR, data.attributes[attrib] );
       this.attributes.push( new Attribute( attrib, accessor ) );
     }
     
+    if( data.indices !== undefined )
+      this.indices = this.gltf.getElement( ElementType.ACCESSOR, data.indices );
+
+    if( data.material )
+      this.material = this.gltf.getElement( ElementType.MATERIAL, data.material );
+    
   }
+
   
 
 }

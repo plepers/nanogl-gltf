@@ -3,14 +3,15 @@
 import Gltf from '../src'
 import expect from 'expect.js'
 import { expectEqualArray } from './test-utils';
+import WebGltfIO from '../src/io/web';
 
 
 describe("Animation Sampler", function () {
 
-  const gltf = new Gltf();
+  let gltf :Gltf;
 
   before(function () {
-    return gltf.load( 'samples/models/2.0/AnimatedTriangle/glTF/AnimatedTriangle.gltf' )
+    return WebGltfIO.loadGltf('samples/models/2.0/AnimatedTriangle/glTF/AnimatedTriangle.gltf').then( res=>gltf=res )
   });
 
 

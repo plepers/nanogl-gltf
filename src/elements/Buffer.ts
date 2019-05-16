@@ -29,15 +29,15 @@ export default class Buffer extends BaseElement {
 
   }
 
-  load(){
-    // embed glb buffers
-    if( this.uri === undefined ) 
-      return ( this._bytes );
+  // load(){
+  //   // embed glb buffers
+  //   if( this.uri === undefined ) 
+  //     return ( this._bytes );
 
-    const uri = this.gltf.resolveUri( this.uri );
-    return loadBytes( uri )
-      .then( b=>this._bytes = b );
-  }
+  //   const uri = this.gltf.resolveUri( this.uri );
+  //   return loadBytes( uri )
+  //     .then( b=>this._bytes = b );
+  // }
 
   
 

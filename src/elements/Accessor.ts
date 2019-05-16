@@ -195,10 +195,10 @@ export default class Accessor extends BaseElement {
     
     
     
-    const Arr = getArrayForDataType(this.componentType);
-
+    
     if( data.bufferView !== undefined ){
       this.bufferView     = this.gltf.getElement( ElementType.BUFFERVIEW, data.bufferView );
+      const Arr = getArrayForDataType(this.componentType);
 
       if( this.bufferView.byteStride === 0 ){
         this._stride      = this.numComps * this.bytesPerElem;
@@ -228,6 +228,9 @@ export default class Accessor extends BaseElement {
     this._normalizeFunc = getNormalizeFunction( this.componentType );
 
   }
+
+
+
 
 
   get numComps(){
@@ -336,6 +339,9 @@ export default class Accessor extends BaseElement {
       out[i] = fn( raw[i] );
     }
   }
+
+
+
 
 
 

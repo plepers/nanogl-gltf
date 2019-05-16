@@ -3,6 +3,7 @@ import expect from 'expect.js'
 import { ElementType } from '../src/consts';
 import Node from '../src/elements/Node';
 import { expectEqualArray } from './test-utils';
+import WebGltfIO from '../src/io/web';
 
 
 describe("Node transform", function () {
@@ -12,10 +13,10 @@ describe("Node transform", function () {
   
   describe("no transform", function () {
     
-    const gltf= new Gltf();
+    let gltf : Gltf;
   
     before(function () {
-      return gltf.load('samples/generator/Output/Node_Attribute/Node_Attribute_00.gltf')
+      return WebGltfIO.loadGltf( 'samples/generator/Output/Node_Attribute/Node_Attribute_00.gltf').then( (res)=>gltf=res )
     });
 
     it("matrix ok", function () {
@@ -34,10 +35,10 @@ describe("Node transform", function () {
   
   describe("translation xyz only", function () {
     
-    const gltf= new Gltf();
+    let gltf : Gltf;
   
     before(function () {
-      return gltf.load('samples/generator/Output/Node_Attribute/Node_Attribute_01.gltf')
+      return WebGltfIO.loadGltf('samples/generator/Output/Node_Attribute/Node_Attribute_01.gltf').then( (res)=>gltf=res )
     });
 
     it("position ok", function () {
@@ -66,10 +67,10 @@ describe("Node transform", function () {
   
   describe("rotation only Y", function () {
     
-    const gltf= new Gltf();
+    let gltf : Gltf;
   
     before(function () {
-      return gltf.load('samples/generator/Output/Node_Attribute/Node_Attribute_05.gltf')
+      return WebGltfIO.loadGltf('samples/generator/Output/Node_Attribute/Node_Attribute_05.gltf').then( res=>gltf=res )
     });
 
     it("position ok", function () {
@@ -97,10 +98,10 @@ describe("Node transform", function () {
   
   describe("scale only uniform", function () {
     
-    const gltf= new Gltf();
+    let gltf : Gltf;
   
     before(function () {
-      return gltf.load('samples/generator/Output/Node_Attribute/Node_Attribute_06.gltf')
+      return WebGltfIO.loadGltf('samples/generator/Output/Node_Attribute/Node_Attribute_06.gltf').then( res=>gltf=res )
     });
 
     it("position ok", function () {
@@ -128,10 +129,10 @@ describe("Node transform", function () {
   
   describe("all TRS", function () {
     
-    const gltf= new Gltf();
+    let gltf : Gltf;
   
     before(function () {
-      return gltf.load('samples/generator/Output/Node_Attribute/Node_Attribute_07.gltf')
+      return WebGltfIO.loadGltf('samples/generator/Output/Node_Attribute/Node_Attribute_07.gltf').then( res=>gltf=res )
     });
 
     it("position ok", function () {
@@ -161,10 +162,10 @@ describe("Node transform", function () {
    
   describe("all TRS from matrix", function () {
     
-    const gltf= new Gltf();
+    let gltf : Gltf;
   
     before(function () {
-      return gltf.load('samples/generator/Output/Node_Attribute/Node_Attribute_08.gltf')
+      return WebGltfIO.loadGltf('samples/generator/Output/Node_Attribute/Node_Attribute_08.gltf').then( res=>gltf=res )
     });
 
     it("position ok", function () {

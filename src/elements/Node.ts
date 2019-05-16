@@ -18,6 +18,7 @@ export default class Node extends NGLNode implements BaseElement {
   static TYPE = ElementType.NODE;
 
 
+  uid        : number  ;
   gltf       : Gltf  ;
   name       : string;
   extras     : any   ;
@@ -50,6 +51,7 @@ export default class Node extends NGLNode implements BaseElement {
 
     super();
 
+    this.uid        = BaseElement.CreateUID();
     this.gltf       = gltf;
     this.name       = data.name      
     this.extras     = data.extras    
@@ -106,6 +108,8 @@ export default class Node extends NGLNode implements BaseElement {
       this.skin = this.gltf.getElement( ElementType.SKIN, this.skinRef )
 
   }
+
+
   
 
 }

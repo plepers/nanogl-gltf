@@ -1,5 +1,6 @@
 import Gltf from '../src'
 import expect from 'expect.js'
+import WebGltfIO from '../src/io/web';
 
 
 describe("Interleaved Normalized", function () {
@@ -11,9 +12,9 @@ describe("Interleaved Normalized", function () {
   
     describe("normalized "+suffix, function () {
 
-      const gltf = new Gltf();
+      let gltf:Gltf;
       before(function () {
-        return gltf.load(`samples/generator/Output/Buffer_Interleaved/Buffer_Interleaved_${suffix}.gltf`)
+        return WebGltfIO.loadGltf(`samples/generator/Output/Buffer_Interleaved/Buffer_Interleaved_${suffix}.gltf`).then( res=>gltf=res )
       });
 
       it("positions ok", function () {

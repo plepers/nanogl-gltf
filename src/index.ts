@@ -1,11 +1,6 @@
 
 /// <
 
-import * as Net from './lib/net'
-import when   from 'when'
-
-import UTF8   from './lib/utf8-decoder'
-
 
 import Extensions  from './extensions'           ;
 import Accessor    from './elements/Accessor'    ;
@@ -21,17 +16,6 @@ import BaseElement from './elements/BaseElement' ;
 
 import { ElementType } from './consts';
 
-// import type AnimationSampler from './elements/AnimationSampler';
-// import type AnimationChannel from './elements/AnimationChannel';
-// import type BaseElement      from './elements/BaseElement';
-// import type {ElementType}    from './consts';
-
-
-
-
-const MAGIC      = 0x46546C67; // "glTF"
-const JSON_MAGIC = 0x4E4F534A; // "JSON"
-const GLB_HEADER_SIZE = 20;
 
 
 
@@ -41,7 +25,7 @@ export default class Gltf{
   _url        : string
   _baseDir    : string
   _data       : any
-  _extensions :Extensions
+  _extensions : Extensions
   
 
   _elements         : BaseElement[];
@@ -131,107 +115,6 @@ export default class Gltf{
   }
 
 
-  load( url : string ): Promise<any>{
-
-    this._url = url;
-    this._baseDir = Net.baseDir( url );
-    
-    return Net.loadBytes( url )
-      .then( this.unpack )
-      .then( this.loadBuffers )
-      .then( this.parse )
-
-  }
-
-
-  unpack = ( buffer: ArrayBuffer )=>{
-    const magic = new Uint32Array( buffer, 0, 1 )[0];
-    
-    if( magic === MAGIC ){ 
-      this.unpackGlb( buffer );
-    } else {
-      const jsonStr = UTF8( new Uint8Array(buffer) );
-      this._data = JSON.parse( jsonStr );
-    }
-
-  }
-
-
-  unpackGlb( buffer : ArrayBuffer ){
-
-    const [version, , jsonSize, magic ] = new Uint32Array( buffer, 0, 5 );
-    // Check that the version is 2
-    if (version !== 2) 
-      throw new Error('Binary glTF version is not 2');
-    
-    // Check that the scene format is 0, indicating that it is JSON
-    if ( magic !== JSON_MAGIC )
-        throw new Error('Binary glTF scene format is not JSON');
-    
-    const scene = UTF8( new Uint8Array( buffer,  GLB_HEADER_SIZE, jsonSize ) );
-    this._data = JSON.parse( scene );
-
-    const mbuffer = new Buffer( this, {} );
-    mbuffer._bytes = buffer.slice( GLB_HEADER_SIZE + jsonSize + 8 );
-    this.addElement( mbuffer )
-
-  }
-
-
-  loadBuffers = ()=>{
-    const buffers : BaseElement[] = this._getTypeHolder(ElementType.BUFFER);
-    for (var i = buffers.length; i < this._data.buffers.length; i++) {
-      this.addElement( new Buffer( this, this._data.buffers[i] ) )
-    }
-    
-    return when.map( buffers, b=>b.load() );
-
-  }
-
-
-  parse = ()=>{
-
-    this._parseElements( ElementType.BUFFERVIEW , BufferView );
-    this._parseElements( ElementType.ACCESSOR   , Accessor   );
-    this._parseElements( ElementType.MESH       , Mesh       );
-    this._parseElements( ElementType.NODE       , Node       );
-    this._parseElements( ElementType.ANIMATION  , Animation  );
-    this._parseElements( ElementType.SKIN       , Skin       );
-    this._parseElements( ElementType.CAMERA     , Camera     );
-    this._parseElements( ElementType.MATERIAL   , Material   );
-
-    // resolve nodes refs
-    const nodes = this._getTypeHolder<Node>(ElementType.NODE);
-    for (var node of nodes) {
-      node.resolveReferences();
-    }
-
-  }
-
-
-  _parseElements( type:ElementType, _Class: new (Gltf, any) => BaseElement ){
-    if( this._data[type] ){
-      this._data[type].forEach( d=>this.addElement( new _Class(this, d) ) );
-    }
-  }
-
-
-
-  resolveUri( uri : string ) : string {
-    return this._baseDir + uri;
-  }
-
-
-  // addExternalResource( p ){
-  //   this._loadables.push( p );
-  // }
-
 
 }
 
-
-/// #if DEBUG
-
-// hot reload
-
-/// #endif

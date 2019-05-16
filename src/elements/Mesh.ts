@@ -28,6 +28,7 @@ export default class Mesh extends BaseElement {
       this.weights = new Float32Array( data.weights );
 
   }
+
   
 
 }

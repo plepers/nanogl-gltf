@@ -8,6 +8,15 @@ const TYPES = {
 }
 
 
+
+
+export const MAGIC      = 0x46546C67; // "glTF"
+export const JSON_MAGIC = 0x4E4F534A; // "JSON"
+export const GLB_HEADER_SIZE = 20;
+
+
+
+
 export enum ElementType {
 
   NONE              = ''          ,

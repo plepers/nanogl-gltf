@@ -43,13 +43,18 @@ import Gltf from "../index";
 
 // const BaseElement = BaseElementExtend();
 
+let UID = 0;
 
 class BaseElement {
 
+  static CreateUID() : number {
+    return UID++;
+  }
 
   static TYPE : ElementType = ElementType.NONE;
 
 
+  uid        : number;
   gltf       : Gltf  ;
   name       : string;
   extras     : any   ;
@@ -58,6 +63,7 @@ class BaseElement {
 
   constructor( gltf : Gltf, data : any ){
 
+    this.uid = BaseElement.CreateUID();
 
     this.gltf = gltf;
 
@@ -68,10 +74,12 @@ class BaseElement {
   }
 
 
+
+
+
   get elementType() : ElementType {
     return this.constructor['TYPE'];
   }
-
 
 }
 
