@@ -1,4 +1,6 @@
 
+import base64 from 'base64-js'
+import when   from 'when'
 
 import { loadText, loadBytes, baseDir } from "../lib/net";
 import IOInterface from "./IOInterface";
@@ -7,6 +9,22 @@ import UTF8   from '../lib/utf8-decoder'
 import GltfIO from ".";
 
 class WebImpl implements IOInterface {
+
+
+
+  isDataURI( uri : string ) : Boolean{
+    return ( uri.indexOf('data:') === 0 );
+  }
+
+
+  decodeDataURI(uri: string): ArrayBuffer {
+    if( uri.indexOf('data:') !== 0 ){
+      throw new Error('invalid dataURI' )
+    }
+    var b64 = uri.substr( uri.indexOf(',')+1 );
+
+    return base64.toByteArray( b64 ).buffer;
+  }
   
 
   resolveBaseDir( path: string ) : string[]{
@@ -14,9 +32,9 @@ class WebImpl implements IOInterface {
   }
 
   resolvePath(path: string, baseurl: string ): string {
-    if(baseurl !== undefined )
-      return baseurl + '/' + path;
-    return path;
+    if( baseurl === undefined || this.isDataURI( path ) )
+      return path;  
+    return baseurl + '/' + path;
   }
 
   decodeUTF8(buffer: ArrayBuffer, offset : number = 0, length : number = undefined ): string {
@@ -31,6 +49,9 @@ class WebImpl implements IOInterface {
   }
   
   loadBinaryResource(path: string): Promise<ArrayBuffer> {
+    if( this.isDataURI( path ) ){
+      return when( this.decodeDataURI( path ) );
+    }
     return loadBytes( path );
   }
   

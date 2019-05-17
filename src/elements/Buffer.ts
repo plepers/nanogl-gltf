@@ -5,6 +5,7 @@ import BaseElement from './BaseElement';
 import {loadBytes} from '../lib/net';
 
 import Gltf from '../index'
+import { Data_Buffer } from '../schema/glTF';
 
 
 export default class Buffer extends BaseElement {
@@ -17,15 +18,15 @@ export default class Buffer extends BaseElement {
   _bytes      : ArrayBuffer;
   _byteOffset :number       ;
 
-  constructor( gltf : Gltf, data : any ){
+  constructor( gltf : Gltf, data : Data_Buffer ){
+    
     super( gltf, data );
 
-    this.byteLength = data.byteLength;
-    this.uri        = data.uri;
-    this._bytes     = null;
+    this.byteLength  = data.byteLength;
+    this.uri         = data.uri;
+    this._bytes      = null;
 
-    
-    this._byteOffset=0;
+    this._byteOffset = 0;
 
   }
 

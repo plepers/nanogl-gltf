@@ -19,16 +19,21 @@ import { ElementType } from "../consts";
 //   }
 // }
 // const BaseElement = BaseElementExtend();
+let UID = 0;
 class BaseElement {
     constructor(gltf, data) {
+        this.uid = BaseElement.CreateUID();
         this.gltf = gltf;
         this.name = data.name;
         this.extras = data.extras;
         this.extensions = data.extensions;
     }
+    static CreateUID() {
+        return UID++;
+    }
     get elementType() {
         return this.constructor['TYPE'];
     }
 }
-BaseElement.TYPE = ElementType.TYPE_NONE;
+BaseElement.TYPE = ElementType.NONE;
 export default BaseElement;

@@ -6,4 +6,4 @@ export default class Skin extends BaseElement {
         super(gltf, data);
     }
 }
-Skin.TYPE = ElementType.TYPE_SKIN;
+Skin.TYPE = ElementType.SKIN;

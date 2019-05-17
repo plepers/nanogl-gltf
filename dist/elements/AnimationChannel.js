@@ -1,27 +1,33 @@
 //@flow
 import BaseElement from './BaseElement';
 import { ElementType } from '../consts';
-const PATH_TRANSLATION = 'translation';
-const PATH_ROTATION = 'rotation';
-const PATH_SCALE = 'scale';
-const PATH_WEIGHTS = 'weights';
+var Path;
+(function (Path) {
+    Path["TRANSLATION"] = "translation";
+    Path["ROTATION"] = "rotation";
+    Path["SCALE"] = "scale";
+    Path["WEIGHTS"] = "weights";
+})(Path || (Path = {}));
 function applyTranslation(node, value) {
+    node.position.set(value);
 }
 function applyRotation(node, value) {
+    node.rotation.set(value);
 }
 function applyScale(node, value) {
+    node.scale.set(value);
 }
 function applyWeights(node, value) {
 }
 function getApplyFunctionFromPath(path) {
     switch (path) {
-        case PATH_TRANSLATION:
+        case Path.TRANSLATION:
             return applyTranslation;
-        case PATH_ROTATION:
+        case Path.ROTATION:
             return applyRotation;
-        case PATH_SCALE:
+        case Path.SCALE:
             return applyScale;
-        case PATH_WEIGHTS:
+        case Path.WEIGHTS:
             return applyWeights;
         default:
             throw new Error('unsupported path ' + path);
@@ -37,15 +43,15 @@ export default class AnimationChannel extends BaseElement {
         this.applyFunction = getApplyFunctionFromPath(this.path);
         if (data.target.node !== undefined) {
             this._active = true;
-            this.node = gltf.getElement(ElementType.TYPE_NODE, data.target.node);
+            this.node = gltf.getElement(ElementType.NODE, data.target.node);
         }
         this.valueHolder = this.sampler.createElementHolder();
     }
-    update(t) {
+    evaluate(t) {
         if (this._active) {
             this.sampler.evaluate(this.valueHolder, t);
             this.applyFunction(this.node, this.valueHolder);
         }
     }
 }
-AnimationChannel.TYPE = ElementType.TYPE_ANIMATION_CHANNEL;
+AnimationChannel.TYPE = ElementType.ANIMATION_CHANNEL;

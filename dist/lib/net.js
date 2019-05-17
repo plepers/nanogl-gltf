@@ -39,7 +39,11 @@ export function loadImage(url) {
     return defer.promise.yield(img);
 }
 export function baseDir(p) {
-    return p.substr(0, p.lastIndexOf("/") + 1);
+    const sep = p.lastIndexOf("/");
+    return [
+        p.substr(0, sep),
+        p.substr(sep + 1),
+    ];
 }
 let _requestsList = [];
 let _requestsMap = {};

@@ -10,8 +10,12 @@ import Animation from './Animation'
 import AnimationSampler from './AnimationSampler'
 import Node from './Node'
 import {TypedArray} from '../consts'
+import { Data_AnimationChannel } from '../schema/glTF';
 
 type applyFunc = (node:Node, value:TypedArray)=>void
+
+
+type PathType = 'translation' | 'rotation' | 'scale' | 'weights' | string;
 
 enum Path {
   TRANSLATION = 'translation',
@@ -39,7 +43,7 @@ function applyWeights(node:Node, value:TypedArray) {
 }
 
 
-function getApplyFunctionFromPath(path:Path):applyFunc {
+function getApplyFunctionFromPath(path:PathType):applyFunc {
   switch (path) {
     case Path.TRANSLATION:
       return applyTranslation;
@@ -62,13 +66,13 @@ export default class AnimationChannel extends BaseElement {
   _active       : boolean         ;
   animation     : Animation       ;
   sampler       : AnimationSampler;
-  path          : Path            ;
+  path          : PathType        ;
   applyFunction : applyFunc       ;
   node          : Node            ;
   valueHolder   : TypedArray      ;
 
 
-  constructor(gltf : Gltf, data:any, animation:Animation) {
+  constructor(gltf : Gltf, data:Data_AnimationChannel, animation:Animation) {
 
     super(gltf, data);
 

@@ -7,9 +7,12 @@
     "outDir": "dist",
     "sourceMap": false
   },
+  "files" : [
+    "src/index.ts"
+  ],
   "include": [
-    "src/**/*",
-    "test/*_test.ts"
+    "src/**/*"
+    // "test/*_test.ts"
   ],
   "exclude": [
   ]

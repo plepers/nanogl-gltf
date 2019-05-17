@@ -11,26 +11,16 @@ export default class Animation extends BaseElement {
         this.channels = data.channels.map(d => new AnimationChannel(gltf, d, this));
         this.gltf.addElements(this.channels);
     }
-    update(t) {
+    evaluate(t) {
         for (var channel of this.channels) {
-            channel.update(t);
+            channel.evaluate(t);
         }
     }
-    /**
-     *
-     * @param {number} i
-     * @returns {AnimationChannel}
-     */
     getChannel(i) {
         return this.channels[i];
     }
-    /**
-     *
-     * @param {number} i
-     * @returns {AnimationSampler}
-     */
     getSampler(i) {
         return this.samplers[i];
     }
 }
-Animation.TYPE = ElementType.TYPE_ANIMATION;
+Animation.TYPE = ElementType.ANIMATION;

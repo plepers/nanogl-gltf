@@ -24,7 +24,6 @@ export default class Gltf{
   
   _url        : string
   _baseDir    : string
-  _data       : any
   _extensions : Extensions
   
 
@@ -34,7 +33,6 @@ export default class Gltf{
 
   constructor(){
     this._url        = null;
-    this._data       = null;
 
     this._extensions = new Extensions();
 
@@ -50,12 +48,21 @@ export default class Gltf{
       [ElementType.PRIMITIVE         , [] ],
       [ElementType.NODE              , [] ],
       [ElementType.MATERIAL          , [] ],
+      [ElementType.CAMERA            , [] ],
     ])
 
     this._elements = []
 
   }
 
+
+  get buffers():Buffer[]{
+    return this._getTypeHolder<Buffer>(ElementType.BUFFER);
+  }
+
+  get bufferViews():BufferView[]{
+    return this._getTypeHolder<BufferView>(ElementType.BUFFERVIEW);
+  }
 
   get accessors():Accessor[]{
     return this._getTypeHolder<Accessor>(ElementType.ACCESSOR);
@@ -65,12 +72,20 @@ export default class Gltf{
     return this._getTypeHolder<Animation>(ElementType.ANIMATION);
   }
 
-  get buffers():Buffer[]{
-    return this._getTypeHolder<Buffer>(ElementType.BUFFER);
+  get meshes():Mesh[]{
+    return this._getTypeHolder<Mesh>(ElementType.MESH);
   }
 
-  get bufferViews():BufferView[]{
-    return this._getTypeHolder<BufferView>(ElementType.BUFFERVIEW);
+  get nodes():Node[]{
+    return this._getTypeHolder<Node>(ElementType.NODE);
+  }
+
+  get materials():Material[]{
+    return this._getTypeHolder<Material>(ElementType.MATERIAL);
+  }
+
+  get cameras():Camera[]{
+    return this._getTypeHolder<Camera>(ElementType.CAMERA);
   }
 
 

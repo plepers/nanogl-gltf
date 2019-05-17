@@ -15,6 +15,17 @@ export const JSON_MAGIC = 0x4E4F534A; // "JSON"
 export const GLB_HEADER_SIZE = 20;
 
 
+export enum PrimitiveMode {
+  POINTS          = 0,
+  LINES           = 1,
+  LINE_LOOP       = 2,
+  LINE_STRIP      = 3,
+  TRIANGLES       = 4,
+  TRIANGLE_STRIP  = 5,
+  TRIANGLE_FAN    = 6,
+
+  DEFAULT         = 4,
+}
 
 
 export enum ElementType {

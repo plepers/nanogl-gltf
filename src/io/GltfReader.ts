@@ -14,6 +14,7 @@ import Buffer from "../elements/Buffer";
 import BaseElement from "../elements/BaseElement";
 import Node from "../elements/Node";
 import Animation from "../elements/Animation";
+import { DataGlTF } from "../schema/glTF";
 
 
 
@@ -27,7 +28,8 @@ export default class GltfReader {
   _url     : string;
   _baseUrl : string;
   gltfIO   : IOInterface;
-  _data    : any   ;
+
+  _data    : DataGlTF ;
 
 
   constructor( gltfIO : IOInterface, url : string, baseurl : string ){
@@ -41,14 +43,13 @@ export default class GltfReader {
 
 
 
-
-
   parse = (buffer: ArrayBuffer) : Promise<Gltf>=>{
     return this.unpack( buffer )
       .then( this.loadBuffers )
       .then( this.parseAll )
       .then( this.yieldGltf );
   }
+
 
   unpack = ( buffer: ArrayBuffer ) : Promise<any>=>{
     const magic = new Uint32Array( buffer, 0, 1 )[0];
@@ -67,7 +68,7 @@ export default class GltfReader {
 
   unpackGlb( buffer : ArrayBuffer ){
 
-    const [version, , jsonSize, magic ] = new Uint32Array( buffer, 0, 5 );
+    const [, version, ,jsonSize, magic ] = new Uint32Array( buffer, 0, 5 );
     // Check that the version is 2
     if (version !== 2) 
       throw new Error('Binary glTF version is not 2');
@@ -79,8 +80,9 @@ export default class GltfReader {
     const scene = this.gltfIO.decodeUTF8( buffer, GLB_HEADER_SIZE, jsonSize );
     this._data = JSON.parse( scene );
 
-    const mbuffer = new Buffer( this.gltf, {} );
-    mbuffer._bytes = buffer.slice( GLB_HEADER_SIZE + jsonSize + 8 );
+    const bbytes = buffer.slice( GLB_HEADER_SIZE + jsonSize + 8 );
+    const mbuffer = new Buffer( this.gltf, {byteLength:bbytes.byteLength} );
+    mbuffer._bytes = bbytes;
     this.gltf.addElement( mbuffer )
 
   }
@@ -101,7 +103,7 @@ export default class GltfReader {
 
     if( b.uri === undefined ) 
       return ( b._bytes );
-
+    
     const uri = this.gltfIO.resolvePath( b.uri, this._baseUrl );
     return this.gltfIO.loadBinaryResource( uri )
       .then( data=>b._bytes = data );
@@ -113,12 +115,13 @@ export default class GltfReader {
 
     this._parseElements( ElementType.BUFFERVIEW , BufferView );
     this._parseElements( ElementType.ACCESSOR   , Accessor   );
+    this._parseElements( ElementType.MATERIAL   , Material   );
+    this._parseElements( ElementType.CAMERA     , Camera     );
     this._parseElements( ElementType.MESH       , Mesh       );
     this._parseElements( ElementType.NODE       , Node       );
     this._parseElements( ElementType.ANIMATION  , Animation  );
     this._parseElements( ElementType.SKIN       , Skin       );
-    this._parseElements( ElementType.CAMERA     , Camera     );
-    this._parseElements( ElementType.MATERIAL   , Material   );
+
 
     // resolve nodes refs
     const nodes = this.gltf._getTypeHolder<Node>(ElementType.NODE);

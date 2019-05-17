@@ -10,10 +10,11 @@ import Gltf from '../index'
 import Accessor from './Accessor'
 import Animation from './Animation'
 import {TypedArray} from '../consts'
+import { Data_AnimationSampler } from '../schema/glTF';
 
 type LerpFunc = (out:TypedArray, a:TypedArray, b:TypedArray, p:number )=>void;
 
-type InterpolationType = 'LINEAR' | 'STEP' | 'CUBICSPLINE';
+type InterpolationType = 'LINEAR' | 'STEP' | 'CUBICSPLINE' | string;
 
 const MODE_LINEAR      : InterpolationType = 'LINEAR';
 const MODE_STEP        : InterpolationType = 'STEP';
@@ -316,7 +317,7 @@ export default class AnimationSampler extends BaseElement {
   interpolator  :Interpolator      ;
 
 
-  constructor( gltf:Gltf, data:any, animation:Animation ) {
+  constructor( gltf:Gltf, data:Data_AnimationSampler, animation:Animation ) {
     super(gltf, data);
 
     this.animation = animation;

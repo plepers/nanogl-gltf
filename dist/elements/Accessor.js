@@ -108,9 +108,9 @@ export default class Accessor extends BaseElement {
         this.type = data.type;
         this.max = data.max;
         this.min = data.min;
-        const Arr = getArrayForDataType(this.componentType);
         if (data.bufferView !== undefined) {
-            this.bufferView = this.gltf.getElement(ElementType.TYPE_BUFFERVIEW, data.bufferView);
+            this.bufferView = this.gltf.getElement(ElementType.BUFFERVIEW, data.bufferView);
+            const Arr = getArrayForDataType(this.componentType);
             if (this.bufferView.byteStride === 0) {
                 this._stride = this.numComps * this.bytesPerElem;
                 this._strideElem = this.numComps;
@@ -217,4 +217,4 @@ export default class Accessor extends BaseElement {
         }
     }
 }
-Accessor.TYPE = ElementType.TYPE_ACCESSOR;
+Accessor.TYPE = ElementType.ACCESSOR;

@@ -9,6 +9,7 @@ import  Gltf   from '../index';
 import  Skin   from './Skin'  ;
 import  Camera from './Camera';
 import  Mesh   from './Mesh'  ;
+import { Data_Node } from '../schema/glTF';
 
 
 
@@ -47,7 +48,7 @@ export default class Node extends NGLNode implements BaseElement {
   add        : (n:NGLNode)=>void;
 
 
-  constructor( gltf: Gltf, data: any ){
+  constructor( gltf: Gltf, data: Data_Node ){
 
     super();
 
@@ -63,7 +64,7 @@ export default class Node extends NGLNode implements BaseElement {
       this.camera = this.gltf.getElement( ElementType.CAMERA, data.camera );
 
     if( data.matrix !== undefined )
-      this.setMatrix( data.matrix );
+      this.setMatrix( new Float32Array( data.matrix ) );
 
     if( data.scale !== undefined )
       this.scale.set( data.scale );

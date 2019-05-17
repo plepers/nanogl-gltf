@@ -6,4 +6,4 @@ export default class Material extends BaseElement {
         super(gltf, data);
     }
 }
-Material.TYPE = ElementType.TYPE_MATERIAL;
+Material.TYPE = ElementType.MATERIAL;

@@ -9,3 +9,21 @@ export function expectEqualArray( v, expected ){
       expect().fail(`array not equal : ${v[i]} expected : ${expected[i]} `)
   }
 }
+
+
+interface Scope{
+  title : string
+  data : any
+}
+/*
+scopes
+*/
+export function describeMulti( dFunc, scopes : Scope[], func ){
+
+  for( const scope of scopes ){
+
+    dFunc( scope.title, ()=>{
+      func( scope.data )
+    })
+  }
+}

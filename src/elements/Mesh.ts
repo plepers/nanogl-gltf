@@ -6,6 +6,7 @@ import Primitive from './Primitive';
 
 
 import Gltf from '../index';
+import { Data_Mesh } from '../schema/glTF';
 
 export default class Mesh extends BaseElement {
 
@@ -14,7 +15,7 @@ export default class Mesh extends BaseElement {
   primitives : Primitive[];
   weights    : Float32Array;
 
-  constructor( gltf: Gltf, data: any ){
+  constructor( gltf: Gltf, data: Data_Mesh ){
 
     super( gltf, data );
 

@@ -5,6 +5,7 @@ import { ElementType } from '../consts';
 
 import  Gltf         from '../index'
 import  Buffer       from './Buffer'
+import { Data_BufferView } from '../schema/glTF';
 
 export default class BufferView extends BaseElement {
 
@@ -16,7 +17,7 @@ export default class BufferView extends BaseElement {
   target     : number;
   buffer     : Buffer;
 
-  constructor( gltf:Gltf , data:any ){
+  constructor( gltf:Gltf , data:Data_BufferView ){
 
     super( gltf, data );
 

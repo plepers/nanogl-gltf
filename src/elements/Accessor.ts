@@ -8,10 +8,11 @@ import Assert from '../lib/assert';
 import Gltf from '../index'
 import BufferView from './BufferView'
 import {TypedArrayConstructor, TypedArray} from '../consts'
+import { Data_Accessor } from '../schema/glTF';
 
 type normalizeFunc = (n:number)=>number;
-type CType = 5120 | 5121 | 5122 | 5123 | 5125 | 5126;
-type VType = 'SCALAR' | 'VEC2' | 'VEC3' | 'VEC4' | 'MAT2' | 'MAT3' | 'MAT4';
+type CType = 5120 | 5121 | 5122 | 5123 | 5125 | 5126 | number;
+type VType = 'SCALAR' | 'VEC2' | 'VEC3' | 'VEC4' | 'MAT2' | 'MAT3' | 'MAT4' | string;
 
 
 
@@ -175,7 +176,7 @@ export default class Accessor extends BaseElement {
   _normalizeFunc : normalizeFunc;
 
 
-  constructor( gltf:Gltf, data:any ){
+  constructor( gltf:Gltf, data:Data_Accessor ){
     super( gltf, data );
 
     

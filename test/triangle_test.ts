@@ -20,8 +20,6 @@ describe("Triangle", function () {
     });
 
     it("buffer bytes is ok", function () {
-      console.log( gltf.buffers.length );
-      console.log( gltf.buffers[0]._bytes );
       expect(gltf.buffers[0]._bytes).to.be.ok();
     });
 

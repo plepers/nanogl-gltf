@@ -178,8 +178,8 @@ export default class AnimationSampler extends BaseElement {
     constructor(gltf, data, animation) {
         super(gltf, data);
         this.animation = animation;
-        this.input = this.gltf.getElement(ElementType.TYPE_ACCESSOR, data.input);
-        this.output = this.gltf.getElement(ElementType.TYPE_ACCESSOR, data.output);
+        this.input = this.gltf.getElement(ElementType.ACCESSOR, data.input);
+        this.output = this.gltf.getElement(ElementType.ACCESSOR, data.output);
         this.interpolation = data.interpolation || MODE_LINEAR;
         this.interpolator = InterpolatorFactory(this);
     }
@@ -190,4 +190,4 @@ export default class AnimationSampler extends BaseElement {
         this.interpolator.evaluate(out, t);
     }
 }
-AnimationSampler.TYPE = ElementType.TYPE_ANIMATION_SAMPLER;
+AnimationSampler.TYPE = ElementType.ANIMATION_SAMPLER;

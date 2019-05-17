@@ -9,10 +9,10 @@ export default class BufferView extends BaseElement {
         this.byteOffset = byteOffset;
         this.byteStride = byteStride;
         this.target = target;
-        this.buffer = this.gltf.getElement(ElementType.TYPE_BUFFER, data.buffer);
+        this.buffer = this.gltf.getElement(ElementType.BUFFER, data.buffer);
     }
     getByteOffset() {
         return this.byteOffset + this.buffer._byteOffset;
     }
 }
-BufferView.TYPE = ElementType.TYPE_BUFFERVIEW;
+BufferView.TYPE = ElementType.BUFFERVIEW;

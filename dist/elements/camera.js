@@ -6,4 +6,4 @@ export default class Camera extends BaseElement {
         super(gltf, data);
     }
 }
-Camera.TYPE = ElementType.TYPE_CAMERA;
+Camera.TYPE = ElementType.CAMERA;

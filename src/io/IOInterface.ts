@@ -8,5 +8,8 @@ export default interface IOInterface {
   writeResource(path: string, data: string): Promise<Boolean>;
   writeBinaryResource(path: string, data: ArrayBuffer): Promise<Boolean>;
   decodeUTF8( buffer : ArrayBuffer, offset? : number, length? : number ) : string;
+
+  // decodeDataURI( uri : string ) : ArrayBuffer;
+  // isDataURI( uri : string ) : Boolean;
   
 }

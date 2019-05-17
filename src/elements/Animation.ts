@@ -6,6 +6,7 @@ import AnimationChannel from './AnimationChannel';
 import AnimationSampler from './AnimationSampler';
 
 import Gltf from '../index'
+import { Data_Animation } from '../schema/glTF';
 
 export default class Animation extends BaseElement {
 
@@ -14,7 +15,7 @@ export default class Animation extends BaseElement {
   samplers : AnimationSampler[]
   channels : AnimationChannel[]
 
-  constructor(gltf : Gltf, data : any) {
+  constructor(gltf : Gltf, data : Data_Animation) {
 
     super(gltf, data);
 
