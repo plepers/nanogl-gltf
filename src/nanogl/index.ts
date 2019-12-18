@@ -14,7 +14,7 @@ type AnyElementImpl = ElementImpl<AnyElement>;
 
 
 function filterRenderableNodes( node:GltfNode ){
-  return !!node.mesh;
+  return ( node.mesh !== undefined );
 }
 
 
@@ -67,28 +67,28 @@ class NanoglBackend {
     
     const renderableNodes = this.gltf.nodes.filter( filterRenderableNodes );
     
-    for ( var node of renderableNodes ) {
-      this.renderables.push( this.createRenderable( node ) );
-    }
+    // for ( var node of renderableNodes ) {
+    //   this.renderables.push( this.createRenderable( node ) );
+    // }
     
   }
   
   
-  createRenderable( node : GltfNode ) : IRenderable {
+  // createRenderable( node : GltfNode ) : IRenderable {
 
-    if( this.hasElement( node ) )
-      return this.getElement<GltfNode>( node );
+  //   if( this.hasElement( node ) )
+  //     return this.getElement<GltfNode>( node );
 
-    const r = new MeshRenderable( node.mesh );
+  //   const r = new MeshRenderable( node.mesh );
 
-    const primitives = this.createPrimitives( node.mesh.primitives );
-    return r;
-  }
+  //   const primitives = this.createPrimitives( node.mesh.primitives );
+  //   return r;
+  // }
 
 
-  createPrimitives(primitives: GltfPrimitive[] ) : Primitive[] {
+  // createPrimitives(primitives: GltfPrimitive[] ) : Primitive[] {
     
-  }
+  // }
 
 
 }

@@ -1,7 +1,7 @@
-//@flow
+
 
 import { ElementType } from '../consts';
-import BaseElement from './BaseElement';
+import BaseElement, { ElementMixin } from './BaseElement';
 import NGLNode from 'nanogl-node'
 
 
@@ -10,61 +10,36 @@ import  Skin   from './Skin'  ;
 import  Camera from './Camera';
 import  Mesh   from './Mesh'  ;
 import { Data_Node } from '../schema/glTF';
+import { mat4 } from 'gl-matrix';
 
 
 
-export default class Node extends NGLNode implements BaseElement {
+export default class Node extends ElementMixin( NGLNode ) {
 
 
   static TYPE = ElementType.NODE;
 
-
-  uid        : number  ;
-  gltf       : Gltf  ;
-  name       : string;
-  extras     : any   ;
-  extensions : any   ;
-
   camera      : Camera;
   skin        : Skin;
   mesh        : Mesh;
-  childRefs   : number[];
-  skinRef     : number;
   weights     : Float32Array;
 
-  // ngl
-  rotation   : Float32Array;
-  scale      : Float32Array;
-  position   : Float32Array;
-  _matrix    : Float32Array;
-  _wmatrix   : Float32Array;
-  _wposition : Float32Array;
-  _parent    : Node        ;
-  _children  : Node[]      ;
 
+  parse( gltf: Gltf, data: Data_Node ){
 
-  setMatrix  : (m:Float32Array)=>void;
-  invalidate : ()=>void
-  add        : (n:NGLNode)=>void;
-
-
-  constructor( gltf: Gltf, data: Data_Node ){
-
-    super();
+    // super.parse();
 
     this.uid        = BaseElement.CreateUID();
     this.gltf       = gltf;
     this.name       = data.name      
     this.extras     = data.extras    
     this.extensions = data.extensions
-    this.childRefs  = data.children || [];
-    this.skinRef    = data.skin;
 
     if( data.camera !== undefined )
       this.camera = this.gltf.getElement( ElementType.CAMERA, data.camera );
 
     if( data.matrix !== undefined )
-      this.setMatrix( new Float32Array( data.matrix ) );
+      this.setMatrix( <mat4> new Float32Array( data.matrix ) );
 
     if( data.scale !== undefined )
       this.scale.set( data.scale );
@@ -80,6 +55,16 @@ export default class Node extends NGLNode implements BaseElement {
 
     if( data.mesh !== undefined )
       this.mesh = gltf.getElement( ElementType.MESH, data.mesh );
+
+    if( data.children !== undefined ){
+      for (var i of data.children) {
+        this.add( this.gltf.getElement(ElementType.NODE, i ) as any as NGLNode );
+      }
+    }
+  
+    if( data.skin !== undefined ) {
+      this.skin = this.gltf.getElement( ElementType.SKIN, data.skin )
+    }
 
     this.invalidate();
     
@@ -99,18 +84,7 @@ export default class Node extends NGLNode implements BaseElement {
   //   return this.mesh.weights;
   // }
 
-  resolveReferences(){
-
-    for (var i of this.childRefs) {
-      this.add( this.gltf.getElement(ElementType.NODE, i ) );
-    }
-
-    if( this.skinRef !== undefined )
-      this.skin = this.gltf.getElement( ElementType.SKIN, this.skinRef )
-
-  }
-
-
+ 
   
 
 }

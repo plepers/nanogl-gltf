@@ -15,6 +15,7 @@ import Camera      from './elements/Camera'      ;
 import BaseElement from './elements/BaseElement' ;
 
 import { ElementType } from './consts';
+import Asset from './elements/Asset';
 
 
 
@@ -27,9 +28,10 @@ export default class Gltf{
   _extensions : Extensions
   
 
-  _elements         : BaseElement[];
+  _elements : BaseElement[];
+  _byType   : Map<ElementType, BaseElement[]>;
 
-  _byType           : Map<ElementType, BaseElement[]>;
+  asset : Asset;
 
   constructor(){
     this._url        = null;
@@ -40,6 +42,7 @@ export default class Gltf{
     this._byType = new Map<ElementType, BaseElement[]>([
       [ElementType.BUFFER            , [] ],
       [ElementType.BUFFERVIEW        , [] ],
+      [ElementType.ASSET             , [] ],
       [ElementType.ACCESSOR          , [] ],
       [ElementType.ANIMATION         , [] ],
       [ElementType.ANIMATION_SAMPLER , [] ],
@@ -49,6 +52,8 @@ export default class Gltf{
       [ElementType.NODE              , [] ],
       [ElementType.MATERIAL          , [] ],
       [ElementType.CAMERA            , [] ],
+      [ElementType.SCENE             , [] ],
+      [ElementType.SKIN              , [] ],
     ])
 
     this._elements = []
@@ -88,6 +93,10 @@ export default class Gltf{
     return this._getTypeHolder<Camera>(ElementType.CAMERA);
   }
 
+  get skins():Skin[]{
+    return this._getTypeHolder<Skin>(ElementType.SKIN);
+  }
+
 
   _getTypeHolder<T extends BaseElement>( type : ElementType ) : T[] {
     return this._byType.get( type ) as T[];
@@ -118,6 +127,7 @@ export default class Gltf{
  
   getElement<T extends BaseElement>( type:ElementType, index:number ) : T {
     return this._getTypeHolder<T>(type)[index]; 
+    HTMLCanvasElement
   }
  
 

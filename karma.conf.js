@@ -21,13 +21,18 @@ module.exports = function(config) {
       },
 
       karmaTypescriptConfig:{
-        "compilerOptions": {
+        compilerOptions: {
           "moduleResolution": "node",
           "lib": ["es2016", "dom"],
           "target": "es2016",
           "preserveConstEnums": true,
           "sourceMap": false,
           "allowJs": true,
+        },
+        bundlerOptions: {
+          transforms: [
+              require("karma-typescript-es6-transform")()
+          ]
         }
       },
   

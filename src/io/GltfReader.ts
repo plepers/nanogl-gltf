@@ -3,7 +3,7 @@ import Gltf from "..";
 
 import when from 'when'
 import IOInterface from "./IOInterface";
-import { ElementType, MAGIC, GLB_HEADER_SIZE, JSON_MAGIC } from "../consts";
+import { ElementType, MAGIC, GLB_HEADER_SIZE, JSON_MAGIC, ROOT_TYPES } from "../consts";
 import BufferView from "../elements/BufferView";
 import Accessor from "../elements/Accessor";
 import Mesh from "../elements/Mesh";
@@ -15,6 +15,8 @@ import BaseElement from "../elements/BaseElement";
 import Node from "../elements/Node";
 import Animation from "../elements/Animation";
 import { DataGlTF } from "../schema/glTF";
+import ElementFactory, { IElementFactory } from "./ElementFactory";
+import Asset from "../elements/Asset";
 
 
 
@@ -31,6 +33,9 @@ export default class GltfReader {
 
   _data    : DataGlTF ;
 
+  _defaultFactory : IElementFactory;
+  _factory        : IElementFactory;
+
 
   constructor( gltfIO : IOInterface, url : string, baseurl : string ){
     this.gltfIO   = gltfIO;
@@ -38,6 +43,9 @@ export default class GltfReader {
     this._baseUrl = baseurl; 
     this.gltf     = new Gltf();
     this._data    = null; 
+
+    this._defaultFactory = new ElementFactory();
+    this._factory = this._defaultFactory;
 
   }
 
@@ -81,7 +89,8 @@ export default class GltfReader {
     this._data = JSON.parse( scene );
 
     const bbytes = buffer.slice( GLB_HEADER_SIZE + jsonSize + 8 );
-    const mbuffer = new Buffer( this.gltf, {byteLength:bbytes.byteLength} );
+    const mbuffer = new Buffer()
+    mbuffer.parse( this.gltf, {byteLength:bbytes.byteLength} );
     mbuffer._bytes = bbytes;
     this.gltf.addElement( mbuffer )
 
@@ -91,7 +100,9 @@ export default class GltfReader {
   loadBuffers = ()=>{
     const buffers : BaseElement[] = this.gltf._getTypeHolder(ElementType.BUFFER);
     for (var i = buffers.length; i < this._data.buffers.length; i++) {
-      this.gltf.addElement( new Buffer( this.gltf, this._data.buffers[i] ) )
+      var buffer = new Buffer();
+      buffer.parse( this.gltf, this._data.buffers[i] );
+      this.gltf.addElement( buffer );
     }
     
     return when.map( buffers, this.loadBuffer );
@@ -111,36 +122,37 @@ export default class GltfReader {
   }
 
 
+  
   parseAll = ()=>{
 
-    this._parseElements( ElementType.BUFFERVIEW , BufferView );
-    this._parseElements( ElementType.ACCESSOR   , Accessor   );
-    this._parseElements( ElementType.MATERIAL   , Material   );
-    this._parseElements( ElementType.CAMERA     , Camera     );
-    this._parseElements( ElementType.MESH       , Mesh       );
-    this._parseElements( ElementType.NODE       , Node       );
-    this._parseElements( ElementType.ANIMATION  , Animation  );
-    this._parseElements( ElementType.SKIN       , Skin       );
+    const gltf = this.gltf;
+    
+    gltf.asset = this._factory.createElement( ElementType.ASSET ) as Asset;
+    gltf.asset.parse( gltf, this._data.asset )
 
 
-    // resolve nodes refs
-    const nodes = this.gltf._getTypeHolder<Node>(ElementType.NODE);
-    for (var node of nodes) {
-      node.resolveReferences();
+
+    const elementDataPair : [BaseElement,any][] = [];
+    
+    for (let type of ROOT_TYPES) {
+
+      this._data[type]?.forEach( (data: any)=>{
+        const element = this._factory.createElement( type );
+        if( element !== null ){
+          elementDataPair.push( [element, data])
+          gltf.addElement( element )
+        }
+      })
+
     }
-
+    
+    elementDataPair.forEach( ([element, data])=>element.parse( gltf, data));
+  
   }
 
 
   yieldGltf = ():Promise<Gltf>=>{
     return when( this.gltf );
-  }
-
-
-  _parseElements( type:ElementType, _Class: new (Gltf, any) => BaseElement ){
-    if( this._data[type] ){
-      this._data[type].forEach( d=>this.gltf.addElement( new _Class(this.gltf, d) ) );
-    }
   }
 
 

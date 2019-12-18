@@ -24,13 +24,13 @@ export default class Camera extends BaseElement {
 
   type : ProjectionType;
   projectionData : ProjectionData;
-  projection : Float32Array;
+  projection : mat4;
 
-  constructor( gltf: Gltf, data: Data_Camera ){
+  parse( gltf: Gltf, data: Data_Camera ){
 
-    super( gltf, data );
+    super.parse( gltf, data );
 
-    this.projection = new Float32Array( 16 );
+    this.projection = mat4.create();
 
     this.type = data.type;
   

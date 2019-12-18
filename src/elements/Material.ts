@@ -1,4 +1,4 @@
-//@flow
+
 
 import { ElementType } from '../consts';
 import BaseElement from './BaseElement';
@@ -12,9 +12,9 @@ export default class Material extends BaseElement {
 
   static TYPE : ElementType = ElementType.MATERIAL;
 
-  constructor( gltf: Gltf, data: Data_Material ){
+  parse( gltf: Gltf, data: Data_Material ){
 
-    super( gltf, data );
+    super.parse( gltf, data );
 
   }
   

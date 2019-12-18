@@ -1,4 +1,4 @@
-//@flow
+
 
 
 import BaseElement from './BaseElement';
@@ -15,7 +15,6 @@ import { Data_AnimationChannel } from '../schema/glTF';
 type applyFunc = (node:Node, value:TypedArray)=>void
 
 
-type PathType = 'translation' | 'rotation' | 'scale' | 'weights' | string;
 
 enum Path {
   TRANSLATION = 'translation',
@@ -24,22 +23,26 @@ enum Path {
   WEIGHTS     = 'weights'    ,
 }
 
+type PathType = 'translation' | 'rotation' | 'scale' | 'weights' | string;
 
 
 function applyTranslation(node:Node, value:TypedArray) {
   node.position.set( value );
+  node.invalidate();
 }
 
 function applyRotation(node:Node, value:TypedArray) {
   node.rotation.set( value );
+  node.invalidate();
 }
 
 function applyScale(node:Node, value:TypedArray) {
   node.scale.set( value );
+  node.invalidate();
 }
 
 function applyWeights(node:Node, value:TypedArray) {
-
+  node.weights.set( value );
 }
 
 
@@ -64,7 +67,6 @@ export default class AnimationChannel extends BaseElement {
   static TYPE = ElementType.ANIMATION_CHANNEL
 
   _active       : boolean         ;
-  animation     : Animation       ;
   sampler       : AnimationSampler;
   path          : PathType        ;
   applyFunction : applyFunc       ;
@@ -72,26 +74,23 @@ export default class AnimationChannel extends BaseElement {
   valueHolder   : TypedArray      ;
 
 
-  constructor(gltf : Gltf, data:Data_AnimationChannel, animation:Animation) {
+  parse(gltf : Gltf, data:Data_AnimationChannel, animation:Animation) {
 
-    super(gltf, data);
+    super.parse(gltf, data);
 
     this._active = false;
 
-    this.animation = animation;
-    this.sampler = animation.getSampler(data.sampler);
     this.path = data.target.path;
     this.applyFunction = getApplyFunctionFromPath( this.path );
-
+    
     if( data.target.node !== undefined ){
       this._active = true;
       this.node = gltf.getElement<Node>( ElementType.NODE, data.target.node);
     }
-
+    
+    this.sampler = animation.getSampler(data.sampler);
     this.valueHolder = this.sampler.createElementHolder();
   }
-  
- 
 
 
   evaluate(t:number) {

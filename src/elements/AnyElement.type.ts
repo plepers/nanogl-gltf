@@ -6,7 +6,6 @@ import Material   from "./Material"  ;
 import Mesh       from "./Mesh"      ;
 import Primitive  from "./Primitive" ;
 import Skin       from "./Skin"      ;
-import BaseElement from "./BaseElement";
 
 
 export type AnyElement = 

@@ -32,4 +32,41 @@ describe("Node graph", function () {
 
   });
   
+  
+  
+  describe("parent with no transform", function () {
+    
+    let gltf:Gltf;
+  
+    before(function () {
+      return WebGltfIO.loadGltf('samples/generator/Output/Node_Attribute/Node_Attribute_01.gltf').then( res=>gltf=res )
+    });
+
+    it("world pos ok", function () {
+      const m = gltf.getElementByName<Node>( ElementType.NODE, 'Node1' );
+      m.updateWorldMatrix();
+      expectEqualArray( m._wposition, new Float32Array( [-2,2,-2] ));
+    });
+
+
+    it("child has parent", function () {
+      const child = gltf.getElementByName<Node>( ElementType.NODE, 'Node1' );
+      const parent = gltf.getElementByName<Node>( ElementType.NODE, 'Node0' );
+      
+      expect( child._parent).to.be( parent );
+    });
+
+
+    it("parent has children", function () {
+      const child = gltf.getElementByName<Node>( ElementType.NODE, 'Node1' );
+      const parent = gltf.getElementByName<Node>( ElementType.NODE, 'Node0' );
+      
+      expect( parent._parent).to.be( null );
+      expect( parent._children.length).to.be( 1 );
+      expect( parent._children[0]).to.be( child );
+    });
+
+
+  });
+  
 });

@@ -2,86 +2,52 @@ import { ElementType } from "../consts";
 import Gltf from "../index";
 
 
-// export function BaseElementExtend( C:any = Object ){
-
-
-//   return class extends C {
-
-
-//     static TYPE : ElementType = ElementType.TYPE_NONE;
-
-
-//     gltf       : Gltf  ;
-//     name       : string;
-//     extras     : any   ;
-//     extensions : any   ;
-
-
-//     constructor( gltf : Gltf, data : any ){
-
-//       super();
-
-//       this.gltf = gltf;
-
-//       this.name       = data.name      
-//       this.extras     = data.extras    
-//       this.extensions = data.extensions
-
-//     }
-
-
-//     get elementType() : ElementType {
-//       return this.constructor['TYPE'];
-//     }
-
-
-//   }
-
-// }
-
-
-
-// const BaseElement = BaseElementExtend();
-
 let UID = 0;
 
-class BaseElement {
 
-  static CreateUID() : number {
-    return UID++;
-  }
+type Constructor<T = {}> = new (...args: any[]) => T;
 
-  static TYPE : ElementType = ElementType.NONE;
+function ElementMixin<TBase extends Constructor>(Base: TBase) {
 
-
-  uid        : number;
-  gltf       : Gltf  ;
-  name       : string;
-  extras     : any   ;
-  extensions : any   ;
+  return class extends Base {
 
 
-  constructor( gltf : Gltf, data : any ){
+    static CreateUID() : number {
+      return UID++;
+    }
 
-    this.uid = BaseElement.CreateUID();
-
-    this.gltf = gltf;
-
-    this.name       = data.name      
-    this.extras     = data.extras    
-    this.extensions = data.extensions
-
-  }
+    static TYPE : ElementType = ElementType.NONE;
 
 
+    uid         : number;
+    gltf        : Gltf  ;
+
+    name?       : string;
+    extras?     : any   ;
+    extensions? : any   ;
 
 
+    parse( gltf : Gltf, data : any, ...args : any ){
 
-  get elementType() : ElementType {
-    return this.constructor['TYPE'];
+      this.uid = BaseElement.CreateUID();
+
+      this.gltf = gltf;
+
+      this.name       = data.name      
+      this.extras     = data.extras    
+      this.extensions = data.extensions
+
+    }
+
+
+    get elementType() : ElementType {
+      return this.constructor['TYPE'];
+    }
+
   }
 
 }
 
+export {ElementMixin};
 
-export default BaseElement;
+export default class BaseElement extends ElementMixin(Object) {}

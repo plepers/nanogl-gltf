@@ -1,4 +1,4 @@
-//@flow
+
 
 
 import BaseElement from './BaseElement';
@@ -270,7 +270,7 @@ class CubicSplineInterpolator extends Interpolator {
       cubicSplineInterpolation(out, p, dt, this.val0, this.val1, this.val2, this.val3);
 
       if (this.assumeQuat) {
-        quat.normalize(out, out);
+        quat.normalize(<quat>out, <quat>out);
       }
 
 
@@ -310,17 +310,15 @@ export default class AnimationSampler extends BaseElement {
   static TYPE = ElementType.ANIMATION_SAMPLER
 
 
-  animation     :Animation         ;
   interpolation :InterpolationType ;
   input         :Accessor          ;
   output        :Accessor          ;
   interpolator  :Interpolator      ;
 
 
-  constructor( gltf:Gltf, data:Data_AnimationSampler, animation:Animation ) {
-    super(gltf, data);
+  parse( gltf:Gltf, data:Data_AnimationSampler ) {
+    super.parse(gltf, data);
 
-    this.animation = animation;
 
     this.input = this.gltf.getElement( ElementType.ACCESSOR, data.input );
     this.output = this.gltf.getElement( ElementType.ACCESSOR, data.output );

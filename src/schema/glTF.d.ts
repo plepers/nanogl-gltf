@@ -9,13 +9,17 @@ export type DataGlTFId = number;
 /**
  * Image data used to create a texture. Image can be referenced by URI or `bufferView` index. `mimeType` is required in the latter case.
  */
-export type Data_Image =
-  | {
-      [k: string]: any;
-    }
-  | {
-      [k: string]: any;
-    };
+export interface Data_Image {
+
+  uri? : string;
+  mimeType?:string;
+  bufferView?:DataGlTFId;
+  name?: any;
+  extensions?: any;
+  extras?: any;
+}
+
+
 export type Data_MaterialNormalTextureInfo = Data_TextureInfo;
 export type Data_MaterialOcclusionTextureInfo = Data_TextureInfo;
 

@@ -1,14 +1,11 @@
 
-//@flow
-
-
 import BaseElement from './BaseElement';
 import { ElementType} from '../consts';
 import Assert from '../lib/assert';
 import Gltf from '../index'
 import BufferView from './BufferView'
 import {TypedArrayConstructor, TypedArray} from '../consts'
-import { Data_Accessor } from '../schema/glTF';
+import { Data_Accessor, Data_AccessorSparse } from '../schema/glTF';
 
 type normalizeFunc = (n:number)=>number;
 type CType = 5120 | 5121 | 5122 | 5123 | 5125 | 5126 | number;
@@ -86,12 +83,13 @@ class Sparse{
   indicesSet:Set<number>;
   indicesMap:Map<number, number>;
 
-  constructor( accessor, data ){
+  constructor( accessor: Accessor, data: Data_AccessorSparse ){
     this.accessor = accessor;
 
     let iData = data.indices;
     
-    this.indices = new Accessor( accessor.gltf, {
+    this.indices = new Accessor()
+    this.indices.parse( accessor.gltf, {
       bufferView   : iData   .bufferView ,
       byteOffset   : iData   .byteOffset ,
       componentType: iData   .componentType,
@@ -102,7 +100,8 @@ class Sparse{
     
     let vData = data.values;
     
-    this.values = new Accessor( accessor.gltf, {
+    this.values = new Accessor();
+    this.values.parse( accessor.gltf, {
       bufferView   : vData   .bufferView ,
       byteOffset   : vData   .byteOffset ,
       count        : data    .count,
@@ -176,8 +175,8 @@ export default class Accessor extends BaseElement {
   _normalizeFunc : normalizeFunc;
 
 
-  constructor( gltf:Gltf, data:Data_Accessor ){
-    super( gltf, data );
+  parse( gltf:Gltf, data:Data_Accessor ){
+    super.parse( gltf, data );
 
     
     const { 
@@ -244,7 +243,6 @@ export default class Accessor extends BaseElement {
  
 
 
-  // $FlowFixMe
   *[Symbol.iterator](){
     const holder = this.createElementHolder();
     for (let i=0; i < this.count; i++) {
@@ -340,11 +338,5 @@ export default class Accessor extends BaseElement {
       out[i] = fn( raw[i] );
     }
   }
-
-
-
-
-
-
 
 }

@@ -31,18 +31,19 @@ export enum PrimitiveMode {
 export enum ElementType {
 
   NONE              = ''          ,
-  BUFFER            = 'buffers'          ,
-  BUFFERVIEW        = 'bufferViews'      ,
   ACCESSOR          = 'accessors'        ,
   ANIMATION         = 'animations'       ,
+  ASSET             = 'asset'            ,
+  BUFFER            = 'buffers'          ,
+  BUFFERVIEW        = 'bufferViews'      ,
   MESH              = 'meshes'           ,
   PRIMITIVE         = 'primitives'       ,
   NODE              = 'nodes'            ,
-  SCENE             = 'scenes'           ,
   CAMERA            = 'cameras'          ,
+  SAMPLER           = 'samplers'         ,
+  SCENE             = 'scenes'           ,
   SKIN              = 'skins'            ,
   IMAGE             = 'images'           ,
-  SAMPLER           = 'samplers'         ,
   TEXTURE           = 'textures'         ,
   MATERIAL          = 'materials'        ,
   ANIMATION_SAMPLER = 'animationSamplers',
@@ -55,11 +56,16 @@ export enum ElementType {
 
 
 export const ROOT_TYPES = [
-  ElementType.BUFFERVIEW,
-  ElementType.ACCESSOR,
-  ElementType.ANIMATION,
-  ElementType.MESH,
-]
+  ElementType.BUFFERVIEW ,
+  ElementType.ACCESSOR   ,
+  ElementType.MATERIAL   ,
+  ElementType.CAMERA     ,
+  ElementType.MESH       ,
+  ElementType.NODE       ,
+  ElementType.ANIMATION  ,
+  ElementType.SCENE     ,
+  ElementType.SKIN       ,
+] as const
 
 export const ALL_TYPES = [
   ...ROOT_TYPES,
@@ -67,4 +73,4 @@ export const ALL_TYPES = [
   ElementType.ANIMATION_SAMPLER,
   ElementType.ANIMATION_CHANNEL,
   ElementType.PRIMITIVE,
-]
+] as const

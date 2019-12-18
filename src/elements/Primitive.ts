@@ -1,4 +1,4 @@
-//@flow
+
 
 import { ElementType, PrimitiveMode } from '../consts';
 import BaseElement from './BaseElement';
@@ -87,23 +87,20 @@ export default class Primitive extends BaseElement {
   targets    : AttributesSet[];
 
 
-  constructor( gltf:Gltf, data:Data_MeshPrimitive ){
+  parse( gltf:Gltf, data:Data_MeshPrimitive ){
 
-    super( gltf, data );
+    super.parse( gltf, data );
 
     
     this.attributes = new AttributesSet();
     this.parseAttributeSet( this.attributes, data.attributes );
 
     
-
     if( data.indices !== undefined )
-      this.indices = this.gltf.getElement( ElementType.ACCESSOR, data.indices );
-
+      this.indices = gltf.getElement( ElementType.ACCESSOR, data.indices );
 
     if( data.material !== undefined )
-      this.material = this.gltf.getElement( ElementType.MATERIAL, data.material );
-    
+      this.material = gltf.getElement( ElementType.MATERIAL, data.material );
 
     if( data.mode !== undefined)
       this.mode = data.mode;

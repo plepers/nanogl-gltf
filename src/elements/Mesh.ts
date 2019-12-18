@@ -1,4 +1,4 @@
-//@flow
+
 
 import { ElementType } from '../consts';
 import BaseElement from './BaseElement';
@@ -15,12 +15,16 @@ export default class Mesh extends BaseElement {
   primitives : Primitive[];
   weights    : Float32Array;
 
-  constructor( gltf: Gltf, data: Data_Mesh ){
+  parse( gltf: Gltf, data: Data_Mesh ){
 
-    super( gltf, data );
+    super.parse( gltf, data );
 
     this.primitives = data.primitives.map(
-      d => new Primitive(gltf, d)
+      d => {
+        const p = new Primitive();
+        p.parse(gltf, d);
+        return p;
+      }
     );
     
     this.gltf.addElements(this.primitives);

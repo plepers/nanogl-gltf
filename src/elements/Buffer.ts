@@ -1,4 +1,4 @@
-//@flow
+
 
 import { ElementType } from '../consts';
 import BaseElement from './BaseElement';
@@ -18,9 +18,9 @@ export default class Buffer extends BaseElement {
   _bytes      : ArrayBuffer;
   _byteOffset :number       ;
 
-  constructor( gltf : Gltf, data : Data_Buffer ){
+  parse( gltf : Gltf, data : Data_Buffer ){
     
-    super( gltf, data );
+    super.parse( gltf, data );
 
     this.byteLength  = data.byteLength;
     this.uri         = data.uri;

@@ -1,4 +1,4 @@
-//@flow
+
 
 import BaseElement from './BaseElement';
 import { ElementType } from '../consts';
@@ -17,9 +17,9 @@ export default class BufferView extends BaseElement {
   target     : number;
   buffer     : Buffer;
 
-  constructor( gltf:Gltf , data:Data_BufferView ){
+  parse( gltf:Gltf , data:Data_BufferView ){
 
-    super( gltf, data );
+    super.parse( gltf, data );
 
     const {
       byteLength,
