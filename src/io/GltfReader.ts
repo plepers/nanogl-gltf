@@ -4,16 +4,8 @@ import Gltf from "..";
 import when from 'when'
 import IOInterface from "./IOInterface";
 import { ElementType, MAGIC, GLB_HEADER_SIZE, JSON_MAGIC, ROOT_TYPES } from "../consts";
-import BufferView from "../elements/BufferView";
-import Accessor from "../elements/Accessor";
-import Mesh from "../elements/Mesh";
-import Skin from "../elements/Skin";
-import Camera from "../elements/Camera";
-import Material from "../elements/Material";
 import Buffer from "../elements/Buffer";
 import BaseElement from "../elements/BaseElement";
-import Node from "../elements/Node";
-import Animation from "../elements/Animation";
 import { DataGlTF } from "../schema/glTF";
 import ElementFactory, { IElementFactory } from "./ElementFactory";
 import Asset from "../elements/Asset";

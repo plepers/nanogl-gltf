@@ -13,9 +13,12 @@ import Mesh        from './elements/Mesh'        ;
 import Skin        from './elements/Skin'        ;
 import Camera      from './elements/Camera'      ;
 import BaseElement from './elements/BaseElement' ;
+import Asset       from './elements/Asset'       ;
 
 import { ElementType } from './consts';
-import Asset from './elements/Asset';
+import BufferCache from './BufferCache';
+import { GLContext } from 'nanogl/types';
+import { ISemantics, DefaultSemantics } from './Semantics';
 
 
 
@@ -26,10 +29,13 @@ export default class Gltf{
   _url        : string
   _baseDir    : string
   _extensions : Extensions
-  
+
 
   _elements : BaseElement[];
   _byType   : Map<ElementType, BaseElement[]>;
+
+  bufferCache : BufferCache;
+  semantics   : ISemantics;
 
   asset : Asset;
 
@@ -54,9 +60,23 @@ export default class Gltf{
       [ElementType.CAMERA            , [] ],
       [ElementType.SCENE             , [] ],
       [ElementType.SKIN              , [] ],
+      [ElementType.TEXTURE           , [] ],
     ])
 
     this._elements = []
+
+    this.semantics = new DefaultSemantics();
+
+  }
+  
+  
+  allocateGl( gl : GLContext ){
+    
+    this.bufferCache = new BufferCache( gl );
+
+    for( const mesh of this.meshes ){
+      mesh.allocateGl( gl );
+    }
 
   }
 
@@ -127,7 +147,6 @@ export default class Gltf{
  
   getElement<T extends BaseElement>( type:ElementType, index:number ) : T {
     return this._getTypeHolder<T>(type)[index]; 
-    HTMLCanvasElement
   }
  
 

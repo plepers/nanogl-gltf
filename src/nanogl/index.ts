@@ -47,10 +47,10 @@ class NanoglBackend {
   }
 
 
-  addElement( e : ElementImpl<BaseElement> ){
-    this._elements.push( e );
-    this._elementsByUid.set( e.getElement().uid, e );
-  }
+  // addElement( e : ElementImpl<BaseElement> ){
+  //   this._elements.push( e );
+  //   this._elementsByUid.set( e.getElement().uid, e );
+  // }
   
   getElement<T extends AnyElement>( e : BaseElement ) : AnyElementImpl{
     return this._elementsByUid.get( e.uid );

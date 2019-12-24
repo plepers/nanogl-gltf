@@ -1,10 +1,9 @@
 
 
 import { ElementType } from '../consts';
-import { Data_Scene, Data_Asset } from '../schema/glTF';
+import { Data_Asset } from '../schema/glTF';
 import Gltf        from '../index'     ;
 import BaseElement from './BaseElement';
-import Node        from './Node'       ;
 
 
 export default class Asset extends BaseElement {

@@ -1,10 +1,6 @@
 import when from 'when';
 
 
-const _domParser = new DOMParser();
-
-
-
 export function whenAll( promises ){
   const def = when.defer()
   let remaining = promises.length;
@@ -37,16 +33,6 @@ export function loadJson( url ) {
     .then( str => JSON.parse(str) );
   
 }
-
-
-
-export function loadXml( url ) {
-  return loadText( url )
-    .then( str =>
-      _domParser.parseFromString( str, "application/xml" )
-    );
-}
-
 
 
 export function loadBytes( url ) {
@@ -150,4 +136,3 @@ function _reqComplete( req ){
   if( i > -1 )
     _requestsList.splice( i, 1 );
 }
-

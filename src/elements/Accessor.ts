@@ -7,9 +7,20 @@ import BufferView from './BufferView'
 import {TypedArrayConstructor, TypedArray} from '../consts'
 import { Data_Accessor, Data_AccessorSparse } from '../schema/glTF';
 
+
+const enum ComponentType {
+  BYTE           = 5120,
+  UNSIGNED_BYTE  = 5121,
+  SHORT          = 5122,
+  UNSIGNED_SHORT = 5123,
+  UNSIGNED_INT   = 5125,
+  FLOAT          = 5126,
+}
+
 type normalizeFunc = (n:number)=>number;
-type CType = 5120 | 5121 | 5122 | 5123 | 5125 | 5126 | number;
+type CType = ComponentType | number;
 type VType = 'SCALAR' | 'VEC2' | 'VEC3' | 'VEC4' | 'MAT2' | 'MAT3' | 'MAT4' | string;
+
 
 
 
@@ -24,23 +35,23 @@ const TYPE_SIZE_MAP = {
 }
 
 const ARRAY_TYPES = new Map<CType, TypedArrayConstructor >([
-  [5120, Int8Array    ], // force unsigned???
-  [5121, Uint8Array   ],
-  [5122, Int16Array   ],
-  [5123, Uint16Array  ],
-  [5125, Uint32Array  ],
-  [5126, Float32Array ],
+  [ComponentType.BYTE           , Int8Array    ], // force unsigned???
+  [ComponentType.UNSIGNED_BYTE  , Uint8Array   ],
+  [ComponentType.SHORT          , Int16Array   ],
+  [ComponentType.UNSIGNED_SHORT , Uint16Array  ],
+  [ComponentType.UNSIGNED_INT   , Uint32Array  ],
+  [ComponentType.FLOAT          , Float32Array ],
 ]);
 
 
 //https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md_animations
 const NORMALIZE_FUNCS = new Map<CType, normalizeFunc>([
-  [5120, c => Math.max(c / 127.0, -1.0)	 ],
-  [5121, c => c / 255.0	 ],
-  [5122, c => Math.max(c / 32767.0, -1.0)	 ],
-  [5123, c => c / 65535.0	 ],
-  [5125, c => c ],
-  [5126, c => c ],
+  [ComponentType.BYTE           , c => Math.max(c / 127.0, -1.0)	 ],
+  [ComponentType.UNSIGNED_BYTE  , c => c / 255.0	 ],
+  [ComponentType.SHORT          , c => Math.max(c / 32767.0, -1.0)	 ],
+  [ComponentType.UNSIGNED_SHORT , c => c / 65535.0	 ],
+  [ComponentType.UNSIGNED_INT   , c => c ],
+  [ComponentType.FLOAT          , c => c ],
 ]);
 
 
@@ -117,7 +128,6 @@ class Sparse{
 
     const indices = this.indices;
     const count = indices.count;
-    const holder = indices.createElementHolder();
     
     for (var i = 0; i < count; i++) {
       var j = indices.getScalar( i )
@@ -213,6 +223,7 @@ export default class Accessor extends BaseElement {
 
     } else {
       this.bufferView     = null;
+      this._stride        = 0;
       this._strideElem    = 0;
       this._array = this.createElementHolder();
     }
@@ -224,7 +235,6 @@ export default class Accessor extends BaseElement {
     }
 
     this._valueHolder = this.createElementHolder();
-    this._stride = 0;
     this._normalizeFunc = getNormalizeFunction( this.componentType );
 
   }

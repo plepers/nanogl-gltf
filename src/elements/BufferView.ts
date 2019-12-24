@@ -6,6 +6,9 @@ import { ElementType } from '../consts';
 import  Gltf         from '../index'
 import  Buffer       from './Buffer'
 import { Data_BufferView } from '../schema/glTF';
+import GLArrayBuffer from 'nanogl/arraybuffer';
+import GLIndexBuffer from 'nanogl/indexbuffer';
+import { GLContext } from 'nanogl/types';
 
 export default class BufferView extends BaseElement {
 
@@ -40,6 +43,11 @@ export default class BufferView extends BaseElement {
 
   getByteOffset():number{
     return this.byteOffset + this.buffer._byteOffset;
+  }
+
+
+  allocateGl( gl: GLContext ){
+
   }
 
  
