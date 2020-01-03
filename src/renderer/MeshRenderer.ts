@@ -3,22 +3,22 @@ import Mesh from "../elements/Mesh"
 import GLState from 'nanogl-state/state'
 import GLConfig from 'nanogl-state/config'
 import Camera from 'nanogl-camera'
+import IMaterial from "./IMaterial"
 
 export default class MeshRenderer {
 
   node: Node;
   mesh: Mesh;
 
+  glconfig? : GLConfig;
+
   constructor(node: Node) {
     this.node = node;
     this.mesh = node.mesh;
   }
 
-  render(glstate: GLState, camera: Camera, mask: number, cfg: GLConfig) {
 
-
-
-
+  render( glstate: GLState, camera: Camera, mask: number = ~0, glconfig?: GLConfig ){
 
     const primitives = this.mesh.primitives;
     
@@ -26,39 +26,29 @@ export default class MeshRenderer {
     for (let i = 0; i < primitives.length; i++) {
 
       const primitive = primitives[i];
-      const mat = primitive.material;
+      const mat:IMaterial = primitive.material;
 
-
-
-      mat.prepare(this, camera, sub)
+      mat.prepare(this.node, camera, primitive)
 
       // push configs
       // -------------
 
-      state.push(mat.config);
+      mat.glconfig && glstate.push(mat.glconfig);
+      this.glconfig && glstate.push(this.glconfig);
+      glconfig && glstate.push(glconfig);
 
-      if (this.cfg)
-        state.push(this.cfg);
-      // optional cfg
-      if (cfg)
-        state.push(cfg);
-
-      state.apply()
+      glstate.apply()
 
       // render
       // ----------
-      this.drawCall(camera, mat.prg, sub, mat);
+      this.drawCall(camera, mat.prg, primitive, mat);
 
       // pop configs
       // -------------
 
-      state.pop();
-
-      if (this.cfg)
-        state.pop();
-
-      if (cfg)
-        state.pop();
+      mat.glconfig && glstate.pop();
+      this.glconfig && glstate.pop();
+      glconfig && glstate.pop();
 
     }
 
