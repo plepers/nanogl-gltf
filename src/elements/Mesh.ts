@@ -26,14 +26,14 @@ export default class Mesh extends BaseElement {
         p.parse(gltf, d);
         return p;
       }
-      );
-      
-      this.gltf.addElements(this.primitives);
-      
-      if( data.weights )
-      this.weights = new Float32Array( data.weights );
-      
-    }
+    );
+    
+    this.gltf.addElements(this.primitives);
+    
+    if( data.weights )
+    this.weights = new Float32Array( data.weights );
+    
+  }
     
     
     

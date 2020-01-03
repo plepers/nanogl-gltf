@@ -9,6 +9,9 @@ import PbrMetallicRoughness from './PbrMetallicRoughness';
 import NormalTextureInfo    from './NormalTextureInfo'   ;
 import OcclusionTextureInfo from './OcclusionTextureInfo';
 import TextureInfo          from './TextureInfo'         ;
+import { GLContext } from 'nanogl/types';
+import MaterialPass from 'nanogl-pbr/MaterialPass';
+import StandardPass from 'nanogl-pbr/StandardPass'
 
 
 export enum AlphaMode {
@@ -22,10 +25,10 @@ export default class Material extends BaseElement {
   static TYPE : ElementType = ElementType.MATERIAL;
 
 
-  pbrMetallicRoughness : PbrMetallicRoughness;
-  normalTexture        : NormalTextureInfo   ;
-  occlusionTexture     : OcclusionTextureInfo;
-  emissiveTexture      : TextureInfo         ;
+  pbrMetallicRoughness?: PbrMetallicRoughness;
+  normalTexture?       : NormalTextureInfo   ;
+  occlusionTexture?    : OcclusionTextureInfo;
+  emissiveTexture?     : TextureInfo         ;
   emissiveFactor       : vec3                ;
   alphaMode            : AlphaMode | string  ;
   alphaCutoff          : number              ;
@@ -62,7 +65,21 @@ export default class Material extends BaseElement {
       this.emissiveTexture.parse( gltf, data.emissiveTexture )
     }
   }
+
+
+  materialPass : MaterialPass
   
+  
+  allocateGl( gl : GLContext ) {
+
+    const pass = new StandardPass( this.name );
+    
+    pass.glconfig.enableCullface( !this.doubleSided );
+
+    pass.occlusion.attachSampler
+
+    this.materialPass = pass;
+  }
 
 }
 

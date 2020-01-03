@@ -53,6 +53,7 @@
     "nanogl-node": "git@github.com:plepers/nanogl-node.git#develop",
     "nanogl-state": "git@github.com:plepers/nanogl-state.git#develop",
     "nanogl-vao": "git@github.com:plepers/nanogl-vao.git#develop",
+    "nanogl-pbr": "git@github.com:plepers/nanogl-pbr.git#develop",
     "save": "^2.4.0",
     "when": "^3.7.8"
   }
