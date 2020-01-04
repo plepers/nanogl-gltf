@@ -1,14 +1,22 @@
 
 
 import { vec3 } from 'gl-matrix';
-import { ElementType } from '../consts';
+import GLConfig             from 'nanogl-state/config'    ;
+import Node                 from 'nanogl-node'            ;
+
+import { ElementType   } from '../consts'     ;
 import { Data_Material } from '../schema/glTF';
-import Gltf from '../index';
-import BaseElement          from './BaseElement'         ;
-import PbrMetallicRoughness from './PbrMetallicRoughness';
-import NormalTextureInfo    from './NormalTextureInfo'   ;
-import OcclusionTextureInfo from './OcclusionTextureInfo';
-import TextureInfo          from './TextureInfo'         ;
+import   Gltf            from '../index'      ;
+
+import BaseElement          from './BaseElement'          ;
+import PbrMetallicRoughness from './PbrMetallicRoughness' ;
+import NormalTextureInfo    from './NormalTextureInfo'    ;
+import OcclusionTextureInfo from './OcclusionTextureInfo' ;
+import TextureInfo          from './TextureInfo'          ;
+
+import IMaterial            from '../renderer/IMaterial'  ;
+import Camera from 'nanogl-camera';
+import Primitive from './Primitive';
 
 
 export enum AlphaMode {
@@ -17,11 +25,12 @@ export enum AlphaMode {
   BLEND  = "BLEND"  ,
 }
 
-export default class Material extends BaseElement {
-
+export default class Material extends BaseElement implements IMaterial {
+  
+  
   static TYPE : ElementType = ElementType.MATERIAL;
-
-
+  
+  
   pbrMetallicRoughness : PbrMetallicRoughness;
   normalTexture        : NormalTextureInfo   ;
   occlusionTexture     : OcclusionTextureInfo;
@@ -30,6 +39,9 @@ export default class Material extends BaseElement {
   alphaMode            : AlphaMode | string  ;
   alphaCutoff          : number              ;
   doubleSided          : boolean             ;
+  
+  
+  glconfig: GLConfig;
 
 
   parse( gltf: Gltf, data: Data_Material ){
@@ -61,6 +73,13 @@ export default class Material extends BaseElement {
       this.emissiveTexture = new TextureInfo()
       this.emissiveTexture.parse( gltf, data.emissiveTexture )
     }
+  }
+
+
+
+
+  prepare(node: Node, camera: Camera, primitive: Primitive): void {
+    //TODO: material prepare 
   }
   
 

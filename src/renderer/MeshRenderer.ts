@@ -1,5 +1,6 @@
 import Node from "../elements/Node"
 import Mesh from "../elements/Mesh"
+import Primitive from "../elements/Primitive"
 import GLState from 'nanogl-state/state'
 import GLConfig from 'nanogl-state/config'
 import Camera from 'nanogl-camera'
@@ -41,7 +42,7 @@ export default class MeshRenderer {
 
       // render
       // ----------
-      this.drawCall(camera, mat.prg, primitive, mat);
+      // this.drawCall(camera, mat.prg, primitive, mat);
 
       // pop configs
       // -------------
@@ -52,6 +53,9 @@ export default class MeshRenderer {
 
     }
 
+  }
+  drawCall(camera: Camera, prg: any, primitive: Primitive, mat: IMaterial) {
+    
   }
 
 }
