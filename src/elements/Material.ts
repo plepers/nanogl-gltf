@@ -14,9 +14,8 @@ import NormalTextureInfo    from './NormalTextureInfo'    ;
 import OcclusionTextureInfo from './OcclusionTextureInfo' ;
 import TextureInfo          from './TextureInfo'          ;
 
-import IMaterial            from '../renderer/IMaterial'  ;
-import Camera from 'nanogl-camera';
-import Primitive from './Primitive';
+import MaterialPass from 'nanogl-pbr/MaterialPass'
+
 
 
 export enum AlphaMode {
@@ -25,7 +24,7 @@ export enum AlphaMode {
   BLEND  = "BLEND"  ,
 }
 
-export default class Material extends BaseElement implements IMaterial {
+export default class Material extends BaseElement {
   
   
   static TYPE : ElementType = ElementType.MATERIAL;
@@ -76,11 +75,8 @@ export default class Material extends BaseElement implements IMaterial {
   }
 
 
+  pass : MaterialPass;
 
-
-  prepare(node: Node, camera: Camera, primitive: Primitive): void {
-    //TODO: material prepare 
-  }
   
 
 }

@@ -1,7 +1,15 @@
-//@flow
 import BaseElement from './BaseElement';
 import { ElementType } from '../consts';
 import Assert from '../lib/assert';
+var ComponentType;
+(function (ComponentType) {
+    ComponentType[ComponentType["BYTE"] = 5120] = "BYTE";
+    ComponentType[ComponentType["UNSIGNED_BYTE"] = 5121] = "UNSIGNED_BYTE";
+    ComponentType[ComponentType["SHORT"] = 5122] = "SHORT";
+    ComponentType[ComponentType["UNSIGNED_SHORT"] = 5123] = "UNSIGNED_SHORT";
+    ComponentType[ComponentType["UNSIGNED_INT"] = 5125] = "UNSIGNED_INT";
+    ComponentType[ComponentType["FLOAT"] = 5126] = "FLOAT";
+})(ComponentType || (ComponentType = {}));
 const TYPE_SIZE_MAP = {
     'SCALAR': 1,
     'VEC2': 2,
@@ -12,21 +20,21 @@ const TYPE_SIZE_MAP = {
     'MAT4': 16
 };
 const ARRAY_TYPES = new Map([
-    [5120, Int8Array],
-    [5121, Uint8Array],
-    [5122, Int16Array],
-    [5123, Uint16Array],
-    [5125, Uint32Array],
-    [5126, Float32Array],
+    [5120 /* BYTE */, Int8Array],
+    [5121 /* UNSIGNED_BYTE */, Uint8Array],
+    [5122 /* SHORT */, Int16Array],
+    [5123 /* UNSIGNED_SHORT */, Uint16Array],
+    [5125 /* UNSIGNED_INT */, Uint32Array],
+    [5126 /* FLOAT */, Float32Array],
 ]);
 //https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md_animations
 const NORMALIZE_FUNCS = new Map([
-    [5120, c => Math.max(c / 127.0, -1.0)],
-    [5121, c => c / 255.0],
-    [5122, c => Math.max(c / 32767.0, -1.0)],
-    [5123, c => c / 65535.0],
-    [5125, c => c],
-    [5126, c => c],
+    [5120 /* BYTE */, c => Math.max(c / 127.0, -1.0)],
+    [5121 /* UNSIGNED_BYTE */, c => c / 255.0],
+    [5122 /* SHORT */, c => Math.max(c / 32767.0, -1.0)],
+    [5123 /* UNSIGNED_SHORT */, c => c / 65535.0],
+    [5125 /* UNSIGNED_INT */, c => c],
+    [5126 /* FLOAT */, c => c],
 ]);
 function getNormalizeFunction(t) {
     const a = NORMALIZE_FUNCS.get(t);
@@ -50,7 +58,8 @@ class Sparse {
     constructor(accessor, data) {
         this.accessor = accessor;
         let iData = data.indices;
-        this.indices = new Accessor(accessor.gltf, {
+        this.indices = new Accessor();
+        this.indices.parse(accessor.gltf, {
             bufferView: iData.bufferView,
             byteOffset: iData.byteOffset,
             componentType: iData.componentType,
@@ -59,7 +68,8 @@ class Sparse {
             type: "SCALAR"
         });
         let vData = data.values;
-        this.values = new Accessor(accessor.gltf, {
+        this.values = new Accessor();
+        this.values.parse(accessor.gltf, {
             bufferView: vData.bufferView,
             byteOffset: vData.byteOffset,
             count: data.count,
@@ -71,7 +81,6 @@ class Sparse {
         const imap = this.indicesMap = new Map();
         const indices = this.indices;
         const count = indices.count;
-        const holder = indices.createElementHolder();
         for (var i = 0; i < count; i++) {
             var j = indices.getScalar(i);
             iset.add(j);
@@ -98,8 +107,8 @@ class Sparse {
     }
 }
 export default class Accessor extends BaseElement {
-    constructor(gltf, data) {
-        super(gltf, data);
+    parse(gltf, data) {
+        super.parse(gltf, data);
         const { byteOffset = 0, normalized = false, } = data;
         this.normalized = normalized;
         this.byteOffset = byteOffset;
@@ -124,6 +133,7 @@ export default class Accessor extends BaseElement {
         }
         else {
             this.bufferView = null;
+            this._stride = 0;
             this._strideElem = 0;
             this._array = this.createElementHolder();
         }
@@ -132,7 +142,6 @@ export default class Accessor extends BaseElement {
             this.sparse = new Sparse(this, data.sparse);
         }
         this._valueHolder = this.createElementHolder();
-        this._stride = 0;
         this._normalizeFunc = getNormalizeFunction(this.componentType);
     }
     get numComps() {
@@ -141,7 +150,6 @@ export default class Accessor extends BaseElement {
     get bytesPerElem() {
         return getBytesLengthForDataType(this.componentType);
     }
-    // $FlowFixMe
     *[Symbol.iterator]() {
         const holder = this.createElementHolder();
         for (let i = 0; i < this.count; i++) {

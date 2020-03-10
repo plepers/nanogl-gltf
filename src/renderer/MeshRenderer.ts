@@ -4,7 +4,7 @@ import Primitive from "../elements/Primitive"
 import GLState from 'nanogl-state/state'
 import GLConfig from 'nanogl-state/config'
 import Camera from 'nanogl-camera'
-import IMaterial from "./IMaterial"
+import Material from "../elements/Material"
 
 export default class MeshRenderer {
 
@@ -27,9 +27,9 @@ export default class MeshRenderer {
     for (let i = 0; i < primitives.length; i++) {
 
       const primitive = primitives[i];
-      const mat:IMaterial = primitive.material;
+      const mat:Material = primitive.material;
 
-      mat.prepare(this.node, camera, primitive)
+      // mat.prepare(this.node, camera, primitive)
 
       // push configs
       // -------------
@@ -54,7 +54,7 @@ export default class MeshRenderer {
     }
 
   }
-  drawCall(camera: Camera, prg: any, primitive: Primitive, mat: IMaterial) {
+  drawCall(camera: Camera, prg: any, primitive: Primitive, mat: Material) {
     
   }
 

@@ -6,7 +6,8 @@
     "module": "ES6",
     "preserveConstEnums": true,
     "outDir": "dist",
-    "sourceMap": false
+    "sourceMap": false,
+    "allowSyntheticDefaultImports": true
   },
   "files" : [
     "src/index.ts"

@@ -1,5 +1,4 @@
 import when from 'when';
-const _domParser = new DOMParser();
 export function whenAll(promises) {
     const def = when.defer();
     let remaining = promises.length;
@@ -21,10 +20,6 @@ export function loadText(url) {
 export function loadJson(url) {
     return loadText(url)
         .then(str => JSON.parse(str));
-}
-export function loadXml(url) {
-    return loadText(url)
-        .then(str => _domParser.parseFromString(str, "application/xml"));
 }
 export function loadBytes(url) {
     return _ajax(url, 'arraybuffer');

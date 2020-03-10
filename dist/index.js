@@ -1,15 +1,17 @@
 /// <
 import Extensions from './extensions';
 import { ElementType } from './consts';
+import BufferCache from './BufferCache';
+import { DefaultSemantics } from './Semantics';
 /** Gltf file representation */
 export default class Gltf {
     constructor() {
         this._url = null;
-        this._data = null;
         this._extensions = new Extensions();
         this._byType = new Map([
             [ElementType.BUFFER, []],
             [ElementType.BUFFERVIEW, []],
+            [ElementType.ASSET, []],
             [ElementType.ACCESSOR, []],
             [ElementType.ANIMATION, []],
             [ElementType.ANIMATION_SAMPLER, []],
@@ -18,8 +20,25 @@ export default class Gltf {
             [ElementType.PRIMITIVE, []],
             [ElementType.NODE, []],
             [ElementType.MATERIAL, []],
+            [ElementType.CAMERA, []],
+            [ElementType.SCENE, []],
+            [ElementType.SKIN, []],
+            [ElementType.TEXTURE, []],
         ]);
         this._elements = [];
+        this.semantics = new DefaultSemantics();
+    }
+    allocateGl(gl) {
+        this.bufferCache = new BufferCache(gl);
+        for (const mesh of this.meshes) {
+            mesh.allocateGl(gl);
+        }
+    }
+    get buffers() {
+        return this._getTypeHolder(ElementType.BUFFER);
+    }
+    get bufferViews() {
+        return this._getTypeHolder(ElementType.BUFFERVIEW);
     }
     get accessors() {
         return this._getTypeHolder(ElementType.ACCESSOR);
@@ -27,11 +46,20 @@ export default class Gltf {
     get animations() {
         return this._getTypeHolder(ElementType.ANIMATION);
     }
-    get buffers() {
-        return this._getTypeHolder(ElementType.BUFFER);
+    get meshes() {
+        return this._getTypeHolder(ElementType.MESH);
     }
-    get bufferViews() {
-        return this._getTypeHolder(ElementType.BUFFERVIEW);
+    get nodes() {
+        return this._getTypeHolder(ElementType.NODE);
+    }
+    get materials() {
+        return this._getTypeHolder(ElementType.MATERIAL);
+    }
+    get cameras() {
+        return this._getTypeHolder(ElementType.CAMERA);
+    }
+    get skins() {
+        return this._getTypeHolder(ElementType.SKIN);
     }
     _getTypeHolder(type) {
         return this._byType.get(type);

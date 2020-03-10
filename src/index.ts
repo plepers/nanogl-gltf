@@ -2,7 +2,7 @@
 /// <
 
 
-import Extensions  from './extensions'           ;
+import ExtensionsRegistry, { IExtension, Extensions }  from './extensions';
 import Accessor    from './elements/Accessor'    ;
 import BufferView  from './elements/BufferView'  ;
 import Buffer      from './elements/Buffer'      ;
@@ -26,24 +26,32 @@ import { ISemantics, DefaultSemantics } from './Semantics';
 /** Gltf file representation */
 export default class Gltf{
   
+  
+  static _extensions : ExtensionsRegistry = new ExtensionsRegistry();
+
+  static addExtension( ext:IExtension ){
+    Gltf._extensions.addExtension( ext );
+  }
+
+
   _url        : string
   _baseDir    : string
-  _extensions : Extensions
-
-
-  _elements : BaseElement[];
-  _byType   : Map<ElementType, BaseElement[]>;
+  
+  _elements   : BaseElement[];
+  _byType     : Map<ElementType, BaseElement[]>;
+  _extensions : Extensions;
 
   bufferCache : BufferCache;
   semantics   : ISemantics;
 
   asset : Asset;
 
+  
+
   constructor(){
     this._url        = null;
 
-    this._extensions = new Extensions();
-
+    this._extensions = new Extensions(); 
 
     this._byType = new Map<ElementType, BaseElement[]>([
       [ElementType.BUFFER            , [] ],

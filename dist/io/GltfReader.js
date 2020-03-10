@@ -1,15 +1,8 @@
 import Gltf from "..";
 import when from 'when';
-import { ElementType, MAGIC, GLB_HEADER_SIZE, JSON_MAGIC } from "../consts";
-import BufferView from "../elements/BufferView";
-import Accessor from "../elements/Accessor";
-import Mesh from "../elements/Mesh";
-import Skin from "../elements/Skin";
-import Camera from "../elements/Camera";
-import Material from "../elements/Material";
+import { ElementType, MAGIC, GLB_HEADER_SIZE, JSON_MAGIC, ROOT_TYPES } from "../consts";
 import Buffer from "../elements/Buffer";
-import Node from "../elements/Node";
-import Animation from "../elements/Animation";
+import ElementFactory from "./ElementFactory";
 export default class GltfReader {
     constructor(gltfIO, url, baseurl) {
         this.parse = (buffer) => {
@@ -32,7 +25,9 @@ export default class GltfReader {
         this.loadBuffers = () => {
             const buffers = this.gltf._getTypeHolder(ElementType.BUFFER);
             for (var i = buffers.length; i < this._data.buffers.length; i++) {
-                this.gltf.addElement(new Buffer(this.gltf, this._data.buffers[i]));
+                var buffer = new Buffer();
+                buffer.parse(this.gltf, this._data.buffers[i]);
+                this.gltf.addElement(buffer);
             }
             return when.map(buffers, this.loadBuffer);
         };
@@ -44,19 +39,21 @@ export default class GltfReader {
                 .then(data => b._bytes = data);
         };
         this.parseAll = () => {
-            this._parseElements(ElementType.BUFFERVIEW, BufferView);
-            this._parseElements(ElementType.ACCESSOR, Accessor);
-            this._parseElements(ElementType.MESH, Mesh);
-            this._parseElements(ElementType.NODE, Node);
-            this._parseElements(ElementType.ANIMATION, Animation);
-            this._parseElements(ElementType.SKIN, Skin);
-            this._parseElements(ElementType.CAMERA, Camera);
-            this._parseElements(ElementType.MATERIAL, Material);
-            // resolve nodes refs
-            const nodes = this.gltf._getTypeHolder(ElementType.NODE);
-            for (var node of nodes) {
-                node.resolveReferences();
+            var _a;
+            const gltf = this.gltf;
+            gltf.asset = this._factory.createElement(ElementType.ASSET);
+            gltf.asset.parse(gltf, this._data.asset);
+            const elementDataPair = [];
+            for (let type of ROOT_TYPES) {
+                (_a = this._data[type]) === null || _a === void 0 ? void 0 : _a.forEach((data) => {
+                    const element = this._factory.createElement(type);
+                    if (element !== null) {
+                        elementDataPair.push([element, data]);
+                        gltf.addElement(element);
+                    }
+                });
             }
+            elementDataPair.forEach(([element, data]) => element.parse(gltf, data));
         };
         this.yieldGltf = () => {
             return when(this.gltf);
@@ -66,9 +63,11 @@ export default class GltfReader {
         this._baseUrl = baseurl;
         this.gltf = new Gltf();
         this._data = null;
+        this._defaultFactory = new ElementFactory();
+        this._factory = this._defaultFactory;
     }
     unpackGlb(buffer) {
-        const [version, , jsonSize, magic] = new Uint32Array(buffer, 0, 5);
+        const [, version, , jsonSize, magic] = new Uint32Array(buffer, 0, 5);
         // Check that the version is 2
         if (version !== 2)
             throw new Error('Binary glTF version is not 2');
@@ -77,13 +76,10 @@ export default class GltfReader {
             throw new Error('Binary glTF scene format is not JSON');
         const scene = this.gltfIO.decodeUTF8(buffer, GLB_HEADER_SIZE, jsonSize);
         this._data = JSON.parse(scene);
-        const mbuffer = new Buffer(this.gltf, {});
-        mbuffer._bytes = buffer.slice(GLB_HEADER_SIZE + jsonSize + 8);
+        const bbytes = buffer.slice(GLB_HEADER_SIZE + jsonSize + 8);
+        const mbuffer = new Buffer();
+        mbuffer.parse(this.gltf, { byteLength: bbytes.byteLength });
+        mbuffer._bytes = bbytes;
         this.gltf.addElement(mbuffer);
-    }
-    _parseElements(type, _Class) {
-        if (this._data[type]) {
-            this._data[type].forEach(d => this.gltf.addElement(new _Class(this.gltf, d)));
-        }
     }
 }

@@ -13,28 +13,14 @@ module.exports = function(config) {
   
       // frameworks to use
       // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-      frameworks: [ 'mocha', 'karma-typescript'],
+      frameworks: [ 'mocha' ],
   
       // mocha custom option
       client: {
         
       },
 
-      karmaTypescriptConfig:{
-        compilerOptions: {
-          "moduleResolution": "node",
-          "lib": ["es2016", "dom"],
-          "target": "es2016",
-          "preserveConstEnums": true,
-          "sourceMap": false,
-          "allowJs": true,
-        },
-        bundlerOptions: {
-          transforms: [
-              require("karma-typescript-es6-transform")()
-          ]
-        }
-      },
+
   
       // list of files / patterns to load in the browser
       files: [
@@ -57,7 +43,53 @@ module.exports = function(config) {
       // preprocess matching files before serving them to the browser
       // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
       preprocessors: {
-        '**/*.ts': 'karma-typescript'
+        'test/**/*.ts': ['webpack']
+      },
+
+      // preprocessors: {
+      //   // add webpack as preprocessor
+      //   'test/*_test.js': ['webpack'],
+      //   'test/**/*_test.js': ['webpack'],
+      // },
+  
+      webpack: {
+        // karma watches the test entry points
+        // (you don't need to specify the entry option)
+        // webpack watches dependencies
+        // webpack configuration
+        module : {
+          rules : [
+          
+            // JS
+            {
+              test: /\.js$/, 
+              use: "babel-loader"
+            },
+            
+            // TS
+            {
+              test: /\.tsx?$/,
+              use:  'ts-loader',
+            },
+
+            // GLSL
+            {
+              test: /\.(vert|frag|glsl)$/,
+              use: 'nanogl-template/lib/compiler'
+            },
+          ]
+            
+        },
+
+        resolve: {
+          extensions: [ '.ts', '.js' ],
+        },
+      },
+  
+      webpackMiddleware: {
+        // webpack-dev-middleware configuration
+        // i. e.
+        stats: 'errors-only',
       },
   
       // test results reporter to use

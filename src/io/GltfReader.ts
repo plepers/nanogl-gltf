@@ -15,6 +15,7 @@ import Asset from "../elements/Asset";
 
 
 export default class GltfReader {
+  
 
 
   gltf      : Gltf;
@@ -114,10 +115,19 @@ export default class GltfReader {
   }
 
 
+  createElement(type: ElementType) : BaseElement {
+    let el = this._factory.createElement( type );
+    if( el === null ){
+      // handle extensions here
+    }
+    return el;
+  }
   
   parseAll = ()=>{
 
     const gltf = this.gltf;
+    
+    Gltf._extensions.setupExtensions( gltf, this._data.extensionsUsed, this._data.extensionsRequired );
     
     gltf.asset = this._factory.createElement( ElementType.ASSET ) as Asset;
     gltf.asset.parse( gltf, this._data.asset )
@@ -129,7 +139,7 @@ export default class GltfReader {
     for (let type of ROOT_TYPES) {
 
       this._data[type]?.forEach( (data: any)=>{
-        const element = this._factory.createElement( type );
+        const element = this.createElement( type );
         if( element !== null ){
           elementDataPair.push( [element, data])
           gltf.addElement( element )

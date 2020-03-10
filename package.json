@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "karma start",
-    "build": "tsc",
+    "build": "tsc && ./build/make-glsl",
     "gentypes": "json2ts -i src/schema/glTF.schema.json -o src/schema/glTF.d.ts --cwd=src/schema/"
   },
   "repository": {
@@ -26,9 +26,11 @@
     "@babel/core": "^7.7.7",
     "@babel/plugin-proposal-class-properties": "^7.7.4",
     "@babel/preset-flow": "^7.7.4",
+    "@types/expect.js": "^0.3.29",
     "@types/mocha": "^5.2.7",
     "babel-loader": "^8.0.6",
     "expect.js": "^0.3.1",
+    "glob": "^7.1.6",
     "json-schema-to-typescript": "^8.0.0",
     "karma": "^4.4.1",
     "karma-chrome-launcher": "^3.1.0",
@@ -38,7 +40,9 @@
     "karma-typescript-es6-transform": "^4.1.1",
     "karma-webpack": "^4.0.2",
     "mocha": "^6.2.2",
+    "nanogl-template": "git@github.com:plepers/nanogl-template.git#develop",
     "remove-flow-types-loader": "^1.1.0",
+    "replace-ext": "^1.0.0",
     "ts-loader": "^6.2.1",
     "typescript": "^3.7.4",
     "webpack": "^4.41.4",
@@ -53,6 +57,7 @@
     "nanogl-node": "git@github.com:plepers/nanogl-node.git#develop",
     "nanogl-state": "git@github.com:plepers/nanogl-state.git#develop",
     "nanogl-vao": "git@github.com:plepers/nanogl-vao.git#develop",
+    "nanogl-pbr": "git@github.com:plepers/nanogl-pbr.git#develop",
     "save": "^2.4.0",
     "when": "^3.7.8"
   }

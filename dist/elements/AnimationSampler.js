@@ -1,4 +1,3 @@
-//@flow
 import BaseElement from './BaseElement';
 import { ElementType } from '../consts';
 import { quat } from 'gl-matrix';
@@ -175,9 +174,8 @@ function InterpolatorFactory(sampler) {
     }
 }
 export default class AnimationSampler extends BaseElement {
-    constructor(gltf, data, animation) {
-        super(gltf, data);
-        this.animation = animation;
+    parse(gltf, data) {
+        super.parse(gltf, data);
         this.input = this.gltf.getElement(ElementType.ACCESSOR, data.input);
         this.output = this.gltf.getElement(ElementType.ACCESSOR, data.output);
         this.interpolation = data.interpolation || MODE_LINEAR;
