@@ -4,18 +4,18 @@ import { vec3 } from 'gl-matrix';
 import GLConfig             from 'nanogl-state/config'    ;
 import Node                 from 'nanogl-node'            ;
 
-import { ElementType   } from '../consts'     ;
-import { Data_Material } from '../schema/glTF';
-import   Gltf            from '../index'      ;
+import { ElementType   }    from '../consts'     ;
+import { Data_Material }    from '../schema/glTF';
+import Gltf                 from '../index';
+import BaseElement          from './BaseElement'         ;
+import PbrMetallicRoughness from './PbrMetallicRoughness';
+import NormalTextureInfo    from './NormalTextureInfo'   ;
+import OcclusionTextureInfo from './OcclusionTextureInfo';
+import TextureInfo          from './TextureInfo'         ;
 
-import BaseElement          from './BaseElement'          ;
-import PbrMetallicRoughness from './PbrMetallicRoughness' ;
-import NormalTextureInfo    from './NormalTextureInfo'    ;
-import OcclusionTextureInfo from './OcclusionTextureInfo' ;
-import TextureInfo          from './TextureInfo'          ;
-
-import MaterialPass from 'nanogl-pbr/MaterialPass'
-
+import { GLContext } from 'nanogl/types';
+import MaterialPass from 'nanogl-pbr/MaterialPass';
+import StandardPass from 'nanogl-pbr/StandardPass'
 
 
 export enum AlphaMode {
@@ -28,12 +28,12 @@ export default class Material extends BaseElement {
   
   
   static TYPE : ElementType = ElementType.MATERIAL;
-  
-  
-  pbrMetallicRoughness : PbrMetallicRoughness;
-  normalTexture        : NormalTextureInfo   ;
-  occlusionTexture     : OcclusionTextureInfo;
-  emissiveTexture      : TextureInfo         ;
+
+
+  pbrMetallicRoughness?: PbrMetallicRoughness;
+  normalTexture?       : NormalTextureInfo   ;
+  occlusionTexture?    : OcclusionTextureInfo;
+  emissiveTexture?     : TextureInfo         ;
   emissiveFactor       : vec3                ;
   alphaMode            : AlphaMode | string  ;
   alphaCutoff          : number              ;
@@ -75,9 +75,19 @@ export default class Material extends BaseElement {
   }
 
 
-  pass : MaterialPass;
-
+  materialPass : MaterialPass
   
+  
+  allocateGl( gl : GLContext ) {
+
+    const pass = new StandardPass( this.name );
+    
+    pass.glconfig.enableCullface( !this.doubleSided );
+
+    pass.occlusion.attachSampler
+
+    this.materialPass = pass;
+  }
 
 }
 
