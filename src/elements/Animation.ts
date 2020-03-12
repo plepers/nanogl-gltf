@@ -1,47 +1,47 @@
 
 
 import BaseElement from './BaseElement';
-import { ElementType } from '../consts';
 import AnimationChannel from './AnimationChannel';
 import AnimationSampler from './AnimationSampler';
 
-import Gltf from '../index'
-import { Data_Animation, Data_AnimationSampler, Data_AnimationChannel } from '../schema/glTF';
+import Gltf2 from '../types/Gltf2'
+import GltfLoader from '../io/GltfLoader';
+import GltfTypes from '../types/GltfTypes';
 
 
-function createSampler(gltf:Gltf, data:Data_AnimationSampler){
+function createSampler(gltfLoader:GltfLoader, data:Gltf2.IAnimationSampler){
   const sampler = new AnimationSampler();
-  sampler.parse( gltf, data );
+  sampler.parse( gltfLoader, data );
   return sampler;
 }
 
 
-function createChannel(gltf:Gltf, data:Data_AnimationChannel, animation:Animation ){
+function createChannel(gltfLoader:GltfLoader, data:Gltf2.IAnimationChannel, animation:Animation ){
   const channel = new AnimationChannel();
-  channel.parse( gltf, data, animation );
+  channel.parse( gltfLoader, data, animation );
   return channel;
 }
 
 
 export default class Animation extends BaseElement {
 
-  static TYPE = ElementType.ANIMATION;
+  readonly gltftype : GltfTypes.ANIMATION = GltfTypes.ANIMATION;
 
-  samplers : AnimationSampler[]
-  channels : AnimationChannel[]
+  samplers : AnimationSampler[] = []
+  channels : AnimationChannel[] = []
 
-  parse(gltf : Gltf, data : Data_Animation) {
+  parse(gltfLoader:GltfLoader, data : Gltf2.IAnimation) {
 
-    super.parse(gltf, data);
+    super.parse(gltfLoader, data);
 
     this.samplers = data.samplers.map(
-      d => createSampler(gltf, d)
+      d => createSampler(gltfLoader, d)
     );
     
     this.gltf.addElements(this.samplers);
 
     this.channels = data.channels.map(
-      d => createChannel(gltf, d, this)
+      d => createChannel(gltfLoader, d, this)
     );
     
     this.gltf.addElements(this.channels);

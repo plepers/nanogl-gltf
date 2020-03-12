@@ -1,30 +1,32 @@
 
 
-import { ElementType } from '../consts';
-import {  Data_Texture } from '../schema/glTF';
+
 import Gltf        from '../index'     ;
 import BaseElement from './BaseElement';
 import Sampler from './Sampler';
 import Image from './Image';
+import Gltf2 from '../types/Gltf2';
+import GltfLoader from '../io/GltfLoader';
+import GltfTypes from '../types/GltfTypes';
 
 
 export default class Texture extends BaseElement {
 
-  static TYPE = ElementType.TEXTURE;
+  readonly gltftype : GltfTypes.TEXTURE = GltfTypes.TEXTURE;
 
   sampler:Sampler
   source: Image;
 
-  parse( gltf: Gltf, data: Data_Texture ){
+  parse( gltfLoader:GltfLoader, data: Gltf2.ITexture ){
 
-    super.parse( gltf, data );
+    super.parse( gltfLoader, data );
 
     if( data.sampler !== undefined ){
-      this.sampler = gltf.getElement<Sampler>( ElementType.SAMPLER, data.sampler );
+      this.sampler = this.gltf.getElement<Sampler>( GltfTypes.SAMPLER, data.sampler );
     }
 
     if( data.source !== undefined ){
-      this.source = gltf.getElement<Image>( ElementType.IMAGE, data.source );
+      this.source = this.gltf.getElement<Image>( GltfTypes.IMAGE, data.source );
     }
     
   }

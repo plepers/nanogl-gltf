@@ -1,6 +1,6 @@
 import Gltf from "..";
 import IOInterface from "./IOInterface";
-import GltfReader from "./GltfReader";
+import GltfLoader from "./GltfLoader";
 
 
 
@@ -22,7 +22,7 @@ export default class GltfIO {
     if( baseurl === undefined )
       [baseurl, path] = this._ioImpl.resolveBaseDir( path );
 
-    const reader = new GltfReader( this._ioImpl, path, baseurl );
+    const reader = new GltfLoader( this._ioImpl, path, baseurl );
     
     return this._ioImpl.loadBinaryResource( this._ioImpl.resolvePath( path, baseurl ) )
       .then( reader.parse )

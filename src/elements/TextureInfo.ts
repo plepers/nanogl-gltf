@@ -1,26 +1,28 @@
 
 
-import { ElementType } from '../consts';
-import { Data_TextureInfo } from '../schema/glTF';
+
 import Gltf        from '../index'     ;
 import BaseElement from './BaseElement';
 import Texture from './Texture';
+import Gltf2 from '../types/Gltf2';
+import GltfLoader from '../io/GltfLoader';
+import GltfTypes from '../types/GltfTypes';
 
 
 export default class TextureInfo extends BaseElement {
 
 
-  static TYPE = ElementType.TEXTURE_INFO;
+  readonly gltftype : GltfTypes.TEXTURE_INFO = GltfTypes.TEXTURE_INFO;
   
   texture : Texture;
   texCoord: number;
 
 
-  parse( gltf: Gltf, data: Data_TextureInfo ){
+  parse( gltfLoader:GltfLoader, data: Gltf2.ITextureInfo ){
 
-    super.parse( gltf, data );
+    super.parse( gltfLoader, data );
 
-    this.texture = gltf.getElement<Texture>( ElementType.TEXTURE, data.index );
+    this.texture = this.gltf.getElement<Texture>( GltfTypes.TEXTURE, data.index );
 
     this.texCoord = data.texCoord ?? 0;
   }

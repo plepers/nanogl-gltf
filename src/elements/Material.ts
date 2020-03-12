@@ -2,10 +2,7 @@
 
 import { vec3 } from 'gl-matrix';
 import GLConfig             from 'nanogl-state/config'    ;
-import Node                 from 'nanogl-node'            ;
 
-import { ElementType   }    from '../consts'     ;
-import { Data_Material }    from '../schema/glTF';
 import Gltf                 from '../index';
 import BaseElement          from './BaseElement'         ;
 import PbrMetallicRoughness from './PbrMetallicRoughness';
@@ -16,6 +13,9 @@ import TextureInfo          from './TextureInfo'         ;
 import { GLContext } from 'nanogl/types';
 import MaterialPass from 'nanogl-pbr/MaterialPass';
 import StandardPass from 'nanogl-pbr/StandardPass'
+import Gltf2 from '../types/Gltf2';
+import GltfLoader from '../io/GltfLoader';
+import GltfTypes from '../types/GltfTypes';
 
 
 export enum AlphaMode {
@@ -27,7 +27,7 @@ export enum AlphaMode {
 export default class Material extends BaseElement {
   
   
-  static TYPE : ElementType = ElementType.MATERIAL;
+  static TYPE : GltfTypes = GltfTypes.MATERIAL;
 
 
   pbrMetallicRoughness?: PbrMetallicRoughness;
@@ -43,9 +43,9 @@ export default class Material extends BaseElement {
   glconfig: GLConfig;
 
 
-  parse( gltf: Gltf, data: Data_Material ){
+  parse( gltfLoader:GltfLoader, data: Gltf2.IMaterial ){
 
-    super.parse( gltf, data );
+    super.parse( gltfLoader, data );
 
     this.emissiveFactor = <vec3> new Float32Array(data.emissiveFactor || [0,0,0]);
 
@@ -55,22 +55,22 @@ export default class Material extends BaseElement {
 
     if( data.pbrMetallicRoughness !== undefined ){
       this.pbrMetallicRoughness = new PbrMetallicRoughness()
-      this.pbrMetallicRoughness.parse( gltf, data.pbrMetallicRoughness )
+      this.pbrMetallicRoughness.parse( gltfLoader, data.pbrMetallicRoughness )
     }
 
     if( data.normalTexture !== undefined ){
       this.normalTexture = new NormalTextureInfo()
-      this.normalTexture.parse( gltf, data.normalTexture )
+      this.normalTexture.parse( gltfLoader, data.normalTexture )
     }
 
     if( data.occlusionTexture !== undefined ){
       this.occlusionTexture = new OcclusionTextureInfo()
-      this.occlusionTexture.parse( gltf, data.occlusionTexture )
+      this.occlusionTexture.parse( gltfLoader, data.occlusionTexture )
     }
 
     if( data.emissiveTexture !== undefined ){
       this.emissiveTexture = new TextureInfo()
-      this.emissiveTexture.parse( gltf, data.emissiveTexture )
+      this.emissiveTexture.parse( gltfLoader, data.emissiveTexture )
     }
   }
 

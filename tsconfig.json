@@ -17,5 +17,6 @@
     // "test/*_test.ts"
   ],
   "exclude": [
+    "node_modules"
   ]
 }

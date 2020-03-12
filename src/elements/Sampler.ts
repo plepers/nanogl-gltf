@@ -1,9 +1,11 @@
 
 
-import { ElementType } from '../consts';
-import { Data_Sampler } from '../schema/glTF';
+
 import Gltf        from '../index'     ;
 import BaseElement from './BaseElement';
+import Gltf2 from '../types/Gltf2';
+import GltfLoader from '../io/GltfLoader';
+import GltfTypes from '../types/GltfTypes';
 
 
 const GL_REPEAT = 10497;
@@ -11,16 +13,16 @@ const GL_REPEAT = 10497;
 
 export default class Sampler extends BaseElement {
 
-  static TYPE = ElementType.SAMPLER;
+  readonly gltftype : GltfTypes.SAMPLER = GltfTypes.SAMPLER;
 
   magFilter?: GLenum;
   minFilter?: GLenum;
   wrapS     : GLenum;
   wrapT     : GLenum
 
-  parse( gltf: Gltf, data: Data_Sampler ){
+  parse( gltfLoader:GltfLoader, data: Gltf2.ISampler ){
 
-    super.parse( gltf, data );
+    super.parse( gltfLoader, data );
 
     this.magFilter = data.magFilter
     this.minFilter = data.minFilter

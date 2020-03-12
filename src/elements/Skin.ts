@@ -1,37 +1,39 @@
 
 
-import { ElementType } from '../consts';
-import { Data_Skin } from '../schema/glTF';
+
 import Gltf        from '../index'     ;
 import BaseElement from './BaseElement';
 import Accessor    from './Accessor'   ;
 import Node        from './Node'       ;
 import { mat4 } from 'gl-matrix';
+import Gltf2 from '../types/Gltf2';
+import GltfLoader from '../io/GltfLoader';
+import GltfTypes from '../types/GltfTypes';
 
 
 export default class Skin extends BaseElement {
 
-  static TYPE = ElementType.SKIN;
+  readonly gltftype : GltfTypes.SKIN = GltfTypes.SKIN;
 
   inverseBindMatrices: mat4[];
   skeletonRoot : Node;
   joints       : Node[];
 
-  parse( gltf: Gltf, data: Data_Skin ){
+  parse( gltfLoader:GltfLoader, data: Gltf2.ISkin ){
 
-    super.parse( gltf, data );
+    super.parse( gltfLoader, data );
     
-    this.joints = data.joints.map( idx=>this.gltf.getElement( ElementType.NODE, idx ) )
+    this.joints = data.joints.map( idx=>this.gltf.getElement( GltfTypes.NODE, idx ) )
 
     this.inverseBindMatrices = this.joints.map( mat4.create );
 
     if( data.inverseBindMatrices !== undefined ){
-      const ibmAccessor = this.gltf.getElement<Accessor>( ElementType.ACCESSOR, data.inverseBindMatrices );
+      const ibmAccessor = this.gltf.getElement<Accessor>( GltfTypes.ACCESSOR, data.inverseBindMatrices );
       this.inverseBindMatrices.forEach( (m, i)=>ibmAccessor.getValue(m, i) )
     }
 
     if( data.skeleton !== undefined ){
-      this.skeletonRoot = this.gltf.getElement( ElementType.NODE, data.skeleton );
+      this.skeletonRoot = this.gltf.getElement( GltfTypes.NODE, data.skeleton );
     }
 
   }

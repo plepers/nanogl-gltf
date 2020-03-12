@@ -1,16 +1,17 @@
 
 
-import { ElementType } from '../consts';
+
 import BaseElement from './BaseElement';
-import {loadBytes} from '../lib/net';
 
 import Gltf from '../index'
-import { Data_Buffer } from '../schema/glTF';
+import Gltf2 from '../types/Gltf2';
+import GltfLoader from '../io/GltfLoader';
+import GltfTypes from '../types/GltfTypes';
 
 
 export default class Buffer extends BaseElement {
 
-  static TYPE : ElementType = ElementType.BUFFER;
+  static TYPE : GltfTypes = GltfTypes.BUFFER;
 
 
   byteLength  :number       ;
@@ -18,9 +19,9 @@ export default class Buffer extends BaseElement {
   _bytes      : ArrayBuffer;
   _byteOffset :number       ;
 
-  parse( gltf : Gltf, data : Data_Buffer ){
+  parse( gltfLoader : GltfLoader, data : Gltf2.IBuffer ){
     
-    super.parse( gltf, data );
+    super.parse( gltfLoader, data );
 
     this.byteLength  = data.byteLength;
     this.uri         = data.uri;
@@ -29,16 +30,6 @@ export default class Buffer extends BaseElement {
     this._byteOffset = 0;
 
   }
-
-  // load(){
-  //   // embed glb buffers
-  //   if( this.uri === undefined ) 
-  //     return ( this._bytes );
-
-  //   const uri = this.gltf.resolveUri( this.uri );
-  //   return loadBytes( uri )
-  //     .then( b=>this._bytes = b );
-  // }
 
   
 

@@ -1,48 +1,38 @@
-import { ElementType } from "../consts";
 import Gltf from "../index";
-
-
-let UID = 0;
+import Gltf2 from "../types/Gltf2";
+import GltfLoader from "../io/GltfLoader";
+import GltfTypes from "../types/GltfTypes";
 
 
 type Constructor<T = {}> = new (...args: any[]) => T;
 
 function ElementMixin<TBase extends Constructor>(Base: TBase) {
 
-  return class extends Base {
+  return class extends Base implements Gltf2.IChildRootProperty {
 
 
-    static CreateUID() : number {
-      return UID++;
-    }
+    readonly gltftype : GltfTypes;
+    uuid         : string;
 
-    static TYPE : ElementType = ElementType.NONE;
-
-
-    uid         : number;
     gltf        : Gltf  ;
 
     name?       : string;
     extras?     : any   ;
-    extensions? : any   ;
+    extensions? : Record<string,any>;
 
 
-    parse( gltf : Gltf, data : any, ...args : any ){
+    parse( gltfLoader : GltfLoader, data : Gltf2.IProperty, ...args : any ){
 
-      this.uid = BaseElement.CreateUID();
+      this.uuid = data.uuid;
 
-      this.gltf = gltf;
+      this.gltf = gltfLoader.gltf;
 
-      this.name       = data.name      
+      this.name       = (data as any).name ?? ""
       this.extras     = data.extras    
       this.extensions = data.extensions
 
     }
 
-
-    get elementType() : ElementType {
-      return this.constructor['TYPE'];
-    }
 
   }
 

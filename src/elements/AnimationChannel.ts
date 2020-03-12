@@ -2,7 +2,6 @@
 
 
 import BaseElement from './BaseElement';
-import { ElementType } from '../consts';
 
 
 import Gltf from '../index'
@@ -10,7 +9,9 @@ import Animation from './Animation'
 import AnimationSampler from './AnimationSampler'
 import Node from './Node'
 import {TypedArray} from '../consts'
-import { Data_AnimationChannel } from '../schema/glTF';
+import Gltf2 from '../types/Gltf2';
+import GltfLoader from '../io/GltfLoader';
+import GltfTypes from '../types/GltfTypes';
 
 type applyFunc = (node:Node, value:TypedArray)=>void
 
@@ -64,7 +65,7 @@ function getApplyFunctionFromPath(path:PathType):applyFunc {
 
 export default class AnimationChannel extends BaseElement {
 
-  static TYPE = ElementType.ANIMATION_CHANNEL
+  readonly gltftype : GltfTypes.ANIMATION_CHANNEL = GltfTypes.ANIMATION_CHANNEL
 
   _active       : boolean         ;
   sampler       : AnimationSampler;
@@ -74,9 +75,9 @@ export default class AnimationChannel extends BaseElement {
   valueHolder   : TypedArray      ;
 
 
-  parse(gltf : Gltf, data:Data_AnimationChannel, animation:Animation) {
+  parse(gltfLoader:GltfLoader, data:Gltf2.IAnimationChannel, animation:Animation) {
 
-    super.parse(gltf, data);
+    super.parse(gltfLoader, data);
 
     this._active = false;
 
@@ -85,7 +86,7 @@ export default class AnimationChannel extends BaseElement {
     
     if( data.target.node !== undefined ){
       this._active = true;
-      this.node = gltf.getElement<Node>( ElementType.NODE, data.target.node);
+      this.node = this.gltf.getElement<Node>( GltfTypes.NODE, data.target.node);
     }
     
     this.sampler = animation.getSampler(data.sampler);

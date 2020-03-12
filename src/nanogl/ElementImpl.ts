@@ -1,5 +1,5 @@
 
-import { AnyElement } from "../elements/AnyElement.type";
+import { AnyElement } from "../types/Elements";
 
 
 

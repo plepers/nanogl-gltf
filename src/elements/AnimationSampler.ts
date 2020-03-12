@@ -2,7 +2,7 @@
 
 
 import BaseElement from './BaseElement';
-import { ElementType } from '../consts';
+
 import { quat } from 'gl-matrix';
 
 
@@ -10,15 +10,13 @@ import Gltf from '../index'
 import Accessor from './Accessor'
 import Animation from './Animation'
 import {TypedArray} from '../consts'
-import { Data_AnimationSampler } from '../schema/glTF';
+import Gltf2 from '../types/Gltf2';
+import GltfLoader from '../io/GltfLoader';
+import GltfTypes from '../types/GltfTypes';
 
 type LerpFunc = (out:TypedArray, a:TypedArray, b:TypedArray, p:number )=>void;
 
-type InterpolationType = 'LINEAR' | 'STEP' | 'CUBICSPLINE' | string;
 
-const MODE_LINEAR      : InterpolationType = 'LINEAR';
-const MODE_STEP        : InterpolationType = 'STEP';
-const MODE_CUBICSPLINE : InterpolationType = 'CUBICSPLINE';
 
 
 
@@ -287,11 +285,11 @@ class CubicSplineInterpolator extends Interpolator {
 
 function InterpolatorFactory(sampler:AnimationSampler) : Interpolator {
   switch (sampler.interpolation) {
-    case MODE_STEP:
+    case Gltf2.AnimationSamplerInterpolation.STEP:
       return new StepInterpolator(sampler);
-    case MODE_LINEAR:
+    case Gltf2.AnimationSamplerInterpolation.LINEAR:
       return new LinearInterpolator(sampler);
-    case MODE_CUBICSPLINE:
+    case Gltf2.AnimationSamplerInterpolation.CUBICSPLINE:
       return new CubicSplineInterpolator(sampler);
 
     default:
@@ -307,23 +305,23 @@ function InterpolatorFactory(sampler:AnimationSampler) : Interpolator {
 
 export default class AnimationSampler extends BaseElement {
 
-  static TYPE = ElementType.ANIMATION_SAMPLER
+  readonly gltftype : GltfTypes.ANIMATION_SAMPLER = GltfTypes.ANIMATION_SAMPLER
 
 
-  interpolation :InterpolationType ;
+  interpolation :Gltf2.AnimationSamplerInterpolation ;
   input         :Accessor          ;
   output        :Accessor          ;
   interpolator  :Interpolator      ;
 
 
-  parse( gltf:Gltf, data:Data_AnimationSampler ) {
-    super.parse(gltf, data);
+  parse( gltfLoader:GltfLoader, data:Gltf2.IAnimationSampler ) {
+    super.parse( gltfLoader, data );
 
 
-    this.input = this.gltf.getElement( ElementType.ACCESSOR, data.input );
-    this.output = this.gltf.getElement( ElementType.ACCESSOR, data.output );
+    this.input = this.gltf.getElement( GltfTypes.ACCESSOR, data.input );
+    this.output = this.gltf.getElement( GltfTypes.ACCESSOR, data.output );
 
-    this.interpolation = data.interpolation || MODE_LINEAR;
+    this.interpolation = data.interpolation || Gltf2.AnimationSamplerInterpolation.LINEAR;
     this.interpolator  = InterpolatorFactory( this );
   }
 

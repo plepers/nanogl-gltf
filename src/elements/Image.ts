@@ -1,30 +1,32 @@
 
 
-import { ElementType } from '../consts';
-import { Data_Image } from '../schema/glTF';
+
 import Gltf        from '../index'     ;
 import BaseElement from './BaseElement';
 import BufferView from './BufferView';
+import Gltf2 from '../types/Gltf2';
+import GltfLoader from '../io/GltfLoader';
+import GltfTypes from '../types/GltfTypes';
 
 
 export default class Image extends BaseElement {
 
-  static TYPE = ElementType.IMAGE;
+  readonly gltftype : GltfTypes.IMAGE = GltfTypes.IMAGE;
 
 
   uri?        : string;
   mimeType?   : string;
   bufferView? : BufferView;
 
-  parse( gltf: Gltf, data: Data_Image ){
+  parse( gltfLoader:GltfLoader, data: Gltf2.IImage ){
 
-    super.parse( gltf, data );
+    super.parse( gltfLoader, data );
 
     this.uri = data.uri;
     this.mimeType = data.mimeType;
 
     if( data.bufferView !== undefined ){
-      this.bufferView = gltf.getElement( ElementType.BUFFERVIEW, data.bufferView );
+      this.bufferView = this.gltf.getElement( GltfTypes.BUFFERVIEW, data.bufferView );
     }
 
   }

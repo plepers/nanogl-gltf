@@ -2,7 +2,8 @@
 /// <
 
 
-import ExtensionsRegistry, { IExtension, Extensions }  from './extensions';
+import ExtensionsRegistry from './extensions/Registry';
+
 import Accessor    from './elements/Accessor'    ;
 import BufferView  from './elements/BufferView'  ;
 import Buffer      from './elements/Buffer'      ;
@@ -15,10 +16,12 @@ import Camera      from './elements/Camera'      ;
 import BaseElement from './elements/BaseElement' ;
 import Asset       from './elements/Asset'       ;
 
-import { ElementType } from './consts';
 import BufferCache from './BufferCache';
 import { GLContext } from 'nanogl/types';
 import { ISemantics, DefaultSemantics } from './Semantics';
+import { IExtensionFactory } from './extensions/IExtension';
+import Gltf2 from './types/Gltf2';
+import GltfTypes from './types/GltfTypes';
 
 
 
@@ -27,19 +30,19 @@ import { ISemantics, DefaultSemantics } from './Semantics';
 export default class Gltf{
   
   
-  static _extensions : ExtensionsRegistry = new ExtensionsRegistry();
+  static _extensionsRegistry : ExtensionsRegistry = new ExtensionsRegistry();
 
-  static addExtension( ext:IExtension ){
-    Gltf._extensions.addExtension( ext );
+  static addExtension( ext:IExtensionFactory ){
+    Gltf._extensionsRegistry.addExtension( ext );
   }
+
 
 
   _url        : string
   _baseDir    : string
   
   _elements   : BaseElement[];
-  _byType     : Map<ElementType, BaseElement[]>;
-  _extensions : Extensions;
+  _byType     : Map<GltfTypes, BaseElement[]>;
 
   bufferCache : BufferCache;
   semantics   : ISemantics;
@@ -51,24 +54,23 @@ export default class Gltf{
   constructor(){
     this._url        = null;
 
-    this._extensions = new Extensions(); 
 
-    this._byType = new Map<ElementType, BaseElement[]>([
-      [ElementType.BUFFER            , [] ],
-      [ElementType.BUFFERVIEW        , [] ],
-      [ElementType.ASSET             , [] ],
-      [ElementType.ACCESSOR          , [] ],
-      [ElementType.ANIMATION         , [] ],
-      [ElementType.ANIMATION_SAMPLER , [] ],
-      [ElementType.ANIMATION_CHANNEL , [] ],
-      [ElementType.MESH              , [] ],
-      [ElementType.PRIMITIVE         , [] ],
-      [ElementType.NODE              , [] ],
-      [ElementType.MATERIAL          , [] ],
-      [ElementType.CAMERA            , [] ],
-      [ElementType.SCENE             , [] ],
-      [ElementType.SKIN              , [] ],
-      [ElementType.TEXTURE           , [] ],
+    this._byType = new Map<GltfTypes, BaseElement[]>([
+      [GltfTypes.BUFFER            , [] ],
+      [GltfTypes.BUFFERVIEW        , [] ],
+      [GltfTypes.ASSET             , [] ],
+      [GltfTypes.ACCESSOR          , [] ],
+      [GltfTypes.ANIMATION         , [] ],
+      [GltfTypes.ANIMATION_SAMPLER , [] ],
+      [GltfTypes.ANIMATION_CHANNEL , [] ],
+      [GltfTypes.MESH              , [] ],
+      [GltfTypes.PRIMITIVE         , [] ],
+      [GltfTypes.NODE              , [] ],
+      [GltfTypes.MATERIAL          , [] ],
+      [GltfTypes.CAMERA            , [] ],
+      [GltfTypes.SCENE             , [] ],
+      [GltfTypes.SKIN              , [] ],
+      [GltfTypes.TEXTURE           , [] ],
     ])
 
     this._elements = []
@@ -90,43 +92,43 @@ export default class Gltf{
 
 
   get buffers():Buffer[]{
-    return this._getTypeHolder<Buffer>(ElementType.BUFFER);
+    return this._getTypeHolder<Buffer>(GltfTypes.BUFFER);
   }
 
   get bufferViews():BufferView[]{
-    return this._getTypeHolder<BufferView>(ElementType.BUFFERVIEW);
+    return this._getTypeHolder<BufferView>(GltfTypes.BUFFERVIEW);
   }
 
   get accessors():Accessor[]{
-    return this._getTypeHolder<Accessor>(ElementType.ACCESSOR);
+    return this._getTypeHolder<Accessor>(GltfTypes.ACCESSOR);
   }
 
   get animations():Animation[]{
-    return this._getTypeHolder<Animation>(ElementType.ANIMATION);
+    return this._getTypeHolder<Animation>(GltfTypes.ANIMATION);
   }
 
   get meshes():Mesh[]{
-    return this._getTypeHolder<Mesh>(ElementType.MESH);
+    return this._getTypeHolder<Mesh>(GltfTypes.MESH);
   }
 
   get nodes():Node[]{
-    return this._getTypeHolder<Node>(ElementType.NODE);
+    return this._getTypeHolder<Node>(GltfTypes.NODE);
   }
 
   get materials():Material[]{
-    return this._getTypeHolder<Material>(ElementType.MATERIAL);
+    return this._getTypeHolder<Material>(GltfTypes.MATERIAL);
   }
 
   get cameras():Camera[]{
-    return this._getTypeHolder<Camera>(ElementType.CAMERA);
+    return this._getTypeHolder<Camera>(GltfTypes.CAMERA);
   }
 
   get skins():Skin[]{
-    return this._getTypeHolder<Skin>(ElementType.SKIN);
+    return this._getTypeHolder<Skin>(GltfTypes.SKIN);
   }
 
 
-  _getTypeHolder<T extends BaseElement>( type : ElementType ) : T[] {
+  _getTypeHolder<T extends BaseElement>( type : GltfTypes ) : T[] {
     return this._byType.get( type ) as T[];
   }
   
@@ -137,7 +139,7 @@ export default class Gltf{
 
 
   addElement( element : BaseElement ){
-    const a: BaseElement[] = this._getTypeHolder( element.elementType );
+    const a: BaseElement[] = this._getTypeHolder( element.gltftype );
     if( a.indexOf( element ) === -1 ){
       a.push( element );
       this._elements.push( element );
@@ -153,12 +155,12 @@ export default class Gltf{
   }
 
  
-  getElement<T extends BaseElement>( type:ElementType, index:number ) : T {
+  getElement<T extends BaseElement>( type:GltfTypes, index:number ) : T {
     return this._getTypeHolder<T>(type)[index]; 
   }
  
 
-  getElementByName<T extends BaseElement>( type:ElementType, name:string ) : T {
+  getElementByName<T extends BaseElement>( type:GltfTypes, name:string ) : T {
     const list : T[] = this._getTypeHolder<T>(type);
     for (var el of list) {
       if( el.name === name ) return el;

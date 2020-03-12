@@ -7,7 +7,7 @@ import GltfNode from "../elements/Node";
 import GltfPrimitive from "../elements/Primitive";
 import ElementImpl from "./ElementImpl";
 import BaseElement from "../elements/BaseElement";
-import { AnyElement } from "../elements/AnyElement.type";
+import { AnyElement } from "../types/Elements";
 
 
 type AnyElementImpl = ElementImpl<AnyElement>;
@@ -25,7 +25,7 @@ class NanoglBackend {
 
   renderables   : IRenderable[];
   _elements     : AnyElementImpl[];
-  _elementsByUid: Map<Number, AnyElementImpl>;
+  _elementsByUid: Map<string, AnyElementImpl>;
 
 
   constructor( gl:WebGLRenderingContext, gltf : Gltf ){
@@ -34,7 +34,7 @@ class NanoglBackend {
     this.gltf = gltf;
 
     this._elements = []
-    this._elementsByUid = new Map<Number, AnyElementImpl>();
+    this._elementsByUid = new Map<string, AnyElementImpl>();
 
     this.renderables = [];
 
@@ -53,12 +53,12 @@ class NanoglBackend {
   // }
   
   getElement<T extends AnyElement>( e : BaseElement ) : AnyElementImpl{
-    return this._elementsByUid.get( e.uid );
+    return this._elementsByUid.get( e.uuid );
   }
 
 
   hasElement( e : BaseElement ) : Boolean {
-    return this._elementsByUid.has( e.uid );
+    return this._elementsByUid.has( e.uuid );
   }
 
 

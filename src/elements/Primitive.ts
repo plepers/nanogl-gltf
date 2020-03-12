@@ -1,19 +1,21 @@
 
 
-import { ElementType, PrimitiveMode } from '../consts';
+
 import BaseElement from './BaseElement';
 
 
 import Gltf from '../index'
 import Accessor from './Accessor'
 import Material from './Material'
-import { Data_MeshPrimitive } from '../schema/glTF';
 import { GLContext } from 'nanogl/types';
 import { ArrayBufferType } from '../BufferCache';
 import GLArrayBuffer from 'nanogl/arraybuffer';
 import Program from 'nanogl/program';
 import Vao from 'nanogl-vao';
 import GLIndexBuffer from 'nanogl/indexbuffer';
+import Gltf2 from '../types/Gltf2';
+import GltfLoader from '../io/GltfLoader';
+import GltfTypes from '../types/GltfTypes';
 
 
 class Attribute {
@@ -79,10 +81,10 @@ class AttributesSet {
    */
   getBuffersViewSets() : BufferInfos[] {
 
-    const map : Map<number, BufferInfos> = new Map();
+    const map : Map<string, BufferInfos> = new Map();
 
     for (var a of this._attributes ) {
-      var bId = a.accessor.bufferView.uid;
+      var bId = a.accessor.bufferView.uuid;
       if( !map.has( bId ) ){
         map.set( bId, new BufferInfos( a.accessor) );
       }
@@ -101,11 +103,11 @@ class AttributesSet {
 
 export default class Primitive extends BaseElement {
 
-  static TYPE :ElementType = ElementType.PRIMITIVE;
+  static TYPE :GltfTypes = GltfTypes.PRIMITIVE;
   
   // gltf
   attributes : AttributesSet;
-  mode       : PrimitiveMode;
+  mode       : Gltf2.MeshPrimitiveMode;
   material   : Material = null;
   indices    : Accessor = null;
   targets    : AttributesSet[] = null;
@@ -118,9 +120,9 @@ export default class Primitive extends BaseElement {
   indexBuffer : GLIndexBuffer;
 
 
-  parse( gltf:Gltf, data:Data_MeshPrimitive ){
+  parse( gltfLoader:GltfLoader, data:Gltf2.IMeshPrimitive ){
 
-    super.parse( gltf, data );
+    super.parse( gltfLoader, data );
 
     
     this.attributes = new AttributesSet();
@@ -128,15 +130,15 @@ export default class Primitive extends BaseElement {
 
     
     if( data.indices !== undefined )
-      this.indices = gltf.getElement( ElementType.ACCESSOR, data.indices );
+      this.indices = this.gltf.getElement( GltfTypes.ACCESSOR, data.indices );
 
     if( data.material !== undefined )
-      this.material = gltf.getElement( ElementType.MATERIAL, data.material );
+      this.material = this.gltf.getElement( GltfTypes.MATERIAL, data.material );
 
     if( data.mode !== undefined)
       this.mode = data.mode;
     else
-      this.mode = PrimitiveMode.DEFAULT;
+      this.mode = Gltf2.MeshPrimitiveMode.DEFAULT;
 
     if( data.targets !== undefined ){
       this.targets = [];
@@ -153,7 +155,7 @@ export default class Primitive extends BaseElement {
   parseAttributeSet( aset : AttributesSet, data : any ) {
     
     for (const attrib in data ) { 
-      const accessor:Accessor = this.gltf.getElement( ElementType.ACCESSOR, data[attrib] );
+      const accessor:Accessor = this.gltf.getElement( GltfTypes.ACCESSOR, data[attrib] );
       aset.add( new Attribute( attrib, accessor ) );
     }
 

@@ -1,28 +1,30 @@
 
 
 import BaseElement from './BaseElement';
-import { ElementType } from '../consts';
+
 
 import  Gltf         from '../index'
 import  Buffer       from './Buffer'
-import { Data_BufferView } from '../schema/glTF';
 import GLArrayBuffer from 'nanogl/arraybuffer';
 import GLIndexBuffer from 'nanogl/indexbuffer';
 import { GLContext } from 'nanogl/types';
+import Gltf2 from '../types/Gltf2';
+import GltfLoader from '../io/GltfLoader';
+import GltfTypes from '../types/GltfTypes';
 
 export default class BufferView extends BaseElement {
 
-  static TYPE : ElementType = ElementType.BUFFERVIEW;
+  static TYPE : GltfTypes = GltfTypes.BUFFERVIEW;
 
-  byteOffset : number;
-  byteLength : number;
-  byteStride : number;
-  target     : number;
+  byteOffset : number = 0;
+  byteLength : number = 0;
+  byteStride : number = 0;
+  target     : number = 0;
   buffer     : Buffer;
 
-  parse( gltf:Gltf , data:Data_BufferView ){
+  parse( gltfLoader:GltfLoader , data:Gltf2.IBufferView ){
 
-    super.parse( gltf, data );
+    super.parse( gltfLoader, data );
 
     const {
       byteLength,
@@ -36,7 +38,7 @@ export default class BufferView extends BaseElement {
     this.byteStride = byteStride;
     this.target     = target;
 
-    this.buffer  = this.gltf.getElement<Buffer>( ElementType.BUFFER, data.buffer );
+    this.buffer  = this.gltf.getElement<Buffer>( GltfTypes.BUFFER, data.buffer );
 
   }
 

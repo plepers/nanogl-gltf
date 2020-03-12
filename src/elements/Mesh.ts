@@ -1,29 +1,31 @@
 
 
-import { ElementType } from '../consts';
+
 import BaseElement from './BaseElement';
 import Primitive from './Primitive';
 
 
 import Gltf from '../index';
-import { Data_Mesh } from '../schema/glTF';
 import { GLContext } from 'nanogl/types';
+import Gltf2 from '../types/Gltf2';
+import GltfLoader from '../io/GltfLoader';
+import GltfTypes from '../types/GltfTypes';
 
 export default class Mesh extends BaseElement {
   
-  static TYPE : ElementType = ElementType.MESH;
+  static TYPE : GltfTypes = GltfTypes.MESH;
   
   primitives : Primitive[];
   weights    : Float32Array;
   
-  parse( gltf: Gltf, data: Data_Mesh ){
+  parse( gltfLoader:GltfLoader, data: Gltf2.IMesh ){
     
-    super.parse( gltf, data );
+    super.parse( gltfLoader, data );
     
     this.primitives = data.primitives.map(
       d => {
         const p = new Primitive();
-        p.parse(gltf, d);
+        p.parse(gltfLoader, d);
         return p;
       }
     );
@@ -37,11 +39,11 @@ export default class Mesh extends BaseElement {
     
     
     
-    allocateGl( gl : GLContext ) {
-      for( const primitive of this.primitives ) {
-        primitive.allocateGl( gl );
-      }
+  allocateGl( gl : GLContext ) {
+    for( const primitive of this.primitives ) {
+      primitive.allocateGl( gl );
     }
+  }
 
   
 

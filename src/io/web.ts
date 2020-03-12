@@ -1,6 +1,5 @@
 
 import base64 from 'base64-js'
-import when   from 'when'
 
 import { loadText, loadBytes, baseDir } from "../lib/net";
 import IOInterface from "./IOInterface";
@@ -44,15 +43,17 @@ class WebImpl implements IOInterface {
 
   
   
-  loadResource(path: string): Promise<string> {
-    return loadText( path );
+  async loadResource(path: string): Promise<string> {
+    const response = await fetch( path );
+    return response.text();
   }
   
-  loadBinaryResource(path: string): Promise<ArrayBuffer> {
+  async loadBinaryResource(path: string): Promise<ArrayBuffer> {
     if( this.isDataURI( path ) ){
-      return when( this.decodeDataURI( path ) );
+      return this.decodeDataURI( path );
     }
-    return loadBytes( path );
+    const response = await fetch( path );
+    return response.arrayBuffer();
   }
   
   

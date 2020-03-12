@@ -1,21 +1,23 @@
 
 
-import { ElementType } from '../consts';
-import { Data_MaterialOcclusionTextureInfo } from '../schema/glTF';
+
 import Gltf        from '../index'     ;
 import TextureInfo from './TextureInfo';
+import Gltf2 from '../types/Gltf2';
+import GltfLoader from '../io/GltfLoader';
+import GltfTypes from '../types/GltfTypes';
 
 
 export default class OcclusionTextureInfo extends TextureInfo {
 
 
-  static TYPE = ElementType.OCCLUSION_TEXTURE_INFO;
+  readonly gltftype : GltfTypes.OCCLUSION_TEXTURE_INFO = GltfTypes.OCCLUSION_TEXTURE_INFO;
 
   strength: number;
 
-  parse( gltf: Gltf, data: Data_MaterialOcclusionTextureInfo ){
+  parse( gltfLoader:GltfLoader, data: Gltf2.IMaterialOcclusionTextureInfo ){
 
-    super.parse( gltf, data );
+    super.parse( gltfLoader, data );
 
     this.strength = data.strength ?? 1;
 

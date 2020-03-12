@@ -1,23 +1,24 @@
 
 
-import { ElementType } from '../consts';
-import { Data_Asset } from '../schema/glTF';
 import Gltf        from '../index'     ;
 import BaseElement from './BaseElement';
+import Gltf2 from '../types/Gltf2';
+import GltfLoader from '../io/GltfLoader';
+import GltfTypes from '../types/GltfTypes';
 
 
 export default class Asset extends BaseElement {
 
-  static TYPE = ElementType.ASSET;
+  readonly gltftype : GltfTypes.ASSET = GltfTypes.ASSET;
 
   version    : string;
   copyright? : string;
   generator? : string;
   minVersion?: string;
 
-  parse( gltf: Gltf, data: Data_Asset ){
+  parse( gltfLoader:GltfLoader, data: Gltf2.IAsset ){
 
-    super.parse( gltf, data );
+    super.parse( gltfLoader, data );
 
     this.version    = data.version;
     this.copyright  = data.copyright;

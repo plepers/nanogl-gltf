@@ -26,7 +26,7 @@ export default class BufferCache {
     
     // const dict = (target == ArrayBufferType.ARRAY_BUFFER) ? this._abuffers : this._ibuffers;
     
-    const uid = bufferView.uid;
+    const uid = bufferView.uuid;
     let glBuffer= this._buffers[uid];
 
     if( glBuffer === undefined ){

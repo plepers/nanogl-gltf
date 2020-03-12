@@ -1,24 +1,26 @@
 
 
-import { ElementType } from '../consts';
-import { Data_Scene } from '../schema/glTF';
+
 import Gltf        from '../index'     ;
 import BaseElement from './BaseElement';
 import Node        from './Node'       ;
+import Gltf2 from '../types/Gltf2';
+import GltfLoader from '../io/GltfLoader';
+import GltfTypes from '../types/GltfTypes';
 
 
 export default class Scene extends BaseElement {
 
-  static TYPE = ElementType.SCENE;
+  readonly gltftype : GltfTypes.SCENE = GltfTypes.SCENE;
 
   nodes : Node[]
 
-  parse( gltf: Gltf, data: Data_Scene ){
+  parse( gltfLoader:GltfLoader, data: Gltf2.IScene ){
 
-    super.parse( gltf, data );
+    super.parse( gltfLoader, data );
 
     if( data.nodes !== undefined ){
-      this.nodes = data.nodes.map( idx=>gltf.getElement( ElementType.NODE, idx ) )
+      this.nodes = data.nodes.map( idx=>this.gltf.getElement( GltfTypes.NODE, idx ) )
     } else {
       this.nodes = [];
     }

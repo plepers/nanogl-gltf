@@ -1,11 +1,12 @@
 
 import BaseElement from './BaseElement';
-import { ElementType} from '../consts';
 import Assert from '../lib/assert';
 import Gltf from '../index'
 import BufferView from './BufferView'
 import {TypedArrayConstructor, TypedArray} from '../consts'
-import { Data_Accessor, Data_AccessorSparse } from '../schema/glTF';
+import Gltf2 from '../types/Gltf2';
+import GltfLoader from '../io/GltfLoader';
+import GltfTypes from '../types/GltfTypes';
 
 
 const enum ComponentType {
@@ -19,7 +20,7 @@ const enum ComponentType {
 
 type normalizeFunc = (n:number)=>number;
 type CType = ComponentType | number;
-type VType = 'SCALAR' | 'VEC2' | 'VEC3' | 'VEC4' | 'MAT2' | 'MAT3' | 'MAT4' | string;
+type VType = Gltf2.AccessorType;
 
 
 
@@ -94,25 +95,29 @@ class Sparse{
   indicesSet:Set<number>;
   indicesMap:Map<number, number>;
 
-  constructor( accessor: Accessor, data: Data_AccessorSparse ){
+  constructor( accessor: Accessor, loader : GltfLoader, data: Gltf2.IAccessorSparse ){
     this.accessor = accessor;
 
     let iData = data.indices;
     
     this.indices = new Accessor()
-    this.indices.parse( accessor.gltf, {
+    this.indices.parse( loader, {
+      uuid : "-internal-",
+      gltftype : GltfTypes.ACCESSOR,
       bufferView   : iData   .bufferView ,
       byteOffset   : iData   .byteOffset ,
       componentType: iData   .componentType,
       count        : data    .count,
       normalized   : accessor.normalized,
-      type         : "SCALAR"
+      type         : Gltf2.AccessorType.SCALAR    
     });
     
     let vData = data.values;
     
     this.values = new Accessor();
-    this.values.parse( accessor.gltf, {
+    this.values.parse( loader, {
+      uuid : "-internal-",
+      gltftype : GltfTypes.ACCESSOR,
       bufferView   : vData   .bufferView ,
       byteOffset   : vData   .byteOffset ,
       count        : data    .count,
@@ -166,8 +171,8 @@ class Sparse{
 
 export default class Accessor extends BaseElement {
 
-
-  static TYPE = ElementType.ACCESSOR
+  readonly gltftype : GltfTypes.ACCESSOR = GltfTypes.ACCESSOR;
+  
 
   normalized     : boolean      ;
   byteOffset     : number       ;
@@ -185,8 +190,8 @@ export default class Accessor extends BaseElement {
   _normalizeFunc : normalizeFunc;
 
 
-  parse( gltf:Gltf, data:Data_Accessor ){
-    super.parse( gltf, data );
+  parse( gltfLoader:GltfLoader, data:Gltf2.IAccessor ){
+    super.parse( gltfLoader, data );
 
     
     const { 
@@ -207,7 +212,7 @@ export default class Accessor extends BaseElement {
     
     
     if( data.bufferView !== undefined ){
-      this.bufferView     = this.gltf.getElement( ElementType.BUFFERVIEW, data.bufferView );
+      this.bufferView     = this.gltf.getElement( GltfTypes.BUFFERVIEW, data.bufferView );
       const Arr = getArrayForDataType(this.componentType);
 
       if( this.bufferView.byteStride === 0 ){
@@ -231,7 +236,7 @@ export default class Accessor extends BaseElement {
 
     this.sparse = null;
     if( data.sparse !== undefined ){
-      this.sparse         = new Sparse( this, data.sparse );
+      this.sparse         = new Sparse( this, gltfLoader, data.sparse );
     }
 
     this._valueHolder = this.createElementHolder();

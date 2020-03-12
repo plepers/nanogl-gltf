@@ -1,15 +1,17 @@
 
 import { mat4 } from 'gl-matrix';
 
-import { ElementType } from '../consts';
+
 import BaseElement from './BaseElement';
 
 import Gltf from '../index';
-import { Data_Camera, Data_CameraPerspective, Data_CameraOrthographic } from '../schema/glTF';
+import Gltf2 from '../types/Gltf2';
+import GltfLoader from '../io/GltfLoader';
+import GltfTypes from '../types/GltfTypes';
 
 
 type ProjectionType = "perspective" | "orthographic" | string;
-type ProjectionData = Data_CameraPerspective | Data_CameraOrthographic;
+type ProjectionData = Gltf2.ICameraPerspective | Gltf2.ICameraOrthographic;
 
 
 export const PROJ_PERSPECTIVE      : ProjectionType = 'perspective';
@@ -20,15 +22,15 @@ export const PROJ_ORTHOGRAPHIC     : ProjectionType = 'orthographic';
 
 export default class Camera extends BaseElement {
 
-  static TYPE : ElementType = ElementType.CAMERA;
+  static TYPE : GltfTypes = GltfTypes.CAMERA;
 
   type : ProjectionType;
   projectionData : ProjectionData;
   projection : mat4;
 
-  parse( gltf: Gltf, data: Data_Camera ){
+  parse( gltfLoader:GltfLoader, data: Gltf2.ICamera ){
 
-    super.parse( gltf, data );
+    super.parse( gltfLoader, data );
 
     this.projection = mat4.create();
 
@@ -55,18 +57,18 @@ export default class Camera extends BaseElement {
 
   }
 
-  createPerpective( data : Data_CameraPerspective ){
+  createPerpective( data : Gltf2.ICameraPerspective ){
 
     mat4.perspective( this.projection,
       data.yfov,
-      data.aspect,
+      data.aspectRatio,
       data.znear,
       data.zfar
     );
 
   }
 
-  createOrtho( data : Data_CameraOrthographic ){
+  createOrtho( data : Gltf2.ICameraOrthographic ){
 
     mat4.ortho( this.projection,
       -data.xmag *.5,

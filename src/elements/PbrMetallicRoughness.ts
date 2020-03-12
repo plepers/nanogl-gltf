@@ -1,18 +1,16 @@
 
 
-import { ElementType } from '../consts';
-import { Data_TextureInfo, Data_MaterialPBRMetallicRoughness } from '../schema/glTF';
+
 import Gltf        from '../index'     ;
 import { vec4 } from 'gl-matrix';
 import TextureInfo from './TextureInfo';
 import BaseElement from './BaseElement';
 import Texture from './Texture';
+import Gltf2 from '../types/Gltf2';
+import GltfLoader from '../io/GltfLoader';
 
 
-export default class PbrMetallicRoughness extends BaseElement {
-
-
-  static TYPE = ElementType.PBR_METALLIC_ROUGHNESS;
+export default class PbrMetallicRoughness {
 
 
   baseColorFactor          : vec4       ;
@@ -23,9 +21,8 @@ export default class PbrMetallicRoughness extends BaseElement {
   
 
 
-  parse( gltf: Gltf, data: Data_MaterialPBRMetallicRoughness ){
+  parse( gltfLoader:GltfLoader, data: Gltf2.IMaterialPbrMetallicRoughness ){
 
-    super.parse( gltf, data );
 
     this.baseColorFactor = <vec4> new Float32Array(data.baseColorFactor || [1,1,1,1]);
     
@@ -34,12 +31,12 @@ export default class PbrMetallicRoughness extends BaseElement {
 
     if( data.baseColorTexture !== undefined ){
       this.baseColorTexture = new TextureInfo();
-      this.baseColorTexture.parse( gltf, data.baseColorTexture );
+      this.baseColorTexture.parse( gltfLoader, data.baseColorTexture );
     }
 
     if( data.metallicRoughnessTexture !== undefined ){
       this.metallicRoughnessTexture = new TextureInfo();
-      this.metallicRoughnessTexture.parse( gltf, data.metallicRoughnessTexture );
+      this.metallicRoughnessTexture.parse( gltfLoader, data.metallicRoughnessTexture );
     }
 
   }

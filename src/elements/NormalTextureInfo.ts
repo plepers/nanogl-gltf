@@ -1,23 +1,25 @@
 
 
-import { ElementType } from '../consts';
-import { Data_MaterialNormalTextureInfo } from '../schema/glTF';
+
 import Gltf        from '../index'     ;
 import TextureInfo from './TextureInfo';
+import Gltf2 from '../types/Gltf2';
+import GltfLoader from '../io/GltfLoader';
+import GltfTypes from '../types/GltfTypes';
 
 
 export default class NormalTextureInfo extends TextureInfo {
 
 
-  static TYPE = ElementType.NORMAL_TEXTURE_INFO;
+  readonly gltftype : GltfTypes.NORMAL_TEXTURE_INFO = GltfTypes.NORMAL_TEXTURE_INFO;
   
   scale: number;
   
 
 
-  parse( gltf: Gltf, data: Data_MaterialNormalTextureInfo ){
+  parse( gltfLoader:GltfLoader, data: Gltf2.IMaterialNormalTextureInfo ){
 
-    super.parse( gltf, data );
+    super.parse( gltfLoader, data );
 
     this.scale = data.scale ?? 1.0;
 
