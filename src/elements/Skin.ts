@@ -19,21 +19,23 @@ export default class Skin extends BaseElement {
   skeletonRoot : Node;
   joints       : Node[];
 
-  parse( gltfLoader:GltfLoader, data: Gltf2.ISkin ){
+  async parse( gltfLoader:GltfLoader, data: Gltf2.ISkin ){
 
     super.parse( gltfLoader, data );
     
-    this.joints = data.joints.map( idx=>this.gltf.getElement( GltfTypes.NODE, idx ) )
+
+    const jointPromises = data.joints.map( idx=>gltfLoader.getElement( GltfTypes.NODE, idx ) )
+    this.joints = await Promise.all( jointPromises );
 
     this.inverseBindMatrices = this.joints.map( mat4.create );
 
     if( data.inverseBindMatrices !== undefined ){
-      const ibmAccessor = this.gltf.getElement<Accessor>( GltfTypes.ACCESSOR, data.inverseBindMatrices );
+      const ibmAccessor = await gltfLoader.getElement( GltfTypes.ACCESSOR, data.inverseBindMatrices );
       this.inverseBindMatrices.forEach( (m, i)=>ibmAccessor.getValue(m, i) )
     }
 
     if( data.skeleton !== undefined ){
-      this.skeletonRoot = this.gltf.getElement( GltfTypes.NODE, data.skeleton );
+      this.skeletonRoot = await gltfLoader.getElement( GltfTypes.NODE, data.skeleton );
     }
 
   }

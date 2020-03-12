@@ -28,7 +28,7 @@ export default class Camera extends BaseElement {
   projectionData : ProjectionData;
   projection : mat4;
 
-  parse( gltfLoader:GltfLoader, data: Gltf2.ICamera ){
+  parse( gltfLoader:GltfLoader, data: Gltf2.ICamera ) : Promise<any>{
 
     super.parse( gltfLoader, data );
 
@@ -53,6 +53,8 @@ export default class Camera extends BaseElement {
         throw new Error('Camera - unsupported type '+this.type );
         
     }
+
+    return Promise.resolve();
 
 
   }

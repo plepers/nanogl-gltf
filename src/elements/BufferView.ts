@@ -14,7 +14,7 @@ import GltfTypes from '../types/GltfTypes';
 
 export default class BufferView extends BaseElement {
 
-  static TYPE : GltfTypes = GltfTypes.BUFFERVIEW;
+  readonly gltftype : GltfTypes.BUFFERVIEW = GltfTypes.BUFFERVIEW;
 
   byteOffset : number = 0;
   byteLength : number = 0;
@@ -22,7 +22,7 @@ export default class BufferView extends BaseElement {
   target     : number = 0;
   buffer     : Buffer;
 
-  parse( gltfLoader:GltfLoader , data:Gltf2.IBufferView ){
+  async parse( gltfLoader:GltfLoader , data:Gltf2.IBufferView ) : Promise<any> {
 
     super.parse( gltfLoader, data );
 
@@ -38,7 +38,7 @@ export default class BufferView extends BaseElement {
     this.byteStride = byteStride;
     this.target     = target;
 
-    this.buffer  = this.gltf.getElement<Buffer>( GltfTypes.BUFFER, data.buffer );
+    this.buffer  = await gltfLoader.getElement( GltfTypes.BUFFER, data.buffer );
 
   }
 

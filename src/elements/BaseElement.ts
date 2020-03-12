@@ -8,7 +8,7 @@ type Constructor<T = {}> = new (...args: any[]) => T;
 
 function ElementMixin<TBase extends Constructor>(Base: TBase) {
 
-  return class extends Base implements Gltf2.IChildRootProperty {
+  return class extends Base {
 
 
     readonly gltftype : GltfTypes;
@@ -21,7 +21,7 @@ function ElementMixin<TBase extends Constructor>(Base: TBase) {
     extensions? : Record<string,any>;
 
 
-    parse( gltfLoader : GltfLoader, data : Gltf2.IProperty, ...args : any ){
+    parse( gltfLoader : GltfLoader, data : Gltf2.IProperty, ...args : any ) : Promise<any> {
 
       this.uuid = data.uuid;
 
@@ -30,6 +30,8 @@ function ElementMixin<TBase extends Constructor>(Base: TBase) {
       this.name       = (data as any).name ?? ""
       this.extras     = data.extras    
       this.extensions = data.extensions
+
+      return Promise.resolve(true)
 
     }
 

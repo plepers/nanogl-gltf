@@ -18,7 +18,7 @@ export default class Image extends BaseElement {
   mimeType?   : string;
   bufferView? : BufferView;
 
-  parse( gltfLoader:GltfLoader, data: Gltf2.IImage ){
+  async parse( gltfLoader:GltfLoader, data: Gltf2.IImage ) : Promise<any>{
 
     super.parse( gltfLoader, data );
 
@@ -26,7 +26,7 @@ export default class Image extends BaseElement {
     this.mimeType = data.mimeType;
 
     if( data.bufferView !== undefined ){
-      this.bufferView = this.gltf.getElement( GltfTypes.BUFFERVIEW, data.bufferView );
+      this.bufferView = await gltfLoader.getElement( GltfTypes.BUFFERVIEW, data.bufferView );
     }
 
   }

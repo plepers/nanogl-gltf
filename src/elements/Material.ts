@@ -43,7 +43,7 @@ export default class Material extends BaseElement {
   glconfig: GLConfig;
 
 
-  parse( gltfLoader:GltfLoader, data: Gltf2.IMaterial ){
+  async parse( gltfLoader:GltfLoader, data: Gltf2.IMaterial ) : Promise<any>{
 
     super.parse( gltfLoader, data );
 
@@ -55,22 +55,19 @@ export default class Material extends BaseElement {
 
     if( data.pbrMetallicRoughness !== undefined ){
       this.pbrMetallicRoughness = new PbrMetallicRoughness()
-      this.pbrMetallicRoughness.parse( gltfLoader, data.pbrMetallicRoughness )
+      await this.pbrMetallicRoughness.parse( gltfLoader, data.pbrMetallicRoughness )
     }
 
     if( data.normalTexture !== undefined ){
-      this.normalTexture = new NormalTextureInfo()
-      this.normalTexture.parse( gltfLoader, data.normalTexture )
+      this.normalTexture = await gltfLoader._loadElement( data.normalTexture );
     }
-
+    
     if( data.occlusionTexture !== undefined ){
-      this.occlusionTexture = new OcclusionTextureInfo()
-      this.occlusionTexture.parse( gltfLoader, data.occlusionTexture )
+      this.occlusionTexture = await gltfLoader._loadElement( data.occlusionTexture );
     }
-
+    
     if( data.emissiveTexture !== undefined ){
-      this.emissiveTexture = new TextureInfo()
-      this.emissiveTexture.parse( gltfLoader, data.emissiveTexture )
+      this.emissiveTexture = await gltfLoader._loadElement( data.emissiveTexture );
     }
   }
 

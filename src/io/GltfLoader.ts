@@ -4,11 +4,11 @@ import Gltf from "..";
 import IOInterface from "./IOInterface";
 import ElementFactory                              from "./ElementFactory";
 import { MAGIC, GLB_HEADER_SIZE, JSON_MAGIC } from "../consts";
-import Buffer from "../elements/Buffer";
 import { ExtensionList } from "../extensions/Registry";
 import Gltf2 from "../types/Gltf2";
 import { ElementOfType, PropertyType, AnyElement } from "../types/Elements";
 import GltfTypes from "../types/GltfTypes";
+import BaseElement from "../elements/BaseElement";
 
 
 
@@ -32,11 +32,14 @@ export default class GltfLoader {
 
   _data: Gltf2.IGLTF;
 
+  _glbData? : ArrayBuffer;
+
   // _defaultFactory : IElementFactory;
   _factory: ElementFactory;
   _extensions: ExtensionList;
 
-  _elements: Map<string, Promise<AnyElement>>;
+  _elements: Map<string, Promise<AnyElement>> = new Map();
+  _byType  : Map<GltfTypes, Promise<AnyElement>[]> = new Map();
 
 
   constructor(gltfIO: IOInterface, url: string, baseurl: string) {
@@ -58,7 +61,6 @@ export default class GltfLoader {
 
   parse = (buffer: ArrayBuffer): Promise<Gltf> => {
     return this.unpack(buffer)
-      .then(this.loadBuffers)
       .then(this.parseAll)
       .then(this.yieldGltf);
   }
@@ -92,47 +94,47 @@ export default class GltfLoader {
       throw new Error('Binary glTF scene format is not JSON');
 
     const scene = this.gltfIO.decodeUTF8(buffer, GLB_HEADER_SIZE, jsonSize);
+    this._glbData = buffer.slice(GLB_HEADER_SIZE + jsonSize + 8);
     this._data = JSON.parse(scene);
     this.prepareGltfDatas(this._data);
 
 
-    const bbytes = buffer.slice(GLB_HEADER_SIZE + jsonSize + 8);
-    const mbuffer = new Buffer()
-    const bufferData : Gltf2.IBuffer = {
-      byteLength: bbytes.byteLength,
-      gltftype: GltfTypes.BUFFER,
-      uuid: getUUID()
-    }
-    mbuffer.parse(this, bufferData );
-    mbuffer._bytes = bbytes;
-    this._elements.set(bufferData.uuid, Promise.resolve(mbuffer));
-    this.gltf.addElement(mbuffer)
+    // const mbuffer = new Buffer()
+    // const bufferData : Gltf2.IBuffer = {
+    //   byteLength: bbytes.byteLength,
+    //   gltftype: GltfTypes.BUFFER,
+    //   uuid: getUUID()
+    // }
+    // mbuffer.parse(this, bufferData );
+    // mbuffer._bytes = bbytes;
+    // this._elements.set(bufferData.uuid, Promise.resolve(mbuffer));
+    // this.gltf.addElement(mbuffer)
 
   }
 
 
 
-  loadBuffers = () => {
-    const buffers: Buffer[] = this.gltf._getTypeHolder(GltfTypes.BUFFER);
-    for (var i = buffers.length; i < this._data.buffers.length; i++) {
-      var buffer = new Buffer();
-      buffer.parse(this, this._data.buffers[i]);
-      this.gltf.addElement(buffer);
-    }
+  // loadBuffers = () => {
+  //   const buffers: Buffer[] = this.gltf._getTypeHolder(GltfTypes.BUFFER);
+  //   for (var i = buffers.length; i < this._data.buffers.length; i++) {
+  //     var buffer = new Buffer();
+  //     buffer.parse(this, this._data.buffers[i]);
+  //     this.gltf.addElement(buffer);
+  //   }
 
-    return Promise.all(buffers.map(b => this.loadBuffer(b)));
+  //   return Promise.all(buffers.map(b => this.loadBuffer(b)));
 
-  }
+  // }
 
 
-  loadBuffer = (b: Buffer) => {
+  // loadBuffer = (b: Buffer) => {
+  loadBufferUri = (uri? : string):Promise<ArrayBuffer> =>  {
 
-    if (b.uri === undefined)
-      return (b._bytes);
+    if (uri === undefined)
+      return Promise.resolve(this._glbData);
 
-    const uri = this.gltfIO.resolvePath(b.uri, this._baseUrl);
-    return this.gltfIO.loadBinaryResource(uri)
-      .then(data => b._bytes = data);
+    const resolvedUri = this.gltfIO.resolvePath(uri, this._baseUrl);
+    return this.gltfIO.loadBinaryResource(resolvedUri)
 
   }
 
@@ -182,6 +184,22 @@ export default class GltfLoader {
     return res;
   }
 
+  private _getElementHolder<T extends GltfTypes>( type:T ) : Promise<ElementOfType<T>>[] {
+    let array : Promise<AnyElement>[] = this._byType.get( type );
+    if( array === undefined ){
+      array = [];
+      this._byType.set( type, array );
+    }
+    return array as Promise<ElementOfType<T>>[];
+  }
+
+  getElement<T extends GltfTypes>( type : T, index : number ): Promise<ElementOfType<T>> {
+    const holder = this._getElementHolder( type );
+    return holder[index];
+    // get existing or create if not exist!
+    return null;
+  }
+
 
   parseAll = async () => {
 
@@ -194,7 +212,7 @@ export default class GltfLoader {
 
 
 
-    gltf.asset = await this._createElement(this._data.asset);
+    gltf.asset = await this._loadElement(this._data.asset);
     // gltf.asset.parse( this, this._data.asset )
 
     // TODO: validate asset version
@@ -222,27 +240,84 @@ export default class GltfLoader {
 
 
   prepareGltfDatas(gltfData: Gltf2.IGLTF) {
-    this.prepareGltfData(gltfData.accessors, GltfTypes.ACCESSOR);
-    this.prepareGltfData(gltfData.animations, GltfTypes.ANIMATION);
-    this.prepareGltfData(gltfData.buffers, GltfTypes.BUFFER);
-    this.prepareGltfData(gltfData.bufferViews, GltfTypes.BUFFERVIEW);
-    this.prepareGltfData(gltfData.cameras, GltfTypes.CAMERA);
-    this.prepareGltfData(gltfData.images, GltfTypes.IMAGE);
-    this.prepareGltfData(gltfData.materials, GltfTypes.MATERIAL);
-    this.prepareGltfData(gltfData.meshes, GltfTypes.MESH);
-    this.prepareGltfData(gltfData.nodes, GltfTypes.NODE);
-    this.prepareGltfData(gltfData.samplers, GltfTypes.SAMPLER);
-    this.prepareGltfData(gltfData.scenes, GltfTypes.SCENE);
-    this.prepareGltfData(gltfData.skins, GltfTypes.SKIN);
-    this.prepareGltfData(gltfData.textures, GltfTypes.TEXTURE);
+
+    this.prepareGltfProperties( gltfData.accessors  , GltfTypes.ACCESSOR  , null );
+    this.prepareGltfProperties( gltfData.animations , GltfTypes.ANIMATION , null );
+    this.prepareGltfProperties( [gltfData.asset]    , GltfTypes.ASSET     , null );
+    this.prepareGltfProperties( gltfData.buffers    , GltfTypes.BUFFER    , null );
+    this.prepareGltfProperties( gltfData.bufferViews, GltfTypes.BUFFERVIEW, null );
+    this.prepareGltfProperties( gltfData.cameras    , GltfTypes.CAMERA    , null );
+    this.prepareGltfProperties( gltfData.images     , GltfTypes.IMAGE     , null );
+    this.prepareGltfProperties( gltfData.materials  , GltfTypes.MATERIAL  , null );
+    this.prepareGltfProperties( gltfData.meshes     , GltfTypes.MESH      , null );
+    this.prepareGltfProperties( gltfData.nodes      , GltfTypes.NODE      , null );
+    this.prepareGltfProperties( gltfData.samplers   , GltfTypes.SAMPLER   , null );
+    this.prepareGltfProperties( gltfData.scenes     , GltfTypes.SCENE     , null );
+    this.prepareGltfProperties( gltfData.skins      , GltfTypes.SKIN      , null );
+    this.prepareGltfProperties( gltfData.textures   , GltfTypes.TEXTURE   , null );
+
+
+    // ANIMATION_SAMPLER
+    // ANIMATION_CHANNEL
+
+    // NORMAL_TEXTURE_INFO
+    // OCCLUSION_TEXTURE_INFO
+    // PRIMITIVE
+    // TEXTURE_INFO
+
+    if( gltfData.animations !== undefined ){
+      for (const animation of gltfData.animations) {
+        this.prepareGltfProperties( animation.samplers, GltfTypes.ANIMATION_SAMPLER, animation );
+        this.prepareGltfProperties( animation.channels, GltfTypes.ANIMATION_CHANNEL, animation );
+      }
+    }
+
+    if( gltfData.materials !== undefined ){
+      for (const material of gltfData.materials) {
+        this.prepareGltfProperty( material.normalTexture, GltfTypes.NORMAL_TEXTURE_INFO, -1, material );
+        this.prepareGltfProperty( material.occlusionTexture, GltfTypes.OCCLUSION_TEXTURE_INFO, -1, material );
+        this.prepareGltfProperty( material.emissiveTexture, GltfTypes.TEXTURE_INFO, -1, material );
+
+        if( material.pbrMetallicRoughness !== undefined ){
+          this.prepareGltfProperty( material.pbrMetallicRoughness.baseColorTexture, GltfTypes.TEXTURE_INFO, -1, material );
+          this.prepareGltfProperty( material.pbrMetallicRoughness.metallicRoughnessTexture, GltfTypes.TEXTURE_INFO, -1, material );
+        }
+      }
+    }
+
+    if( gltfData.meshes !== undefined ){
+      for (const mesh of gltfData.meshes) {
+        this.prepareGltfProperties( mesh.primitives, GltfTypes.PRIMITIVE, mesh );
+      }
+    }
+
+    if( gltfData.accessors !== undefined ){
+      for (const accessor of gltfData.accessors) {
+        this.prepareGltfProperty( accessor.sparse, GltfTypes.ACCESSOR_SPARSE, -1, accessor );
+        if( accessor.sparse !== undefined ){
+          this.prepareGltfProperty( accessor.sparse.indices, GltfTypes.ACCESSOR_SPARSE_INDICES, -1, accessor.sparse );
+          this.prepareGltfProperty( accessor.sparse.values, GltfTypes.ACCESSOR_SPARSE_VALUES, -1, accessor.sparse );
+        }
+      }
+    }
+
   }
 
 
-  prepareGltfData(elementsData: Gltf2.IProperty[], type: GltfTypes) {
-    for (const e of elementsData) {
-      (e as any).gltftype = type;
-      e.uuid = getUUID();
+  prepareGltfProperties(elementsData: Gltf2.Property[], type: GltfTypes, parent : Gltf2.Property ) {
+    for (let i = 0; i < elementsData.length; i++) {
+      const element = elementsData[i];
+      this.prepareGltfProperty( element, type, i, parent );
     }
+  }
+
+
+  prepareGltfProperty(element: Gltf2.Property, type: GltfTypes, index : number, parent : Gltf2.Property ) {
+    if( element === undefined ) return;
+    (element as any).gltftype = type;
+    element.uuid = getUUID();
+    element.elementIndex  = index;
+    element.elementParent = parent;
   }
 
 }

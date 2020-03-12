@@ -18,37 +18,55 @@ namespace Gltf2 {
     uuid : string;
 
     /**
+     * index of data in gltf data struct
+     */
+    elementIndex : number;
+
+    /**
+     * the parent property of the element (IGLTF for root elements )
+     */
+    elementParent : Property;
+
+    /**
      * Added befoer parsing by loader
      */
     readonly gltftype : GltfTypes;
 
+
+
   }
 
 
-  export interface IAccessor                     { readonly gltftype : GltfTypes.ACCESSOR               ; }
-  export interface IAnimation                    { readonly gltftype : GltfTypes.ANIMATION              ; }
-  export interface IAnimationSampler             { readonly gltftype : GltfTypes.ANIMATION_SAMPLER      ; }
-  export interface IAnimationChannel             { readonly gltftype : GltfTypes.ANIMATION_CHANNEL      ; }
-  export interface IAsset                        { readonly gltftype : GltfTypes.ASSET                  ; }
-  export interface IBuffer                       { readonly gltftype : GltfTypes.BUFFER                 ; }
-  export interface IBufferView                   { readonly gltftype : GltfTypes.BUFFERVIEW             ; }
-  export interface ICamera                       { readonly gltftype : GltfTypes.CAMERA                 ; }
-  export interface IImage                        { readonly gltftype : GltfTypes.IMAGE                  ; }
-  export interface IMaterial                     { readonly gltftype : GltfTypes.MATERIAL               ; }
-  export interface IMesh                         { readonly gltftype : GltfTypes.MESH                   ; }
-  export interface INode                         { readonly gltftype : GltfTypes.NODE                   ; }
-  export interface IMaterialNormalTextureInfo    { readonly gltftype : GltfTypes.NORMAL_TEXTURE_INFO    ; }
-  export interface IMaterialOcclusionTextureInfo { readonly gltftype : GltfTypes.OCCLUSION_TEXTURE_INFO ; }
-  export interface IMeshPrimitive                { readonly gltftype : GltfTypes.PRIMITIVE              ; }
-  export interface ISampler                      { readonly gltftype : GltfTypes.SAMPLER                ; }
-  export interface IScene                        { readonly gltftype : GltfTypes.SCENE                  ; }
-  export interface ISkin                         { readonly gltftype : GltfTypes.SKIN                   ; }
-  export interface ITexture                      { readonly gltftype : GltfTypes.TEXTURE                ; }
-  export interface ITextureInfo                  { readonly gltftype : GltfTypes.TEXTURE_INFO           ; }
+  export interface IAccessor                     { readonly gltftype : GltfTypes.ACCESSOR                ; }
+  export interface IAccessorSparse               { readonly gltftype : GltfTypes.ACCESSOR_SPARSE         ; elementParent : IAccessor}
+  export interface IAccessorSparseIndices        { readonly gltftype : GltfTypes.ACCESSOR_SPARSE_INDICES ; elementParent : IAccessorSparse}
+  export interface IAccessorSparseValues         { readonly gltftype : GltfTypes.ACCESSOR_SPARSE_VALUES  ; elementParent : IAccessorSparse}
+  export interface IAnimation                    { readonly gltftype : GltfTypes.ANIMATION               ; }
+  export interface IAnimationSampler             { readonly gltftype : GltfTypes.ANIMATION_SAMPLER       ; elementParent : IAnimation }
+  export interface IAnimationChannel             { readonly gltftype : GltfTypes.ANIMATION_CHANNEL       ; elementParent : IAnimation }
+  export interface IAsset                        { readonly gltftype : GltfTypes.ASSET                   ; }
+  export interface IBuffer                       { readonly gltftype : GltfTypes.BUFFER                  ; }
+  export interface IBufferView                   { readonly gltftype : GltfTypes.BUFFERVIEW              ; }
+  export interface ICamera                       { readonly gltftype : GltfTypes.CAMERA                  ; }
+  export interface IImage                        { readonly gltftype : GltfTypes.IMAGE                   ; }
+  export interface IMaterial                     { readonly gltftype : GltfTypes.MATERIAL                ; }
+  export interface IMesh                         { readonly gltftype : GltfTypes.MESH                    ; }
+  export interface INode                         { readonly gltftype : GltfTypes.NODE                    ; }
+  export interface IMaterialNormalTextureInfo    { readonly gltftype : GltfTypes.NORMAL_TEXTURE_INFO     ; }
+  export interface IMaterialOcclusionTextureInfo { readonly gltftype : GltfTypes.OCCLUSION_TEXTURE_INFO  ; }
+  export interface IMeshPrimitive                { readonly gltftype : GltfTypes.PRIMITIVE               ; }
+  export interface ISampler                      { readonly gltftype : GltfTypes.SAMPLER                 ; }
+  export interface IScene                        { readonly gltftype : GltfTypes.SCENE                   ; }
+  export interface ISkin                         { readonly gltftype : GltfTypes.SKIN                    ; }
+  export interface ITexture                      { readonly gltftype : GltfTypes.TEXTURE                 ; }
+  export interface ITextureInfo                  { readonly gltftype : GltfTypes.TEXTURE_INFO            ; }
 
 
   export type Property = 
     IAccessor                     |
+    IAccessorSparse               |
+    IAccessorSparseIndices        |
+    IAccessorSparseValues         |
     IAnimation                    |
     IAnimationSampler             |
     IAnimationChannel             |

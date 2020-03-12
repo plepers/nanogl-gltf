@@ -17,16 +17,16 @@ export default class Texture extends BaseElement {
   sampler:Sampler
   source: Image;
 
-  parse( gltfLoader:GltfLoader, data: Gltf2.ITexture ){
+  async parse( gltfLoader:GltfLoader, data: Gltf2.ITexture ){
 
     super.parse( gltfLoader, data );
 
     if( data.sampler !== undefined ){
-      this.sampler = this.gltf.getElement<Sampler>( GltfTypes.SAMPLER, data.sampler );
+      this.sampler = await gltfLoader.getElement( GltfTypes.SAMPLER, data.sampler );
     }
 
     if( data.source !== undefined ){
-      this.source = this.gltf.getElement<Image>( GltfTypes.IMAGE, data.source );
+      this.source = await gltfLoader.getElement( GltfTypes.IMAGE, data.source );
     }
     
   }

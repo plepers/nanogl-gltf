@@ -9,43 +9,26 @@ import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
 
 
-function createSampler(gltfLoader:GltfLoader, data:Gltf2.IAnimationSampler){
-  const sampler = new AnimationSampler();
-  sampler.parse( gltfLoader, data );
-  return sampler;
-}
-
-
-function createChannel(gltfLoader:GltfLoader, data:Gltf2.IAnimationChannel, animation:Animation ){
-  const channel = new AnimationChannel();
-  channel.parse( gltfLoader, data, animation );
-  return channel;
-}
 
 
 export default class Animation extends BaseElement {
 
   readonly gltftype : GltfTypes.ANIMATION = GltfTypes.ANIMATION;
 
-  samplers : AnimationSampler[] = []
-  channels : AnimationChannel[] = []
+  samplers : AnimationSampler[];
+  channels : AnimationChannel[]
 
-  parse(gltfLoader:GltfLoader, data : Gltf2.IAnimation) {
+
+  async parse(gltfLoader:GltfLoader, data : Gltf2.IAnimation) : Promise<any> {
 
     super.parse(gltfLoader, data);
 
-    this.samplers = data.samplers.map(
-      d => createSampler(gltfLoader, d)
-    );
-    
-    this.gltf.addElements(this.samplers);
+    const samplerPromises = data.samplers.map( (data)=>gltfLoader._loadElement(data) );
+    this.samplers = await Promise.all( samplerPromises );
 
-    this.channels = data.channels.map(
-      d => createChannel(gltfLoader, d, this)
-    );
+    const channelPromises = data.channels.map( (data)=>gltfLoader._loadElement(data) );
+    this.channels = await Promise.all( channelPromises );
     
-    this.gltf.addElements(this.channels);
-
   }
 
 

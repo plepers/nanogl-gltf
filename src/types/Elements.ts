@@ -7,6 +7,7 @@ import Material             from "../elements/Material"             ;
 import Mesh                 from "../elements/Mesh"                 ;
 import Primitive            from "../elements/Primitive"            ;
 import Skin                 from "../elements/Skin"                 ;
+import Animation            from "../elements/Animation"     ;
 import AnimationChannel     from "../elements/AnimationChannel"     ;
 import AnimationSampler     from "../elements/AnimationSampler"     ;
 import NormalTextureInfo    from "../elements/NormalTextureInfo"    ;
@@ -17,33 +18,40 @@ import Scene                from "../elements/Scene"                ;
 import Texture              from "../elements/Texture"              ;
 import TextureInfo          from "../elements/TextureInfo"          ;
 import Image                from "../elements/Image";
+import Node                 from "../elements/Node";
 
 import Gltf2 from "./Gltf2";
 import GltfTypes from "./GltfTypes";
+import AccessorSparse from "../elements/AccessorSparse";
+import AccessorSparseIndices from "../elements/AccessorSparseIndices";
+import AccessorSparseValues from "../elements/AccessorSparseValues";
 
 
 export type AnyElement = 
-  Asset               |
-  Buffer               |
-  BufferView           |
-  AnimationChannel     |
-  AnimationSampler     |
-  Accessor             |
-  Animation            |
-  Camera               |
-  Image                |
-  Material             |
-  Mesh                 |
-  Node                 |
-  NormalTextureInfo    |
-  OcclusionTextureInfo |
-  PbrMetallicRoughness |
-  Primitive            |
-  Sampler              |
-  Scene                |
-  Skin                 |
-  Texture              |
-  TextureInfo         ;
+  Accessor              |
+  AccessorSparse        |
+  AccessorSparseIndices |
+  AccessorSparseValues  |
+  Animation             |
+  AnimationChannel      |
+  AnimationSampler      |
+  Asset                 |
+  Buffer                |
+  BufferView            |
+  Camera                |
+  Image                 |
+  Material              |
+  Mesh                  |
+  Node                  |
+  NormalTextureInfo     |
+  OcclusionTextureInfo  |
+  PbrMetallicRoughness  |
+  Primitive             |
+  Sampler               |
+  Scene                 |
+  Skin                  |
+  Texture               |
+  TextureInfo           ;
 
 
 

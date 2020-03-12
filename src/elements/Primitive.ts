@@ -4,7 +4,6 @@
 import BaseElement from './BaseElement';
 
 
-import Gltf from '../index'
 import Accessor from './Accessor'
 import Material from './Material'
 import { GLContext } from 'nanogl/types';
@@ -120,20 +119,20 @@ export default class Primitive extends BaseElement {
   indexBuffer : GLIndexBuffer;
 
 
-  parse( gltfLoader:GltfLoader, data:Gltf2.IMeshPrimitive ){
+  async parse( gltfLoader:GltfLoader, data:Gltf2.IMeshPrimitive ) : Promise<any> {
 
     super.parse( gltfLoader, data );
 
     
     this.attributes = new AttributesSet();
-    this.parseAttributeSet( this.attributes, data.attributes );
+    await this.parseAttributeSet( gltfLoader, this.attributes, data.attributes );
 
     
     if( data.indices !== undefined )
-      this.indices = this.gltf.getElement( GltfTypes.ACCESSOR, data.indices );
+      this.indices = await gltfLoader.getElement( GltfTypes.ACCESSOR, data.indices );
 
     if( data.material !== undefined )
-      this.material = this.gltf.getElement( GltfTypes.MATERIAL, data.material );
+      this.material = await gltfLoader.getElement( GltfTypes.MATERIAL, data.material );
 
     if( data.mode !== undefined)
       this.mode = data.mode;
@@ -145,17 +144,17 @@ export default class Primitive extends BaseElement {
 
       for (var tgt of data.targets ) {
         const aset = new AttributesSet();
-        this.parseAttributeSet( aset, tgt );
+        await this.parseAttributeSet( gltfLoader, aset, tgt );
         this.targets.push( aset );
       }
     }
   }
 
 
-  parseAttributeSet( aset : AttributesSet, data : any ) {
+  async parseAttributeSet( gltfLoader:GltfLoader, aset : AttributesSet, data : any ) {
     
     for (const attrib in data ) { 
-      const accessor:Accessor = this.gltf.getElement( GltfTypes.ACCESSOR, data[attrib] );
+      const accessor:Accessor = await gltfLoader.getElement( GltfTypes.ACCESSOR, data[attrib] );
       aset.add( new Attribute( attrib, accessor ) );
     }
 

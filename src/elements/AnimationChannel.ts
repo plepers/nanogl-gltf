@@ -75,7 +75,7 @@ export default class AnimationChannel extends BaseElement {
   valueHolder   : TypedArray      ;
 
 
-  parse(gltfLoader:GltfLoader, data:Gltf2.IAnimationChannel, animation:Animation) {
+  async parse(gltfLoader:GltfLoader, data:Gltf2.IAnimationChannel) : Promise<any> {
 
     super.parse(gltfLoader, data);
 
@@ -86,8 +86,10 @@ export default class AnimationChannel extends BaseElement {
     
     if( data.target.node !== undefined ){
       this._active = true;
-      this.node = this.gltf.getElement<Node>( GltfTypes.NODE, data.target.node);
+      this.node = await gltfLoader.getElement( GltfTypes.NODE, data.target.node);
     }
+
+    const animation = await gltfLoader._loadElement( data.elementParent );
     
     this.sampler = animation.getSampler(data.sampler);
     this.valueHolder = this.sampler.createElementHolder();

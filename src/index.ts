@@ -155,9 +155,9 @@ export default class Gltf{
   }
 
  
-  getElement<T extends BaseElement>( type:GltfTypes, index:number ) : T {
-    return this._getTypeHolder<T>(type)[index]; 
-  }
+  // getElement<T extends BaseElement>( type:GltfTypes, index:number ) : T {
+  //   return this._getTypeHolder<T>(type)[index]; 
+  // }
  
 
   getElementByName<T extends BaseElement>( type:GltfTypes, name:string ) : T {

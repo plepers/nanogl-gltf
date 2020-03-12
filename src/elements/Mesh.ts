@@ -16,24 +16,20 @@ export default class Mesh extends BaseElement {
   static TYPE : GltfTypes = GltfTypes.MESH;
   
   primitives : Primitive[];
-  weights    : Float32Array;
+  weights?   : Float32Array;
   
-  parse( gltfLoader:GltfLoader, data: Gltf2.IMesh ){
+  async parse( gltfLoader:GltfLoader, data: Gltf2.IMesh ) : Promise<any>{
     
     super.parse( gltfLoader, data );
     
-    this.primitives = data.primitives.map(
-      d => {
-        const p = new Primitive();
-        p.parse(gltfLoader, d);
-        return p;
-      }
-    );
+
+
+    const channelPromises = data.primitives.map( (data)=>gltfLoader._loadElement(data) );
+    this.primitives = await Promise.all( channelPromises );
     
-    this.gltf.addElements(this.primitives);
-    
-    if( data.weights )
-    this.weights = new Float32Array( data.weights );
+    if( data.weights ){
+      this.weights = new Float32Array( data.weights );
+    }
     
   }
     

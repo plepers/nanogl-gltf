@@ -27,10 +27,8 @@ export default class Node extends ElementMixin( NGLNode ) {
   weights     : Float32Array;
 
 
-  parse( gltfLoader:GltfLoader, data: Gltf2.INode ){
-
+  async parse( gltfLoader:GltfLoader, data: Gltf2.INode ){
     // super.parse();
-
     this.uuid       = data.uuid;
     this.gltf       = gltfLoader.gltf;
     this.name       = data.name      
@@ -38,7 +36,7 @@ export default class Node extends ElementMixin( NGLNode ) {
     this.extensions = data.extensions
 
     if( data.camera !== undefined )
-      this.camera = this.gltf.getElement( GltfTypes.CAMERA, data.camera );
+      this.camera = await gltfLoader.getElement( GltfTypes.CAMERA, data.camera );
 
     if( data.matrix !== undefined )
       this.setMatrix( <mat4> new Float32Array( data.matrix ) );
@@ -55,19 +53,23 @@ export default class Node extends ElementMixin( NGLNode ) {
     if( data.weights !== undefined )
       this.weights = new Float32Array( data.weights );
 
-    if( data.mesh !== undefined )
-      this.mesh = this.gltf.getElement( GltfTypes.MESH, data.mesh );
-
-    if( data.children !== undefined ){
-      for (var i of data.children) {
-        this.add( this.gltf.getElement(GltfTypes.NODE, i ) as any as NGLNode );
+      
+      if( data.children !== undefined ){
+        const childPromises = data.children.map( (index)=>gltfLoader.getElement(GltfTypes.NODE, index) );
+        const children = await Promise.all( childPromises );
+        for (var child of children) {
+          this.add( child );
+        }
       }
-    }
-  
-    if( data.skin !== undefined ) {
-      this.skin = this.gltf.getElement( GltfTypes.SKIN, data.skin )
-    }
+      
+      if( data.skin !== undefined ) {
+        this.skin = await gltfLoader.getElement( GltfTypes.SKIN, data.skin )
+      }
 
+      if( data.mesh !== undefined ) {
+        this.mesh = await gltfLoader.getElement( GltfTypes.MESH, data.mesh );
+      }
+      
     this.invalidate();
     
   }

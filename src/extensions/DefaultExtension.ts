@@ -21,8 +21,11 @@ import Node                 from "../elements/Node"                 ;
 import Image                from "../elements/Image"                ;
 import Gltf from "..";
 import Gltf2 from "../types/Gltf2";
-import { ElementOfType, PropertyType } from "../types/Elements";
+import { ElementOfType, PropertyType, AnyElement } from "../types/Elements";
 import GltfTypes from "../types/GltfTypes";
+import Asset from "../elements/Asset";
+import Buffer from "../elements/Buffer";
+import BufferView from "../elements/BufferView";
 
 
 
@@ -39,70 +42,57 @@ class DefaultExtensionInstance implements IExtensionInstance {
   }
 
 
+  loadElement<P extends Gltf2.Property>(data: P): Promise<ElementOfType<PropertyType<P>>>;
 
-
-
-  loadElement2<P>( data: P ): P extends Gltf2.ICamera ? number : never {
+  loadElement(data: Gltf2.Property): Promise<AnyElement> {
     
-    const _d :  Gltf2.Property = data;
-
-    if( _d.gltftype === GltfTypes.CAMERA ){
-      _d.perspective.yfov = 0
-
-      return 0
-    }
-    
-    if( data.gltftype === GltfTypes.CAMERA ){
-      data.perspective.yfov = 0
-      return 0
-
-    }
-    return 0
-
-  }
-
-  loadElement<P extends Gltf2.Property>(data: P): Promise<ElementOfType<PropertyType<P>>> {
-
-    const t : PropertyType<P> = null
-    const _d :  Gltf2.Property = data;
-
-    if( _d.gltftype === GltfTypes.ACCESSOR ){
-      _d.max = [0]
-    }
-    
-    if( data.gltftype === GltfTypes.ACCESSOR ){
-      data.max = [0]
-    }
-
-    switch (_d.gltftype) {
-      case GltfTypes.ACCESSOR                  : return this.createAccessor(_d);
-      // case GltfTypes.ANIMATION              : return this.createAnimation(_d);
-      // case GltfTypes.ANIMATION_SAMPLER      : return this.createAnimationSampler(_d);
-      // case GltfTypes.ANIMATION_CHANNEL      : return this.createAnimationChannel(_d);
-      // case GltfTypes.ASSET                  : return this.createAsset(_d);
-      // case GltfTypes.BUFFER                 : return this.createBuffer(_d);
-      // case GltfTypes.BUFFERVIEW             : return this.createBUFferview(_d);
-      // case GltfTypes.CAMERA                 : return this.createCamera(_d);
-      // case GltfTypes.IMAGE                  : return this.createImage(_d);
-      // case GltfTypes.MATERIAL               : return this.createMaterial(_d);
-      // case GltfTypes.MESH                   : return this.createMesh(_d);
-      // case GltfTypes.NODE                   : return this.createNode(_d);
-      // case GltfTypes.NORMAL_TEXTURE_INFO    : return this.createNormalTextureInfo(_d);
-      // case GltfTypes.OCCLUSION_TEXTURE_INFO : return this.createOcclusionTextureInfo(_d);
-      // case GltfTypes.PRIMITIVE              : return this.createPrimitive(_d);
-      // case GltfTypes.SAMPLER                : return this.createSampler(_d);
-      // case GltfTypes.SCENE                  : return this.createScene(_d);
-      // case GltfTypes.SKIN                   : return this.createSkin(_d);
-      // case GltfTypes.TEXTURE                : return this.createTexture(_d);
-      // case GltfTypes.TEXTURE_INFO           : return this.createTextureInfo(_d);
+    switch (data.gltftype) {
+      case GltfTypes.ACCESSOR               : return this.createAccessor(data);
+      case GltfTypes.ANIMATION              : return this.createAnimation(data);
+      case GltfTypes.ANIMATION_SAMPLER      : return this.createAnimationSampler(data);
+      case GltfTypes.ANIMATION_CHANNEL      : return this.createAnimationChannel(data);
+      case GltfTypes.ASSET                  : return this.createAsset(data);
+      case GltfTypes.BUFFER                 : return this.createBuffer(data);
+      case GltfTypes.BUFFERVIEW             : return this.createBufferview(data);
+      case GltfTypes.CAMERA                 : return this.createCamera(data);
+      case GltfTypes.IMAGE                  : return this.createImage(data);
+      case GltfTypes.MATERIAL               : return this.createMaterial(data);
+      case GltfTypes.MESH                   : return this.createMesh(data);
+      case GltfTypes.NODE                   : return this.createNode(data);
+      case GltfTypes.NORMAL_TEXTURE_INFO    : return this.createNormalTextureInfo(data);
+      case GltfTypes.OCCLUSION_TEXTURE_INFO : return this.createOcclusionTextureInfo(data);
+      case GltfTypes.PRIMITIVE              : return this.createPrimitive(data);
+      case GltfTypes.SAMPLER                : return this.createSampler(data);
+      case GltfTypes.SCENE                  : return this.createScene(data);
+      case GltfTypes.SKIN                   : return this.createSkin(data);
+      case GltfTypes.TEXTURE                : return this.createTexture(data);
+      case GltfTypes.TEXTURE_INFO           : return this.createTextureInfo(data);
 
     }
   }
 
-  createAnimationChannel     ( data:Gltf2.IAnimationChannel, animation :Animation ) : null | Promise<AnimationChannel> {
+  createAsset  ( data : Gltf2.IAsset ) : null | Promise<Asset> {
+    const el = new Asset();
+    el.parse( this.loader, data );
+    return Promise.resolve(el);
+  }
+  
+  createBuffer  ( data : Gltf2.IBuffer ) : null | Promise<Buffer> {
+    const el = new Buffer();
+    el.parse( this.loader, data );
+    return Promise.resolve(el);
+  }
+
+  createBufferview  ( data : Gltf2.IBufferView ) : null | Promise<BufferView> {
+    const el = new BufferView();
+    el.parse( this.loader, data );
+    return Promise.resolve(el);
+  }
+
+  createAnimationChannel     ( data:Gltf2.IAnimationChannel ) : null | Promise<AnimationChannel> {
     //el AnimationChannel
     const el = new AnimationChannel();
-    el.parse( this.loader, data, animation );
+    el.parse( this.loader, data );
     return Promise.resolve(el);
   }
 
@@ -176,7 +166,7 @@ class DefaultExtensionInstance implements IExtensionInstance {
     return Promise.resolve(el);
   }
 
-  createPbrMetallicRoughness ( data:Gltf2.IMaterialPBRMetallicRoughness           ) : null | Promise<PbrMetallicRoughness> {
+  createPbrMetallicRoughness ( data:Gltf2.IMaterialPbrMetallicRoughness           ) : null | Promise<PbrMetallicRoughness> {
     //el PbrMetallicRoughness
     const el = new PbrMetallicRoughness();
     el.parse( this.loader, data );

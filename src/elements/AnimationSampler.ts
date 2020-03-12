@@ -314,12 +314,12 @@ export default class AnimationSampler extends BaseElement {
   interpolator  :Interpolator      ;
 
 
-  parse( gltfLoader:GltfLoader, data:Gltf2.IAnimationSampler ) {
+  async parse( gltfLoader:GltfLoader, data:Gltf2.IAnimationSampler ) : Promise<any> {
     super.parse( gltfLoader, data );
 
 
-    this.input = this.gltf.getElement( GltfTypes.ACCESSOR, data.input );
-    this.output = this.gltf.getElement( GltfTypes.ACCESSOR, data.output );
+    this.input  = await gltfLoader.getElement( GltfTypes.ACCESSOR, data.input );
+    this.output = await gltfLoader.getElement( GltfTypes.ACCESSOR, data.output );
 
     this.interpolation = data.interpolation || Gltf2.AnimationSamplerInterpolation.LINEAR;
     this.interpolator  = InterpolatorFactory( this );

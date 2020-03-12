@@ -9,6 +9,7 @@ import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
 
 
+
 export default class TextureInfo extends BaseElement {
 
 
@@ -18,12 +19,10 @@ export default class TextureInfo extends BaseElement {
   texCoord: number;
 
 
-  parse( gltfLoader:GltfLoader, data: Gltf2.ITextureInfo ){
-
+  async parse( gltfLoader:GltfLoader, data: Gltf2.ITextureInfo ) : Promise<any>{
     super.parse( gltfLoader, data );
 
-    this.texture = this.gltf.getElement<Texture>( GltfTypes.TEXTURE, data.index );
-
+    this.texture = await gltfLoader.getElement( GltfTypes.TEXTURE, data.index );
     this.texCoord = data.texCoord ?? 0;
   }
 

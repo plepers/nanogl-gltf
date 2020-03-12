@@ -7,6 +7,7 @@ import Gltf from '../index'
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
+import Assert from '../lib/assert';
 
 
 export default class Buffer extends BaseElement {
@@ -19,16 +20,17 @@ export default class Buffer extends BaseElement {
   _bytes      : ArrayBuffer;
   _byteOffset :number       ;
 
-  parse( gltfLoader : GltfLoader, data : Gltf2.IBuffer ){
+  async parse( gltfLoader : GltfLoader, data : Gltf2.IBuffer ) : Promise<any> {
     
     super.parse( gltfLoader, data );
 
     this.byteLength  = data.byteLength;
     this.uri         = data.uri;
-    this._bytes      = null;
 
     this._byteOffset = 0;
 
+    this._bytes      = await gltfLoader.loadBufferUri( data.uri );
+    Assert.isTrue( this._bytes !== null )
   }
 
   

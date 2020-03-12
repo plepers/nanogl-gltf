@@ -21,7 +21,7 @@ export default class PbrMetallicRoughness {
   
 
 
-  parse( gltfLoader:GltfLoader, data: Gltf2.IMaterialPbrMetallicRoughness ){
+  async parse( gltfLoader:GltfLoader, data: Gltf2.IMaterialPbrMetallicRoughness ) : Promise<any>{
 
 
     this.baseColorFactor = <vec4> new Float32Array(data.baseColorFactor || [1,1,1,1]);
@@ -30,13 +30,11 @@ export default class PbrMetallicRoughness {
     this.roughnessFactor = data.roughnessFactor ?? 1
 
     if( data.baseColorTexture !== undefined ){
-      this.baseColorTexture = new TextureInfo();
-      this.baseColorTexture.parse( gltfLoader, data.baseColorTexture );
+      this.baseColorTexture = await gltfLoader._loadElement( data.baseColorTexture );
     }
-
+    
     if( data.metallicRoughnessTexture !== undefined ){
-      this.metallicRoughnessTexture = new TextureInfo();
-      this.metallicRoughnessTexture.parse( gltfLoader, data.metallicRoughnessTexture );
+      this.metallicRoughnessTexture = await gltfLoader._loadElement( data.metallicRoughnessTexture );
     }
 
   }

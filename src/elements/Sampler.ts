@@ -20,7 +20,7 @@ export default class Sampler extends BaseElement {
   wrapS     : GLenum;
   wrapT     : GLenum
 
-  parse( gltfLoader:GltfLoader, data: Gltf2.ISampler ){
+  parse( gltfLoader:GltfLoader, data: Gltf2.ISampler ): Promise<any>{
 
     super.parse( gltfLoader, data );
 
@@ -28,6 +28,8 @@ export default class Sampler extends BaseElement {
     this.minFilter = data.minFilter
     this.wrapS     = data.wrapS     ?? GL_REPEAT
     this.wrapT     = data.wrapT     ?? GL_REPEAT
+
+    return Promise.resolve()
 
   }
 

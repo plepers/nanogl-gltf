@@ -16,7 +16,7 @@ export default class Asset extends BaseElement {
   generator? : string;
   minVersion?: string;
 
-  parse( gltfLoader:GltfLoader, data: Gltf2.IAsset ){
+  parse( gltfLoader:GltfLoader, data: Gltf2.IAsset ) : Promise<any> {
 
     super.parse( gltfLoader, data );
 
@@ -24,6 +24,8 @@ export default class Asset extends BaseElement {
     this.copyright  = data.copyright;
     this.generator  = data.generator;
     this.minVersion = data.minVersion;
+
+    return Promise.resolve();
   }
 
 }
