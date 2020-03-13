@@ -89,10 +89,11 @@ export default class AnimationChannel extends BaseElement {
       this.node = await gltfLoader.getElement( GltfTypes.NODE, data.target.node);
     }
 
-    const animation = await gltfLoader._loadElement( data.elementParent );
+    gltfLoader._loadElement( data.elementParent ).then( animation=>{
+      this.sampler = animation.getSampler(data.sampler);
+      this.valueHolder = this.sampler.createElementHolder();
+    } );
     
-    this.sampler = animation.getSampler(data.sampler);
-    this.valueHolder = this.sampler.createElementHolder();
   }
 
 

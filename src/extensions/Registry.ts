@@ -8,8 +8,8 @@ import GltfLoader from '../io/GltfLoader';
 
 export class ExtensionList {
 
-  _map : Record<string,IExtensionInstance>;
-  _list : IExtensionInstance[];
+  _map : Record<string,IExtensionInstance> = {};
+  _list : IExtensionInstance[] = [];
 
   addExtension( ext : IExtensionInstance ){
     this._map[ext.name]=ext;

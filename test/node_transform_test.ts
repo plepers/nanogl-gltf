@@ -1,9 +1,9 @@
 import Gltf from '../src'
 import expect from 'expect.js'
-import { ElementType } from '../src/consts';
 import Node from '../src/elements/Node';
 import { expectEqualArray } from './test-utils';
 import WebGltfIO from '../src/io/web';
+import GltfTypes from '../src/types/GltfTypes';
 
 
 describe("Node transform", function () {
@@ -20,7 +20,7 @@ describe("Node transform", function () {
     });
 
     it("matrix ok", function () {
-      const m = gltf.getElementByName<Node>( ElementType.NODE, 'Node1' );
+      const m = gltf.getElementByName<Node>( GltfTypes.NODE, 'Node1' );
       expectEqualArray( m._matrix, new Float32Array( [
         1, 0, 0, 0,
         0, 1, 0, 0,
@@ -42,21 +42,21 @@ describe("Node transform", function () {
     });
 
     it("position ok", function () {
-      const m = gltf.getElementByName<Node>( ElementType.NODE, 'Node1' );
+      const m = gltf.getElementByName<Node>( GltfTypes.NODE, 'Node1' );
       expectEqualArray( m.position, new Float32Array( [
         -2, 2, -2
       ]));
     });
 
     it("scale ok", function () {
-      const m = gltf.getElementByName<Node>( ElementType.NODE, 'Node1' );
+      const m = gltf.getElementByName<Node>( GltfTypes.NODE, 'Node1' );
       expectEqualArray( m.scale, new Float32Array( [
         1,1,1
       ]));
     });
 
     it("rotation ok", function () {
-      const m = gltf.getElementByName<Node>( ElementType.NODE, 'Node1' );
+      const m = gltf.getElementByName<Node>( GltfTypes.NODE, 'Node1' );
       expectEqualArray( m.rotation, new Float32Array( [
         0,0,0,1
       ]));
@@ -74,21 +74,21 @@ describe("Node transform", function () {
     });
 
     it("position ok", function () {
-      const m = gltf.getElementByName<Node>( ElementType.NODE, 'Node1' );
+      const m = gltf.getElementByName<Node>( GltfTypes.NODE, 'Node1' );
       expectEqualArray( m.position, new Float32Array( [
         0,0,0
       ]));
     });
 
     it("scale ok", function () {
-      const m = gltf.getElementByName<Node>( ElementType.NODE, 'Node1' );
+      const m = gltf.getElementByName<Node>( GltfTypes.NODE, 'Node1' );
       expectEqualArray( m.scale, new Float32Array( [
         1,1,1
       ]));
     });
 
     it("rotation ok", function () {
-      const m = gltf.getElementByName<Node>( ElementType.NODE, 'Node1' );
+      const m = gltf.getElementByName<Node>( GltfTypes.NODE, 'Node1' );
       expectEqualArray( m.rotation, new Float32Array( [
         0,1,0,0
       ]));
@@ -105,21 +105,21 @@ describe("Node transform", function () {
     });
 
     it("position ok", function () {
-      const m = gltf.getElementByName<Node>( ElementType.NODE, 'Node1' );
+      const m = gltf.getElementByName<Node>( GltfTypes.NODE, 'Node1' );
       expectEqualArray( m.position, new Float32Array( [
         0,0,0
       ]));
     });
 
     it("scale ok", function () {
-      const m = gltf.getElementByName<Node>( ElementType.NODE, 'Node1' );
+      const m = gltf.getElementByName<Node>( GltfTypes.NODE, 'Node1' );
       expectEqualArray( m.scale, new Float32Array( [
         1.2,1.2,1.2
       ]));
     });
 
     it("rotation ok", function () {
-      const m = gltf.getElementByName<Node>( ElementType.NODE, 'Node1' );
+      const m = gltf.getElementByName<Node>( GltfTypes.NODE, 'Node1' );
       expectEqualArray( m.rotation, new Float32Array( [
         0,0,0,1
       ]));
@@ -136,21 +136,21 @@ describe("Node transform", function () {
     });
 
     it("position ok", function () {
-      const m = gltf.getElementByName<Node>( ElementType.NODE, 'Node1' );
+      const m = gltf.getElementByName<Node>( GltfTypes.NODE, 'Node1' );
       expectEqualArray( m.position, new Float32Array( [
         -2,2,-2
       ]));
     });
 
     it("scale ok", function () {
-      const m = gltf.getElementByName<Node>( ElementType.NODE, 'Node1' );
+      const m = gltf.getElementByName<Node>( GltfTypes.NODE, 'Node1' );
       expectEqualArray( m.scale, new Float32Array( [
         1.2,1.2,1.2
       ]));
     });
 
     it("rotation ok", function () {
-      const m = gltf.getElementByName<Node>( ElementType.NODE, 'Node1' );
+      const m = gltf.getElementByName<Node>( GltfTypes.NODE, 'Node1' );
       expectEqualArray( m.rotation, new Float32Array( [
         0,1,0,0
       ]));
@@ -169,21 +169,21 @@ describe("Node transform", function () {
     });
 
     it("position ok", function () {
-      const m = gltf.getElementByName<Node>( ElementType.NODE, 'Node1' );
+      const m = gltf.getElementByName<Node>( GltfTypes.NODE, 'Node1' );
       expectEqualArray( m.position, new Float32Array( [
         -2,2,-2
       ]));
     });
 
     it("scale ok", function () {
-      const m = gltf.getElementByName<Node>( ElementType.NODE, 'Node1' );
+      const m = gltf.getElementByName<Node>( GltfTypes.NODE, 'Node1' );
       expectEqualArray( m.scale, new Float32Array( [
         1.2,1.2,1.2
       ]));
     });
 
     it("rotation ok", function () {
-      const m = gltf.getElementByName<Node>( ElementType.NODE, 'Node1' );
+      const m = gltf.getElementByName<Node>( GltfTypes.NODE, 'Node1' );
       expectEqualArray( m.rotation, new Float32Array( [
         0,1,0,0
       ]));

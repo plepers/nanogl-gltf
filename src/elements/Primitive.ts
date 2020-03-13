@@ -102,7 +102,7 @@ class AttributesSet {
 
 export default class Primitive extends BaseElement {
 
-  static TYPE :GltfTypes = GltfTypes.PRIMITIVE;
+  readonly gltftype : GltfTypes.PRIMITIVE = GltfTypes.PRIMITIVE;
   
   // gltf
   attributes : AttributesSet;

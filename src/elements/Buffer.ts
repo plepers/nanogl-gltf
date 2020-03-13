@@ -12,8 +12,7 @@ import Assert from '../lib/assert';
 
 export default class Buffer extends BaseElement {
 
-  static TYPE : GltfTypes = GltfTypes.BUFFER;
-
+  readonly gltftype : GltfTypes.BUFFER = GltfTypes.BUFFER;
 
   byteLength  :number       ;
   uri         : string      ;

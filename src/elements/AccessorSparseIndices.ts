@@ -23,6 +23,7 @@ export default class AccessorSparseIndices extends BaseAccessor {
     this.count          = sparseData.count;
     this.type           = Gltf2.AccessorType.SCALAR;
     
+    this.sparse = null;
     
     
     

@@ -57,6 +57,9 @@ module.exports = function(config) {
         // (you don't need to specify the entry option)
         // webpack watches dependencies
         // webpack configuration
+        mode: 'development',
+        devtool: '(none)',
+
         module : {
           rules : [
           

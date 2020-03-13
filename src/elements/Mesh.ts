@@ -13,7 +13,7 @@ import GltfTypes from '../types/GltfTypes';
 
 export default class Mesh extends BaseElement {
   
-  static TYPE : GltfTypes = GltfTypes.MESH;
+  readonly gltftype : GltfTypes.MESH = GltfTypes.MESH;
   
   primitives : Primitive[];
   weights?   : Float32Array;

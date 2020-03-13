@@ -1,10 +1,7 @@
 import Gltf from '../src'
 import expect from 'expect.js'
-import { ElementType } from '../src/consts';
 import { expectEqualArray, describeMulti } from './test-utils';
 import WebGltfIO from '../src/io/web';
-import Mesh from '../src/elements/Mesh';
-import Accessor from '../src/elements/Accessor';
 
 
 describe("Meshes", function () {

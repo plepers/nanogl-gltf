@@ -23,6 +23,7 @@ export default class AccessorSparseValues extends BaseAccessor {
     this.componentType  = accessorData.componentType;
     this.type           = accessorData.type;
     
+    this.sparse = null;
     
     
     

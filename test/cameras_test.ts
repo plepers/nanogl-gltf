@@ -1,11 +1,11 @@
 import Gltf from '../src'
 import expect from 'expect.js'
-import { ElementType } from '../src/consts';
 import { expectEqualArray, describeMulti } from './test-utils';
 import WebGltfIO from '../src/io/web';
 import Mesh from '../src/elements/Mesh';
 import Accessor from '../src/elements/Accessor';
 import { PROJ_PERSPECTIVE, PROJ_ORTHOGRAPHIC } from '../src/elements/Camera';
+import Gltf2 from '../src/types/Gltf2';
 
 
 describe("Cameras", function () {
@@ -46,10 +46,11 @@ describe("Cameras", function () {
     
     it(" has correct proj data values", function () {
       let cam = gltf.cameras[0];
-      expect( cam.projectionData.aspectRatio ).to.be( 1.0  );
-      expect( cam.projectionData.yfov        ).to.be( 0.7  );
-      expect( cam.projectionData.zfar        ).to.be( 100  );
-      expect( cam.projectionData.znear       ).to.be( 0.01 );
+      let projData = cam.projectionData as Gltf2.ICameraPerspective;
+      expect( projData.aspectRatio ).to.be( 1.0  );
+      expect( projData.yfov        ).to.be( 0.7  );
+      expect( projData.zfar        ).to.be( 100  );
+      expect( projData.znear       ).to.be( 0.01 );
       
     });
     
@@ -91,10 +92,11 @@ describe("Cameras", function () {
     
     it(" has correct proj data values", function () {
       let cam = gltf.cameras[1];
-      expect( cam.projectionData.xmag ).to.be( 1.0 );
-      expect( cam.projectionData.ymag ).to.be( 1.0 );
-      expect( cam.projectionData.zfar ).to.be( 100 );
-      expect( cam.projectionData.znear ).to.be( 0.01 );
+      let projData = cam.projectionData as Gltf2.ICameraOrthographic;
+      expect( projData.xmag ).to.be( 1.0 );
+      expect( projData.ymag ).to.be( 1.0 );
+      expect( projData.zfar ).to.be( 100 );
+      expect( projData.znear ).to.be( 0.01 );
       
     });
     

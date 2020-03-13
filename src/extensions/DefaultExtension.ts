@@ -26,6 +26,9 @@ import GltfTypes from "../types/GltfTypes";
 import Asset from "../elements/Asset";
 import Buffer from "../elements/Buffer";
 import BufferView from "../elements/BufferView";
+import AccessorSparse from "../elements/AccessorSparse";
+import AccessorSparseIndices from "../elements/AccessorSparseIndices";
+import AccessorSparseValues from "../elements/AccessorSparseValues";
 
 
 
@@ -47,172 +50,177 @@ class DefaultExtensionInstance implements IExtensionInstance {
   loadElement(data: Gltf2.Property): Promise<AnyElement> {
     
     switch (data.gltftype) {
-      case GltfTypes.ACCESSOR               : return this.createAccessor(data);
-      case GltfTypes.ANIMATION              : return this.createAnimation(data);
-      case GltfTypes.ANIMATION_SAMPLER      : return this.createAnimationSampler(data);
-      case GltfTypes.ANIMATION_CHANNEL      : return this.createAnimationChannel(data);
-      case GltfTypes.ASSET                  : return this.createAsset(data);
-      case GltfTypes.BUFFER                 : return this.createBuffer(data);
-      case GltfTypes.BUFFERVIEW             : return this.createBufferview(data);
-      case GltfTypes.CAMERA                 : return this.createCamera(data);
-      case GltfTypes.IMAGE                  : return this.createImage(data);
-      case GltfTypes.MATERIAL               : return this.createMaterial(data);
-      case GltfTypes.MESH                   : return this.createMesh(data);
-      case GltfTypes.NODE                   : return this.createNode(data);
-      case GltfTypes.NORMAL_TEXTURE_INFO    : return this.createNormalTextureInfo(data);
-      case GltfTypes.OCCLUSION_TEXTURE_INFO : return this.createOcclusionTextureInfo(data);
-      case GltfTypes.PRIMITIVE              : return this.createPrimitive(data);
-      case GltfTypes.SAMPLER                : return this.createSampler(data);
-      case GltfTypes.SCENE                  : return this.createScene(data);
-      case GltfTypes.SKIN                   : return this.createSkin(data);
-      case GltfTypes.TEXTURE                : return this.createTexture(data);
-      case GltfTypes.TEXTURE_INFO           : return this.createTextureInfo(data);
+      case GltfTypes.ACCESSOR                : return this.createAccessor             (data);
+      case GltfTypes.ACCESSOR_SPARSE         : return this.createAccessorSparse       (data);
+      case GltfTypes.ACCESSOR_SPARSE_INDICES : return this.createAccessorSparseIndices(data);
+      case GltfTypes.ACCESSOR_SPARSE_VALUES  : return this.createAccessorSparseValues (data);
+      case GltfTypes.ANIMATION               : return this.createAnimation            (data);
+      case GltfTypes.ANIMATION_SAMPLER       : return this.createAnimationSampler     (data);
+      case GltfTypes.ANIMATION_CHANNEL       : return this.createAnimationChannel     (data);
+      case GltfTypes.ASSET                   : return this.createAsset                (data);
+      case GltfTypes.BUFFER                  : return this.createBuffer               (data);
+      case GltfTypes.BUFFERVIEW              : return this.createBufferview           (data);
+      case GltfTypes.CAMERA                  : return this.createCamera               (data);
+      case GltfTypes.IMAGE                   : return this.createImage                (data);
+      case GltfTypes.MATERIAL                : return this.createMaterial             (data);
+      case GltfTypes.MESH                    : return this.createMesh                 (data);
+      case GltfTypes.NODE                    : return this.createNode                 (data);
+      case GltfTypes.NORMAL_TEXTURE_INFO     : return this.createNormalTextureInfo    (data);
+      case GltfTypes.OCCLUSION_TEXTURE_INFO  : return this.createOcclusionTextureInfo (data);
+      case GltfTypes.PRIMITIVE               : return this.createPrimitive            (data);
+      case GltfTypes.SAMPLER                 : return this.createSampler              (data);
+      case GltfTypes.SCENE                   : return this.createScene                (data);
+      case GltfTypes.SKIN                    : return this.createSkin                 (data);
+      case GltfTypes.TEXTURE                 : return this.createTexture              (data);
+      case GltfTypes.TEXTURE_INFO            : return this.createTextureInfo          (data);
 
     }
   }
 
-  createAsset  ( data : Gltf2.IAsset ) : null | Promise<Asset> {
-    const el = new Asset();
-    el.parse( this.loader, data );
-    return Promise.resolve(el);
+  async createAccessor             ( data:Gltf2.IAccessor                     ) : Promise<Accessor> {
+    const el = new Accessor();
+    await el.parse( this.loader, data );
+    return el;
+  }
+
+  async createAccessorSparse       ( data:Gltf2.IAccessorSparse               ) : Promise<AccessorSparse> {
+    const el = new AccessorSparse();
+    await el.parse( this.loader, data );
+    return el;
+  }
+
+
+  async createAccessorSparseIndices( data:Gltf2.IAccessorSparseIndices               ) : Promise<AccessorSparseIndices> {
+    const el = new AccessorSparseIndices();
+    await el.parse( this.loader, data );
+    return el;
+  }  
+
+  async createAccessorSparseValues( data:Gltf2.IAccessorSparseValues               ) : Promise<AccessorSparseValues> {
+    const el = new AccessorSparseValues();
+    await el.parse( this.loader, data );
+    return el;
   }
   
-  createBuffer  ( data : Gltf2.IBuffer ) : null | Promise<Buffer> {
+  async createAsset  ( data : Gltf2.IAsset ) : Promise<Asset> {
+    const el = new Asset();
+    await el.parse( this.loader, data );
+    return el;
+  }
+  
+  async createBuffer  ( data : Gltf2.IBuffer ) : Promise<Buffer> {
     const el = new Buffer();
-    el.parse( this.loader, data );
-    return Promise.resolve(el);
+    await el.parse( this.loader, data );
+    return el;
   }
 
-  createBufferview  ( data : Gltf2.IBufferView ) : null | Promise<BufferView> {
+  async createBufferview  ( data : Gltf2.IBufferView ) : Promise<BufferView> {
     const el = new BufferView();
-    el.parse( this.loader, data );
-    return Promise.resolve(el);
+    await el.parse( this.loader, data );
+    return el;
   }
 
-  createAnimationChannel     ( data:Gltf2.IAnimationChannel ) : null | Promise<AnimationChannel> {
-    //el AnimationChannel
+  async createAnimationChannel     ( data:Gltf2.IAnimationChannel ) : Promise<AnimationChannel> {
     const el = new AnimationChannel();
-    el.parse( this.loader, data );
-    return Promise.resolve(el);
+    await el.parse( this.loader, data );
+    return el;
   }
 
-  createAnimationSampler     ( data:Gltf2.IAnimationSampler                       ) : null | Promise<AnimationSampler> {
-    //el AnimationSampler
+  async createAnimationSampler     ( data:Gltf2.IAnimationSampler             ) : Promise<AnimationSampler> {
     const el = new AnimationSampler();
-    el.parse( this.loader, data );
-    return Promise.resolve(el);
+    await el.parse( this.loader, data );
+    return el;
   }
 
-  createAccessor             ( data:Gltf2.IAccessor                               ) : null | Promise<Accessor> {
-    //el Accessor
-    const el = new Accessor();
-    el.parse( this.loader, data );
-    return Promise.resolve(el);
-  }
 
-  createAnimation            ( data:Gltf2.IAnimation                              ) : null | Promise<Animation> {
-    //el Animation
+  async createAnimation            ( data:Gltf2.IAnimation                    ) : Promise<Animation> {
     const el = new Animation();
-    el.parse( this.loader, data );
-    return Promise.resolve(el);
+    await el.parse( this.loader, data );
+    return el;
   }
 
-  createCamera               ( data:Gltf2.ICamera                                 ) : null | Promise<Camera> {
-    //el Camera
+  async createCamera               ( data:Gltf2.ICamera                       ) : Promise<Camera> {
     const el = new Camera();
-    el.parse( this.loader, data );
-    return Promise.resolve(el);
+    await el.parse( this.loader, data );
+    return el;
   }
 
-  createImage                ( data:Gltf2.IImage                                  ) : null | Promise<Image> {
-    //el Image
+  async createImage                ( data:Gltf2.IImage                        ) : Promise<Image> {
     const el = new Image();
-    el.parse( this.loader, data );
-    return Promise.resolve(el);
+    await el.parse( this.loader, data );
+    return el;
   }
 
-  createMaterial             ( data:Gltf2.IMaterial                               ) : null | Promise<Material> {
-    //el Material
+  async createMaterial             ( data:Gltf2.IMaterial                     ) : Promise<Material> {
     const el = new Material();
-    el.parse( this.loader, data );
-    return Promise.resolve(el);
+    await el.parse( this.loader, data );
+    return el;
   }
 
-  createMesh                 ( data:Gltf2.IMesh                                   ) : null | Promise<Mesh> {
-    //el Mesh
+  async createMesh                 ( data:Gltf2.IMesh                         ) : Promise<Mesh> {
     const el = new Mesh();
-    el.parse( this.loader, data );
-    return Promise.resolve(el);
+    await el.parse( this.loader, data );
+    return el;
   }
 
-  createNode                 ( data:Gltf2.INode                                   ) : null | Promise<Node> {
-    //el Node
+  async createNode                 ( data:Gltf2.INode                         ) : Promise<Node> {
     const el = new Node();
-    el.parse( this.loader, data );
-    return Promise.resolve(el);
+    await el.parse( this.loader, data );
+    return el;
   }
 
-  createNormalTextureInfo    ( data:Gltf2.IMaterialNormalTextureInfo              ) : null | Promise<NormalTextureInfo> {
-    //el NormalTextureInfo
+  async createNormalTextureInfo    ( data:Gltf2.IMaterialNormalTextureInfo    ) : Promise<NormalTextureInfo> {
     const el = new NormalTextureInfo();
-    el.parse( this.loader, data );
-    return Promise.resolve(el);
+    await el.parse( this.loader, data );
+    return el;
   }
 
-  createOcclusionTextureInfo ( data:Gltf2.IMaterialOcclusionTextureInfo           ) : null | Promise<OcclusionTextureInfo> {
-    //el OcclusionTextureInfo
+  async createOcclusionTextureInfo ( data:Gltf2.IMaterialOcclusionTextureInfo ) : Promise<OcclusionTextureInfo> {
     const el = new OcclusionTextureInfo();
-    el.parse( this.loader, data );
-    return Promise.resolve(el);
+    await el.parse( this.loader, data );
+    return el;
   }
 
-  createPbrMetallicRoughness ( data:Gltf2.IMaterialPbrMetallicRoughness           ) : null | Promise<PbrMetallicRoughness> {
-    //el PbrMetallicRoughness
+  async createPbrMetallicRoughness ( data:Gltf2.IMaterialPbrMetallicRoughness ) : Promise<PbrMetallicRoughness> {
     const el = new PbrMetallicRoughness();
-    el.parse( this.loader, data );
-    return Promise.resolve(el);
+    await el.parse( this.loader, data );
+    return el;
   }
 
-  createPrimitive            ( data:Gltf2.IMeshPrimitive                          ) : null | Promise<Primitive> {
-    //el Primitive
+  async createPrimitive            ( data:Gltf2.IMeshPrimitive                ) : Promise<Primitive> {
     const el = new Primitive();
-    el.parse( this.loader, data );
-    return Promise.resolve(el);
+    await el.parse( this.loader, data );
+    return el;
   }
 
-  createSampler              ( data:Gltf2.ISampler                                ) : null | Promise<Sampler> {
-    //el Sampler
+  async createSampler              ( data:Gltf2.ISampler                      ) : Promise<Sampler> {
     const el = new Sampler();
-    el.parse( this.loader, data );
-    return Promise.resolve(el);
+    await el.parse( this.loader, data );
+    return el;
   }
 
-  createScene                ( data:Gltf2.IScene                                  ) : null | Promise<Scene> {
-    //el Scene
+  async createScene                ( data:Gltf2.IScene                        ) : Promise<Scene> {
     const el = new Scene();
-    el.parse( this.loader, data );
-    return Promise.resolve(el);
+    await el.parse( this.loader, data );
+    return el;
   }
 
-  createSkin                 ( data:Gltf2.ISkin                                   ) : null | Promise<Skin> {
-    //el Skin
+  async createSkin                 ( data:Gltf2.ISkin                         ) : Promise<Skin> {
     const el = new Skin();
-    el.parse( this.loader, data );
-    return Promise.resolve(el);
+    await el.parse( this.loader, data );
+    return el;
   }
 
-  createTexture              ( data:Gltf2.ITexture                                ) : null | Promise<Texture> {
-    //el Texture
+  async createTexture              ( data:Gltf2.ITexture                      ) : Promise<Texture> {
     const el = new Texture();
-    el.parse( this.loader, data );
-    return Promise.resolve(el);
+    await el.parse( this.loader, data );
+    return el;
   }
 
-  createTextureInfo          ( data:Gltf2.ITextureInfo                            ) : null | Promise<TextureInfo> {
-    //el TextureInfo
+  async createTextureInfo          ( data:Gltf2.ITextureInfo                  ) : Promise<TextureInfo> {
     const el = new TextureInfo();
-    el.parse( this.loader, data );
-    return Promise.resolve(el);
+    await el.parse( this.loader, data );
+    return el;
   }
 
 

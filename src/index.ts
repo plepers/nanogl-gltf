@@ -13,15 +13,14 @@ import Material    from './elements/Material'    ;
 import Mesh        from './elements/Mesh'        ;
 import Skin        from './elements/Skin'        ;
 import Camera      from './elements/Camera'      ;
-import BaseElement from './elements/BaseElement' ;
 import Asset       from './elements/Asset'       ;
 
 import BufferCache from './BufferCache';
 import { GLContext } from 'nanogl/types';
 import { ISemantics, DefaultSemantics } from './Semantics';
 import { IExtensionFactory } from './extensions/IExtension';
-import Gltf2 from './types/Gltf2';
 import GltfTypes from './types/GltfTypes';
+import { AnyElement } from './types/Elements';
 
 
 
@@ -41,8 +40,8 @@ export default class Gltf{
   _url        : string
   _baseDir    : string
   
-  _elements   : BaseElement[];
-  _byType     : Map<GltfTypes, BaseElement[]>;
+  _elements   : AnyElement[];
+  _byType     : Map<GltfTypes, AnyElement[]>;
 
   bufferCache : BufferCache;
   semantics   : ISemantics;
@@ -55,22 +54,32 @@ export default class Gltf{
     this._url        = null;
 
 
-    this._byType = new Map<GltfTypes, BaseElement[]>([
-      [GltfTypes.BUFFER            , [] ],
-      [GltfTypes.BUFFERVIEW        , [] ],
-      [GltfTypes.ASSET             , [] ],
-      [GltfTypes.ACCESSOR          , [] ],
-      [GltfTypes.ANIMATION         , [] ],
-      [GltfTypes.ANIMATION_SAMPLER , [] ],
-      [GltfTypes.ANIMATION_CHANNEL , [] ],
-      [GltfTypes.MESH              , [] ],
-      [GltfTypes.PRIMITIVE         , [] ],
-      [GltfTypes.NODE              , [] ],
-      [GltfTypes.MATERIAL          , [] ],
-      [GltfTypes.CAMERA            , [] ],
-      [GltfTypes.SCENE             , [] ],
-      [GltfTypes.SKIN              , [] ],
-      [GltfTypes.TEXTURE           , [] ],
+    this._byType = new Map<GltfTypes, AnyElement[]>([
+
+      [GltfTypes.ACCESSOR                , [] ],
+      [GltfTypes.ACCESSOR_SPARSE         , [] ],
+      [GltfTypes.ACCESSOR_SPARSE_INDICES , [] ],
+      [GltfTypes.ACCESSOR_SPARSE_VALUES  , [] ],
+      [GltfTypes.ANIMATION               , [] ],
+      [GltfTypes.ANIMATION_SAMPLER       , [] ],
+      [GltfTypes.ANIMATION_CHANNEL       , [] ],
+      [GltfTypes.ASSET                   , [] ],
+      [GltfTypes.BUFFER                  , [] ],
+      [GltfTypes.BUFFERVIEW              , [] ],
+      [GltfTypes.CAMERA                  , [] ],
+      [GltfTypes.IMAGE                   , [] ],
+      [GltfTypes.MATERIAL                , [] ],
+      [GltfTypes.MESH                    , [] ],
+      [GltfTypes.NODE                    , [] ],
+      [GltfTypes.NORMAL_TEXTURE_INFO     , [] ],
+      [GltfTypes.OCCLUSION_TEXTURE_INFO  , [] ],
+      [GltfTypes.PRIMITIVE               , [] ],
+      [GltfTypes.SAMPLER                 , [] ],
+      [GltfTypes.SCENE                   , [] ],
+      [GltfTypes.SKIN                    , [] ],
+      [GltfTypes.TEXTURE                 , [] ],
+      [GltfTypes.TEXTURE_INFO            , [] ],
+
     ])
 
     this._elements = []
@@ -128,39 +137,36 @@ export default class Gltf{
   }
 
 
-  _getTypeHolder<T extends BaseElement>( type : GltfTypes ) : T[] {
+  _getTypeHolder<T extends AnyElement>( type : GltfTypes ) : T[] {
     return this._byType.get( type ) as T[];
   }
   
 
-  getAllElements() : BaseElement[]{
+  getAllElements() : AnyElement[]{
     return this._elements;
   }
 
 
-  addElement( element : BaseElement ){
-    const a: BaseElement[] = this._getTypeHolder( element.gltftype );
-    if( a.indexOf( element ) === -1 ){
-      a.push( element );
-      this._elements.push( element );
-    }
+  addElement( element : AnyElement ){
+    const a: AnyElement[] = this._getTypeHolder( element.gltftype );
+    a[element.elementIndex] = element;
   }
 
 
  
-  addElements( elements : BaseElement[] ){
+  addElements( elements : AnyElement[] ){
     for (var e of elements) {
       this.addElement( e );
     }
   }
 
  
-  // getElement<T extends BaseElement>( type:GltfTypes, index:number ) : T {
-  //   return this._getTypeHolder<T>(type)[index]; 
-  // }
+  getElement<T extends AnyElement>( type:GltfTypes, index:number ) : T {
+    return this._getTypeHolder<T>(type)[index]; 
+  }
  
 
-  getElementByName<T extends BaseElement>( type:GltfTypes, name:string ) : T {
+  getElementByName<T extends AnyElement>( type:GltfTypes, name:string ) : T {
     const list : T[] = this._getTypeHolder<T>(type);
     for (var el of list) {
       if( el.name === name ) return el;

@@ -26,9 +26,7 @@ export enum AlphaMode {
 
 export default class Material extends BaseElement {
   
-  
-  static TYPE : GltfTypes = GltfTypes.MATERIAL;
-
+  readonly gltftype : GltfTypes.MATERIAL = GltfTypes.MATERIAL;
 
   pbrMetallicRoughness?: PbrMetallicRoughness;
   normalTexture?       : NormalTextureInfo   ;

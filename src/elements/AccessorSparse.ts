@@ -27,6 +27,7 @@ export default class AccessorSparse extends BaseElement {
 
     this.indices = await gltfLoader._loadElement( data.indices );
     this.values = await gltfLoader._loadElement( data.values );
+
     // this.indices.parse( loader, {
     //   uuid : "-internal-",
     //   gltftype : GltfTypes.ACCESSOR,

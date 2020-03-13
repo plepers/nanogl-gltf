@@ -271,7 +271,8 @@ export default class Accessor extends BaseAccessor {
 
     this.sparse = null;
     if( data.sparse !== undefined ){
-      this.sparse         = await gltfLoader._loadElement( data.sparse );
+      // can't await sparse here because of cyclic dependency ( => sparse await accessor)
+      gltfLoader._loadElement( data.sparse ).then( sparse=>this.sparse=sparse );
     }
 
     this._valueHolder = this.createElementHolder();

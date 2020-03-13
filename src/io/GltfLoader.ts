@@ -6,11 +6,12 @@ import ElementFactory                              from "./ElementFactory";
 import { MAGIC, GLB_HEADER_SIZE, JSON_MAGIC } from "../consts";
 import { ExtensionList } from "../extensions/Registry";
 import Gltf2 from "../types/Gltf2";
-import { ElementOfType, PropertyType, AnyElement } from "../types/Elements";
+import { ElementOfType, PropertyType, AnyElement, PropertyOfType } from "../types/Elements";
 import GltfTypes from "../types/GltfTypes";
 import BaseElement from "../elements/BaseElement";
+import Assert from "../lib/assert";
 
-
+import "../extensions/DefaultExtension"
 
 
 let UID = 0;
@@ -39,7 +40,9 @@ export default class GltfLoader {
   _extensions: ExtensionList;
 
   _elements: Map<string, Promise<AnyElement>> = new Map();
+  _pendingElements : Promise<AnyElement>[] = []
   _byType  : Map<GltfTypes, Promise<AnyElement>[]> = new Map();
+  _propertyMaps  : Map<GltfTypes, Gltf2.Property[]> = new Map();
 
 
   constructor(gltfIO: IOInterface, url: string, baseurl: string) {
@@ -139,28 +142,6 @@ export default class GltfLoader {
   }
 
 
-  // createAnimationChannel    ( data:Gltf2.IAnimationChannel, animation :Animation ) : Promise<AnimationChannel>{ return null; }
-  // createAnimationSampler    ( data:Gltf2.IAnimationSampler                       ) : Promise<AnimationSampler>{ return null; }
-  // createAccessor            ( data:Gltf2.IAccessor                               ) : Promise<Accessor>{ return null; }
-  // createAnimation           ( data:Gltf2.IAnimation                              ) : Promise<Animation>{ return null; }
-  // createCamera              ( data:Gltf2.ICamera                                 ) : Promise<Camera>{ return null; }
-  // createImage               ( data:Gltf2.IImage                                  ) : Promise<Image>{ return null; }
-  // createMaterial            ( data:Gltf2.IMaterial                               ) : Promise<Material>{ return null; }
-  // createMesh                ( data:Gltf2.IMesh                                   ) : Promise<Mesh>{ return null; }
-  // createNode                ( data:Gltf2.INode                                   ) : Promise<Node>{ return null; }
-  // createNormalTextureInfo   ( data:Gltf2.IMaterialNormalTextureInfo              ) : Promise<NormalTextureInfo>{ return null; }
-  // createOcclusionTextureInfo( data:Gltf2.IMaterialOcclusionTextureInfo           ) : Promise<OcclusionTextureInfo>{ return null; }
-  // createPbrMetallicRoughness( data:Gltf2.IMaterialPbrMetallicRoughness           ) : Promise<PbrMetallicRoughness>{ return null; }
-  // createPrimitive           ( data:Gltf2.IMeshPrimitive                          ) : Promise<Primitive>{ return null; }
-  // createSampler             ( data:Gltf2.ISampler                                ) : Promise<Sampler>{ return null; }
-  // createScene               ( data:Gltf2.IScene                                  ) : Promise<Scene>{ return null; }
-  // createSkin                ( data:Gltf2.ISkin                                   ) : Promise<Skin>{ return null; }
-  // createTexture             ( data:Gltf2.ITexture                                ) : Promise<Texture>{ return null; }
-  // createTextureInfo         ( data:Gltf2.ITextureInfo                            ) : Promise<TextureInfo>{ return null; }
-
-
-  // getElement( data: )
-
 
 
 
@@ -169,8 +150,11 @@ export default class GltfLoader {
     const extensions = this._extensions._list;
     for (const ext of extensions) {
       const res = ext.loadElement(data)
+      if( res === undefined )
+        throw new Error( "extensiosn should not return undefined")
       if (res !== null) return res;
     }
+    throw new Error( "Unhandled type")
   }
 
 
@@ -179,6 +163,7 @@ export default class GltfLoader {
     let res = this._elements.get(data.uuid) as Promise<ElementOfType<PropertyType<P>>>;
     if (res === undefined) {
       res = this._createElement(data);
+      this._pendingElements.push( res );
       this._elements.set(data.uuid, res);
     }
     return res;
@@ -195,9 +180,11 @@ export default class GltfLoader {
 
   getElement<T extends GltfTypes>( type : T, index : number ): Promise<ElementOfType<T>> {
     const holder = this._getElementHolder( type );
-    return holder[index];
+    if( holder[index] !== undefined ) return holder[index];
     // get existing or create if not exist!
-    return null;
+    const properties = this._propertyMaps.get(type);
+    const property = properties[index];
+    return this._loadElement( property ) as Promise<ElementOfType<T>>;
   }
 
 
@@ -230,6 +217,20 @@ export default class GltfLoader {
       }
     }
 
+    await this.resolveElements();
+
+
+  }
+
+
+  async resolveElements() {
+
+    while( this._pendingElements.length > 0 ){
+
+      const allPromises = this._pendingElements.splice( 0, this._pendingElements.length )
+      const allElements = await Promise.all( allPromises );
+      this.gltf.addElements( allElements )
+    }
 
   }
 
@@ -241,20 +242,20 @@ export default class GltfLoader {
 
   prepareGltfDatas(gltfData: Gltf2.IGLTF) {
 
-    this.prepareGltfProperties( gltfData.accessors  , GltfTypes.ACCESSOR  , null );
-    this.prepareGltfProperties( gltfData.animations , GltfTypes.ANIMATION , null );
-    this.prepareGltfProperties( [gltfData.asset]    , GltfTypes.ASSET     , null );
-    this.prepareGltfProperties( gltfData.buffers    , GltfTypes.BUFFER    , null );
-    this.prepareGltfProperties( gltfData.bufferViews, GltfTypes.BUFFERVIEW, null );
-    this.prepareGltfProperties( gltfData.cameras    , GltfTypes.CAMERA    , null );
-    this.prepareGltfProperties( gltfData.images     , GltfTypes.IMAGE     , null );
-    this.prepareGltfProperties( gltfData.materials  , GltfTypes.MATERIAL  , null );
-    this.prepareGltfProperties( gltfData.meshes     , GltfTypes.MESH      , null );
-    this.prepareGltfProperties( gltfData.nodes      , GltfTypes.NODE      , null );
-    this.prepareGltfProperties( gltfData.samplers   , GltfTypes.SAMPLER   , null );
-    this.prepareGltfProperties( gltfData.scenes     , GltfTypes.SCENE     , null );
-    this.prepareGltfProperties( gltfData.skins      , GltfTypes.SKIN      , null );
-    this.prepareGltfProperties( gltfData.textures   , GltfTypes.TEXTURE   , null );
+    this.prepareGltfRootProperties( gltfData.accessors  , GltfTypes.ACCESSOR  , null );
+    this.prepareGltfRootProperties( gltfData.animations , GltfTypes.ANIMATION , null );
+    this.prepareGltfRootProperties( [gltfData.asset]    , GltfTypes.ASSET     , null );
+    this.prepareGltfRootProperties( gltfData.buffers    , GltfTypes.BUFFER    , null );
+    this.prepareGltfRootProperties( gltfData.bufferViews, GltfTypes.BUFFERVIEW, null );
+    this.prepareGltfRootProperties( gltfData.cameras    , GltfTypes.CAMERA    , null );
+    this.prepareGltfRootProperties( gltfData.images     , GltfTypes.IMAGE     , null );
+    this.prepareGltfRootProperties( gltfData.materials  , GltfTypes.MATERIAL  , null );
+    this.prepareGltfRootProperties( gltfData.meshes     , GltfTypes.MESH      , null );
+    this.prepareGltfRootProperties( gltfData.nodes      , GltfTypes.NODE      , null );
+    this.prepareGltfRootProperties( gltfData.samplers   , GltfTypes.SAMPLER   , null );
+    this.prepareGltfRootProperties( gltfData.scenes     , GltfTypes.SCENE     , null );
+    this.prepareGltfRootProperties( gltfData.skins      , GltfTypes.SKIN      , null );
+    this.prepareGltfRootProperties( gltfData.textures   , GltfTypes.TEXTURE   , null );
 
 
     // ANIMATION_SAMPLER
@@ -305,10 +306,22 @@ export default class GltfLoader {
 
 
   prepareGltfProperties(elementsData: Gltf2.Property[], type: GltfTypes, parent : Gltf2.Property ) {
+    if( elementsData === undefined ) return;
     for (let i = 0; i < elementsData.length; i++) {
       const element = elementsData[i];
       this.prepareGltfProperty( element, type, i, parent );
     }
+  }
+
+
+  prepareGltfRootProperties(elementsData: Gltf2.Property[], type: GltfTypes, parent : Gltf2.Property ) {
+    if( elementsData === undefined ) return;
+    this._propertyMaps.set( type, elementsData )
+    for (let i = 0; i < elementsData.length; i++) {
+      const element = elementsData[i];
+      this.prepareGltfProperty( element, type, i, parent );
+    }
+
   }
 
 

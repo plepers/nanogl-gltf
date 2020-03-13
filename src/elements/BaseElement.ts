@@ -13,6 +13,7 @@ function ElementMixin<TBase extends Constructor>(Base: TBase) {
 
     readonly gltftype : GltfTypes;
     uuid         : string;
+    elementIndex : number;
 
     gltf        : Gltf  ;
 
@@ -21,9 +22,10 @@ function ElementMixin<TBase extends Constructor>(Base: TBase) {
     extensions? : Record<string,any>;
 
 
-    parse( gltfLoader : GltfLoader, data : Gltf2.IProperty, ...args : any ) : Promise<any> {
+    parse( gltfLoader : GltfLoader, data : Gltf2.IProperty ) : Promise<any> {
 
       this.uuid = data.uuid;
+      this.elementIndex = data.elementIndex;
 
       this.gltf = gltfLoader.gltf;
 

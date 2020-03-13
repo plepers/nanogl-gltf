@@ -22,7 +22,8 @@ export const PROJ_ORTHOGRAPHIC     : ProjectionType = 'orthographic';
 
 export default class Camera extends BaseElement {
 
-  static TYPE : GltfTypes = GltfTypes.CAMERA;
+  
+  readonly gltftype : GltfTypes.CAMERA = GltfTypes.CAMERA;
 
   type : ProjectionType;
   projectionData : ProjectionData;

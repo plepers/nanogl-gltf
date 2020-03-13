@@ -45,15 +45,15 @@ export type AnyElement =
   Node                  |
   NormalTextureInfo     |
   OcclusionTextureInfo  |
-  PbrMetallicRoughness  |
   Primitive             |
   Sampler               |
   Scene                 |
   Skin                  |
   Texture               |
   TextureInfo           ;
-
-
+  
+  // PbrMetallicRoughness  |
+  
 
 
 export type ElementOfType<T extends GltfTypes, E extends AnyElement = AnyElement> = E extends { gltftype : T } ? E : never;
