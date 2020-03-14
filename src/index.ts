@@ -22,6 +22,7 @@ import { IExtensionFactory } from './extensions/IExtension';
 import GltfTypes from './types/GltfTypes';
 import { AnyElement, ElementOfType } from './types/Elements';
 import IRenderable from './renderer/IRenderable';
+import Assert from './lib/assert';
 
 
 
@@ -49,7 +50,7 @@ export default class Gltf {
   semantics: ISemantics;
 
 
-  constructor() {
+  constructor( ) {
     this._url = null;
 
 
@@ -157,7 +158,8 @@ export default class Gltf {
 
   addElement(element: AnyElement) {
     const a: AnyElement[] = this._getTypeHolder(element.gltftype);
-    a[element.elementIndex] = element;
+    if( element.elementIndex>-1 )
+      a[element.elementIndex] = element;
     this._elements.push(element);
   }
 

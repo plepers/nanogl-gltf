@@ -29,7 +29,7 @@ import { ElementOfType, PropertyType } from "../types/Elements";
 export interface IExtensionInstance {
   
   readonly name : string;
-  readonly order : number;
+  readonly priority : number;
 
   loadElement<P extends Gltf2.Property>( data : P ) : null | Promise<ElementOfType<PropertyType<P>>>;
 

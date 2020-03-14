@@ -12,13 +12,16 @@ export class ExtensionList {
   _list : IExtensionInstance[] = [];
 
   addExtension( ext : IExtensionInstance ){
+    if( this._map[ext.name] !== undefined ){
+      throw new Error(`Extension ${ext.name} already exits`);
+    }
     this._map[ext.name]=ext;
     this._list.push( ext );
   }
 
 
   sort(){
-    this._list.sort( (a,b)=>a.order-b.order );
+    this._list.sort( (a,b)=>b.priority-a.priority );
   }
 
 
@@ -50,7 +53,7 @@ class ExtensionsRegistry {
     this._extensionFactories[id] = ext;
   }
   
-  setupExtensions( loader:GltfLoader, used:string[] = [], required:string[] = [] ) : void {
+  setupExtensions( loader:GltfLoader, additionalExtensions : IExtensionFactory[] = [] ) : void {
     const res = loader._extensions;
     
     for( const extName in this._extensionFactories ){
@@ -59,7 +62,14 @@ class ExtensionsRegistry {
       res.addExtension( extInstance );
     }
 
+    for (const ext of additionalExtensions) {
+      const extInstance = ext.createInstance( loader );
+      res.addExtension( extInstance );
+    }
+
     res.sort();
+    
+
     
   }
 

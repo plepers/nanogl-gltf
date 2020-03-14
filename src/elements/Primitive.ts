@@ -131,8 +131,11 @@ export default class Primitive extends BaseElement {
     if( data.indices !== undefined )
       this.indices = await gltfLoader.getElement( GltfTypes.ACCESSOR, data.indices );
 
-    if( data.material !== undefined )
+    if( data.material !== undefined ){
       this.material = await gltfLoader.getElement( GltfTypes.MATERIAL, data.material );
+    } else {
+      this.material = await gltfLoader.loadDefaultMaterial();
+    }
 
     if( data.mode !== undefined)
       this.mode = data.mode;

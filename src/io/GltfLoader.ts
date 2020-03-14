@@ -11,6 +11,8 @@ import BaseElement from "../elements/BaseElement";
 import Assert from "../lib/assert";
 
 import "../extensions/DefaultExtension"
+import { GltfLoaderOptions } from "./GltfLoaderOptions";
+import Material from "../elements/Material";
 
 
 let UID = 0;
@@ -19,6 +21,14 @@ function getUUID(): string {
   return (UID++) + "";
 }
 
+
+const defaultMaterialData : Gltf2.IMaterial = {
+  gltftype : GltfTypes.MATERIAL,
+  elementIndex : -1,
+  elementParent : null,
+  uuid : '_default_mat_',
+  name : 'default',
+}
 
 export default class GltfLoader {
 
@@ -42,28 +52,31 @@ export default class GltfLoader {
   _propertyMaps  : Map<GltfTypes, Gltf2.Property[]> = new Map();
 
 
-  constructor(gltfIO: IOInterface, url: string, baseurl: string) {
+  constructor(gltfIO: IOInterface, url: string, options : GltfLoaderOptions = {} ) {
     this.gltfIO = gltfIO;
+
     this._url = url;
-    this._baseUrl = baseurl;
+    this._baseUrl = options.baseurl;
+
+    if( this._baseUrl === undefined )
+      [this._baseUrl, this._url] = gltfIO.resolveBaseDir( this._url );
+
     this.gltf = new Gltf();
     this._data = null;
 
     this._extensions = new ExtensionList();
-    Gltf._extensionsRegistry.setupExtensions(this);
-
-    // this._defaultFactory = new ElementFactory();
-    // this._factory = this._defaultFactory;
+    Gltf._extensionsRegistry.setupExtensions( this, options.extensions );
 
   }
 
 
-
-  parse = (buffer: ArrayBuffer): Promise<Gltf> => {
-    return this.unpack(buffer)
-      .then(this.parseAll)
-      .then(this.yieldGltf);
+  load(): Promise<Gltf> {
+    return this.gltfIO.loadBinaryResource( this.gltfIO.resolvePath( this._url, this._baseUrl ) )
+    .then( this.unpack )
+    .then( this.parseAll )
+    .then( this.yieldGltf);
   }
+
 
 
   unpack = (buffer: ArrayBuffer): Promise<any> => {
@@ -169,6 +182,12 @@ export default class GltfLoader {
     return res;
   }
 
+
+  loadDefaultMaterial() : Promise<Material>{
+    return this._loadElement(defaultMaterialData);
+  }
+
+
   private _getElementHolder<T extends GltfTypes>( type:T ) : Promise<ElementOfType<T>>[] {
     let array : Promise<AnyElement>[] = this._byType.get( type );
     if( array === undefined ){
@@ -186,6 +205,8 @@ export default class GltfLoader {
     const property = properties[index];
     return this._loadElement( property ) as Promise<ElementOfType<T>>;
   }
+
+
 
 
   parseAll = async () => {

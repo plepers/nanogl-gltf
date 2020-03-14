@@ -13,11 +13,7 @@ describe("Node renderable", function () {
   
   describe("nodes with mesh have renderables", function () {
     
-    let gltf:Gltf;
-  
-    before(function () {
-    });
-    
+    let gltf:Gltf;    
     let gl : GLContext;
     
     before(function () {
@@ -43,6 +39,39 @@ describe("Node renderable", function () {
       const m = gltf.getElement( GltfTypes.NODE, 0 );
       expect( gltf.renderables[0] ).to.be.equal( m.renderable )
       expect( gltf.renderables.length ).to.be.equal( 2 )
+    });
+
+
+  });
+
+  describe("primitives with no material shoul have default one", function () {
+    
+    let gltf:Gltf;    
+    let gl : GLContext;
+    
+    before(function () {
+      gl = createContext();
+      return WebGltfIO.loadGltf('samples/models/2.0/Triangle/glTF/Triangle.gltf').then( res=>{
+        gltf=res 
+        return gltf.allocateGl( gl );
+      })
+    });
+
+
+    after( function(){
+      destroyContext( gl );
+    })
+
+
+    it("renderables are defined", function () {
+      const m = gltf.getElement( GltfTypes.NODE, 0 );
+      expect( m.renderable ).to.be.ok()
+    });
+
+    it("renderables are set on gltf object", function () {
+      const m = gltf.getElement( GltfTypes.NODE, 0 );
+      expect( gltf.renderables[0] ).to.be.equal( m.renderable )
+      expect( gltf.renderables.length ).to.be.equal( 1 )
     });
 
 

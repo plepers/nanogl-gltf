@@ -42,6 +42,15 @@ export default class MeshRenderer implements IRenderable {
       const pass = primitive.material.materialPass;
       const material = new BaseMaterial( gl, pass.name );
       material.addPass( pass, 'color' )
+
+      if( this.node.skin ){
+        //material.setSkin ...
+      }
+
+      if( this.node.weights ){
+        primitive.targets[0]
+      }
+
       this.materials.push( material );
 
     }

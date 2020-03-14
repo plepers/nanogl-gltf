@@ -36,7 +36,7 @@ class DefaultExtensionInstance implements IExtensionInstance {
 
   readonly name: 'default' = 'default';
 
-  readonly order: number = -1;
+  readonly priority: number = -10;
 
   readonly loader: GltfLoader;
   
@@ -46,7 +46,6 @@ class DefaultExtensionInstance implements IExtensionInstance {
 
 
   loadElement<P extends Gltf2.Property>(data: P): Promise<ElementOfType<PropertyType<P>>>;
-
   loadElement(data: Gltf2.Property): Promise<AnyElement> {
     
     switch (data.gltftype) {

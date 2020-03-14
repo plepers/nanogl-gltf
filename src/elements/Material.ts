@@ -18,6 +18,8 @@ import GltfTypes from '../types/GltfTypes';
 import StandardPass from '../glsl/StandardPass';
 import { Sampler } from 'nanogl-pbr/Input';
 import BaseMaterial from 'nanogl-pbr/BaseMaterial';
+import Primitive from './Primitive';
+import Node from './Node';
 
 
 function _isAllOnes( a : ArrayLike<number> ) : boolean {
@@ -50,15 +52,33 @@ export default class Material extends BaseElement {
   alphaMode: Gltf2.MaterialAlphaMode;
   alphaCutoff: number;
   doubleSided: boolean;
+  
+  protected _materialPass   : MaterialPass
 
-
-  glconfig: GLConfig;
-
-  private _materialPass   : MaterialPass
-
-  get materialPass() : MaterialPass{
+  get materialPass() : MaterialPass {
     return this._materialPass;
   }
+
+  createMaterialForPrimitive( gl : GLContext, node : Node, primitive : Primitive ) : BaseMaterial {
+
+    const pass = primitive.material.materialPass;
+    const material = new BaseMaterial( gl, this._materialPass.name );
+    material.addPass( pass, 'color' )
+
+    if( node.skin ){
+      // add skin deformer
+      //material.setSkin ...
+    }
+    
+    if( node.weights ){
+      // add morph target deformer
+      //primitive.targets[0]
+    }
+
+    return material;
+  }
+
+  
 
 
   async parse(gltfLoader: GltfLoader, data: Gltf2.IMaterial): Promise<any> {

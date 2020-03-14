@@ -1,6 +1,7 @@
 import Gltf from "..";
 import IOInterface from "./IOInterface";
 import GltfLoader from "./GltfLoader";
+import { GltfLoaderOptions } from "./GltfLoaderOptions";
 
 
 
@@ -17,16 +18,9 @@ export default class GltfIO {
   }
 
    
-  loadGltf(path: string, baseurl : string = undefined ): Promise<Gltf> {
-    
-    if( baseurl === undefined )
-      [baseurl, path] = this._ioImpl.resolveBaseDir( path );
-
-    const reader = new GltfLoader( this._ioImpl, path, baseurl );
-    
-    return this._ioImpl.loadBinaryResource( this._ioImpl.resolvePath( path, baseurl ) )
-      .then( reader.parse )
-    
+  loadGltf(path: string, options : GltfLoaderOptions = {} ): Promise<Gltf> {
+    const loader = new GltfLoader( this._ioImpl, path, options );
+    return loader.load();
   }
 
 }
