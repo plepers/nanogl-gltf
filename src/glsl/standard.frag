@@ -45,7 +45,7 @@ uniform sampler2D tEnv;
   IN vec3 vIrradiance;
 #else
   uniform vec4 uSHCoeffs[7];
-  #include "./sh.glsl"
+  #include "./includes/sh.glsl"
 #endif
 
 
@@ -58,9 +58,8 @@ uniform sampler2D tEnv;
 
 
 #include "nanogl-pbr/glsl/includes/ibl.glsl"
-
-#include "./perturb-normal.glsl"
-#include "./tonemap.glsl"
+#include "./includes/perturb-normal.glsl"
+#include "./includes/tonemap.glsl"
 
 
 // Schlick approx
@@ -69,24 +68,29 @@ uniform sampler2D tEnv;
 vec3 F_Schlick( float VoH,vec3 spec,float glo )
 {
   float dot = glo*glo * pow( 1.0-VoH, 5.0 );
-  #if HAS_fresnel
-    return( 1.0 - dot )*spec + dot*fresnel();
-  #else
-    return( 1.0 - dot )*spec + dot;
-  #endif
+  return( 1.0 - dot )*spec + dot;
 }
 
 
 
-#if HAS_normal
 
-  #if HAS_normalDetail
-    #define COMPUTE_NORMAL(k) ComputeWorldNormal( normal(), normalDetail() )
-    vec3 ComputeWorldNormal( vec3 nrmmap, vec3 nrmmapDetail ){
+#if HAS_normal
+  #if HAS_normalScale
+    #define SCALED_NORMAL(k) GetScaledNormal( normal(), normalScale() )
+    vec3 GetScaledNormal( vec3 nrmtex, float scale ){
+      vec3 nrm = nrmtex = nrmtex*vec3(2.0) - vec3(1.0);
+      return normalize( nrm * vec3(scale, scale, 1.0 ) );
+    }
   #else
-    #define COMPUTE_NORMAL(k) ComputeWorldNormal( normal() )
-    vec3 ComputeWorldNormal( vec3 nrmmap ){
+    #define SCALED_NORMAL(k) GetScaledNormal( normal() )
+    vec3 GetScaledNormal( vec3 nrmtex ){
+      return nrmtex = nrmtex*vec3(2.0) - vec3(1.0);
+    }
   #endif
+  
+  
+  #define COMPUTE_NORMAL(k) ComputeWorldNormal( SCALED_NORMAL() )
+  vec3 ComputeWorldNormal( vec3 nrmmap ){
     
     vec3 nrm = normalize( gl_FrontFacing ? vWorldNormal : -vWorldNormal );
     #if useDerivatives
@@ -94,20 +98,6 @@ vec3 F_Schlick( float VoH,vec3 spec,float glo )
     #else
       vec3 res = normalize( perturbWorldNormal( nrm, nrmmap, vWorldTangent, vWorldBitangent ) );
     #endif
-
-    #if HAS_normalDetail
-      #if HAS_normalDetailStrength
-        nrmmapDetail.rg = (normalDetailStrength() * (nrmmapDetail.rg-vec2(.5)))+vec2(.5);
-      #endif
-
-      #if useDerivatives
-        res = normalize( perturbWorldNormalDerivatives( res, nrmmapDetail, vTexCoord1 ) );
-      #else
-        res = normalize( perturbWorldNormal( res, nrmmapDetail, vWorldTangent, vWorldBitangent ) );
-      #endif
-
-    #endif
-
     // res = res * 0.0001 + vWorldNormal;
 
     return res;
@@ -138,10 +128,6 @@ void main( void ){
 
   #pragma SLOT f
 
-  #if HAS_alpha && alphaBlending( ALPHA_CUTOUT )
-    if( alpha() < .5 ) discard;
-  #endif
-
   // -----------
   vec3 worldNormal = COMPUTE_NORMAL();
 
@@ -158,24 +144,44 @@ void main( void ){
 
   vec3 viewDir = normalize( uCameraPosition - vWorldPosition );
   vec3 worldReflect = reflect( -viewDir, worldNormal );
-  vec3 specularColor = SpecularIBL( tEnv, worldReflect, 1.0-gloss() );
+  vec3 specularColor = SpecularIBL( tEnv, worldReflect, roughness() );
 
 
   #pragma SLOT lightsf
 
 
+  vec4 _baseColor = vec4(1.0);
+  #if HAS_baseColor
+    _baseColor *= baseColor();
+  #endif
+  #if HAS_baseColorFactor
+    _baseColor *= baseColorFactor();
+  #endif
+
+
+  float _metalness = 1.0;
+  #if HAS_metalnessFactor
+    _metalness *= metalnessFactor();
+  #endif
+  #if HAS_metalness
+    _metalness *= metalness();
+  #endif
+
+
+  float _roughness = 1.0;
+  #if HAS_roughnessFactor
+    _roughness *= roughnessFactor();
+  #endif
+  #if HAS_roughness
+    _roughness *= roughness();
+  #endif
+
+
+
+
   float NoV = sdot( viewDir, worldNormal );
-  vec3 specularSq = specular()*specular();
-
-  #if HAS_specularTint
-    specularSq *= specularTint();
-  #endif
-
-  #if noFresnel
-    specularColor *= specularSq;
-  #else
-    specularColor *= F_Schlick( NoV, specularSq, gloss() );
-  #endif
+  vec3 specularF0 = mix( vec3(0.04), _baseColor, metalness() );
+  specularColor *= F_Schlick( NoV, specularF0, 1.0-roughness() );
 
 
   
@@ -187,99 +193,57 @@ void main( void ){
   #endif
 
 
-  vec3 alb = albedo();
-
-  #if HAS_albedoTint
-  {
-    #if HAS_secondaryTint
-      vec3 tint = mix( albedoTint(), secondaryTint(), secondaryTintMask() );
-    #else
-      vec3 tint = albedoTint();
-    #endif
-
-    #if tintBlendMode( TBM_LINEAR_LIGHT )
-      alb = blendLinearLight( tint, alb, .5 );
-    #endif
-
-    #if tintBlendMode( TBM_MULTIPLY )
-      alb *= tint;
-    #endif
-
-  }
-  #endif
-
-
-  #if conserveEnergy
-    alb = alb - alb * specular();
-  #endif
-  vec3 albedoSq = alb*alb;
-
-
-  // white mat override
-  #if 0
-    albedoSq = vec3(.5) + 0.00001 * albedoSq; 
-
-  #endif
-
-  #if HAS_translu
-    diffuseCoef *= vec3(1.0 + translu()*1.5);
-  #endif
 
   #if HAS_occlusion
-    diffuseCoef *= occlusion();
-  #endif
-
-
-  #ifdef HAS_GI
-  #if HAS_GI
-    vec3 agi = GI() * GI_mix();
-    float gi = agi.r + agi.g + agi.b;
-    // gi = gi * .1 + .9;
-
-    #if HAS_GI_strength
-      gi = gi * GI_strength() + (1.0-GI_strength());
+    float _occlusion = occlusion();
+    #if HAS_occlusionStrength
+      _occlusion = 1 - occlusionStrength() + _occlusion*occlusionStrength()
     #endif
-    diffuseCoef   *= vec3( gi );
-    specularColor *= gi;
-  #endif
+    diffuseCoef *= _occlusion;
   #endif
 
 
-
-  #if HAS_cavity
-    #ifndef cavityStrength
-      #define cavityStrength(k) vec2(1.0)
-    #endif
-    diffuseCoef   *= cavity() * cavityStrength().r + (1.0-cavityStrength().r);
-    specularColor *= cavity() * cavityStrength().g + (1.0-cavityStrength().g);
-  #endif
-
-
-  #if HAS_emissive
-    float e = emissive();
-    #if HAS_emissiveScale
-      e = e * emissiveScale();
-    #endif
-    diffuseCoef += vec3( e ) * albedo();
-  #endif
-
+  vec3 alb = mix( _baseColor * vec3(1-0.04), vec3(0.0), metalness() );
+  vec3 albedoSq = alb*alb;
 
   FragColor.xyz = diffuseCoef*albedoSq + specularColor;
+
+
+  vec3 _emissive = vec3(0.0);
+  #if HAS_emissive 
+    _emissive += emissive();
+  #endif
+  #if HAS_emissiveFactor
+    _emissive *= emissiveFactor();
+  #endif
+  
+  FragColor.xyz += _emissive;
+
+
+
+  vec4 _alpha = 1.0;
+  #if HAS_alpha
+    _alpha *= alpha();
+  #endif
+  #if HAS_alphaFactor
+    _alpha *= alphaFactor();
+  #endif
+
+
+  #if alphaMode( MASK )
+    if( _alpha < alphaCutoff() ) discard;
+    FragColor.a = 1.0;
+  #elif alphaMode( BLEND )
+    FragColor.a = _alpha;
+  #else
+    FragColor.a = 1.0;
+  #endif
+
 
 
   EXPOSURE(FragColor.rgb);
   GAMMA_CORRECTION(FragColor.rgb);
 
-  // #if HAS_alpha
-  //   FragColor.a = alpha();
-  // #else
-  // #endif
-
-  #if HAS_alpha && alphaBlending( ALPHA_STD )
-    FragColor.a = alpha();
-  #else
-    FragColor.a = 1.0;
-  #endif
 
 
   #pragma SLOT post_color
@@ -302,9 +266,6 @@ void main( void ){
 
   #if HAS_normal
   // FragColor.rgb = FragColor.rgb*0.0001 + normal();
-  #endif
-  #if HAS_normalDetail
-    // FragColor.rg = normal().rg;
   #endif
 
 

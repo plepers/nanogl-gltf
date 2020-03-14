@@ -2,6 +2,7 @@ import Gltf from "../index";
 import Gltf2 from "../types/Gltf2";
 import GltfLoader from "../io/GltfLoader";
 import GltfTypes from "../types/GltfTypes";
+import { GLContext } from "nanogl/types";
 
 
 type Constructor<T = {}> = new (...args: any[]) => T;
@@ -35,6 +36,11 @@ function ElementMixin<TBase extends Constructor>(Base: TBase) {
 
       return Promise.resolve(true)
 
+    }
+
+    /** abstract */
+    allocateGl( gl : GLContext ) : void | Promise<any>{
+      return null;
     }
 
 

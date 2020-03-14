@@ -4,7 +4,6 @@ import { expectEqualArray, describeMulti } from './test-utils';
 import WebGltfIO from '../src/io/web';
 import Mesh from '../src/elements/Mesh';
 import Accessor from '../src/elements/Accessor';
-import { PROJ_PERSPECTIVE, PROJ_ORTHOGRAPHIC } from '../src/elements/Camera';
 
 
 describe("Embedded Buffer", function () {

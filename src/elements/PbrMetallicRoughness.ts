@@ -16,8 +16,8 @@ export default class PbrMetallicRoughness {
   baseColorFactor          : vec4       ;
   metallicFactor           : number     ;
   roughnessFactor          : number     ;
-  baseColorTexture         : TextureInfo;
-  metallicRoughnessTexture : TextureInfo;
+  baseColorTexture?        : TextureInfo;
+  metallicRoughnessTexture?: TextureInfo;
   
 
 

@@ -2,7 +2,6 @@
 import Gltf from "..";
 
 import IOInterface from "./IOInterface";
-import ElementFactory                              from "./ElementFactory";
 import { MAGIC, GLB_HEADER_SIZE, JSON_MAGIC } from "../consts";
 import { ExtensionList } from "../extensions/Registry";
 import Gltf2 from "../types/Gltf2";
@@ -35,8 +34,6 @@ export default class GltfLoader {
 
   _glbData? : ArrayBuffer;
 
-  // _defaultFactory : IElementFactory;
-  _factory: ElementFactory;
   _extensions: ExtensionList;
 
   _elements: Map<string, Promise<AnyElement>> = new Map();
@@ -129,6 +126,9 @@ export default class GltfLoader {
 
   // }
 
+  resolveUri( uri : string ) : string {
+    return this.gltfIO.resolvePath(uri, this._baseUrl);
+  }
 
   // loadBuffer = (b: Buffer) => {
   loadBufferUri = (uri? : string):Promise<ArrayBuffer> =>  {
@@ -197,10 +197,7 @@ export default class GltfLoader {
     this._extensions.validate(this._data.extensionsUsed, this._data.extensionsRequired);
 
 
-
-
-    gltf.asset = await this._loadElement(this._data.asset);
-    // gltf.asset.parse( this, this._data.asset )
+    this._loadElement(this._data.asset);
 
     // TODO: validate asset version
 

@@ -21,8 +21,8 @@ describe("Node transform", function () {
     });
 
     it("evaluate t0", function () {
-      const anim = gltf.getElement<Animation>( GltfTypes.ANIMATION, 0 );
-      const m = gltf.getElement<Node>( GltfTypes.NODE, 0 );
+      const anim = gltf.getElement( GltfTypes.ANIMATION, 0 );
+      const m = gltf.getElement( GltfTypes.NODE, 0 );
       
       anim.evaluate( 0 );
       expectEqualArray( m.position, new Float32Array( [
@@ -32,8 +32,8 @@ describe("Node transform", function () {
     });
  
     it("evaluate t1", function () {
-      const anim = gltf.getElement<Animation>( GltfTypes.ANIMATION, 0 );
-      const m = gltf.getElement<Node>( GltfTypes.NODE, 0 );
+      const anim = gltf.getElement( GltfTypes.ANIMATION, 0 );
+      const m = gltf.getElement( GltfTypes.NODE, 0 );
       
       anim.evaluate( 1 );
       expectEqualArray( m.position, new Float32Array( [
@@ -43,8 +43,8 @@ describe("Node transform", function () {
     });
  
     it("evaluate t2", function () {
-      const anim = gltf.getElement<Animation>( GltfTypes.ANIMATION, 0 );
-      const m = gltf.getElement<Node>( GltfTypes.NODE, 0 );
+      const anim = gltf.getElement( GltfTypes.ANIMATION, 0 );
+      const m = gltf.getElement( GltfTypes.NODE, 0 );
       
       anim.evaluate( 2 );
       expectEqualArray( m.position, new Float32Array( [
@@ -55,8 +55,8 @@ describe("Node transform", function () {
 
 
     it("evaluate t-1", function () {
-      const anim = gltf.getElement<Animation>( GltfTypes.ANIMATION, 0 );
-      const m = gltf.getElement<Node>( GltfTypes.NODE, 0 );
+      const anim = gltf.getElement( GltfTypes.ANIMATION, 0 );
+      const m = gltf.getElement( GltfTypes.NODE, 0 );
       
       anim.evaluate( -1 );
       expectEqualArray( m.position, new Float32Array( [
@@ -66,8 +66,8 @@ describe("Node transform", function () {
     });
 
     it("evaluate t+3", function () {
-      const anim = gltf.getElement<Animation>( GltfTypes.ANIMATION, 0 );
-      const m = gltf.getElement<Node>( GltfTypes.NODE, 0 );
+      const anim = gltf.getElement( GltfTypes.ANIMATION, 0 );
+      const m = gltf.getElement( GltfTypes.NODE, 0 );
       
       anim.evaluate( 3 );
       expectEqualArray( m.position, new Float32Array( [
@@ -97,8 +97,8 @@ describe("Node transform", function () {
     });
 
     it("evaluate t-10", function () {
-      const anim = gltf.getElement<Animation>( GltfTypes.ANIMATION, 0 );
-      const m = gltf.getElement<Node>( GltfTypes.NODE, 0 );
+      const anim = gltf.getElement( GltfTypes.ANIMATION, 0 );
+      const m = gltf.getElement( GltfTypes.NODE, 0 );
       
       anim.evaluate( -10 );
       expectEqualArray( m.rotation, new Float32Array( [0.00000, SIN45, 0.00000, SIN45] ));
@@ -107,8 +107,8 @@ describe("Node transform", function () {
 
 
     it("evaluate t0", function () {
-      const anim = gltf.getElement<Animation>( GltfTypes.ANIMATION, 0 );
-      const m = gltf.getElement<Node>( GltfTypes.NODE, 0 );
+      const anim = gltf.getElement( GltfTypes.ANIMATION, 0 );
+      const m = gltf.getElement( GltfTypes.NODE, 0 );
       
       anim.evaluate( 0 );
       expectEqualArray( m.rotation, new Float32Array( [0.00000, SIN45, 0.00000, SIN45] ));
@@ -116,8 +116,8 @@ describe("Node transform", function () {
     });
 
     it("evaluate t1", function () {
-      const anim = gltf.getElement<Animation>( GltfTypes.ANIMATION, 0 );
-      const m = gltf.getElement<Node>( GltfTypes.NODE, 0 );
+      const anim = gltf.getElement( GltfTypes.ANIMATION, 0 );
+      const m = gltf.getElement( GltfTypes.NODE, 0 );
       
       anim.evaluate( 1 );
       expectEqualArray( m.rotation, new Float32Array( [0.00000, 0.00000, 0.00000, 1.00000] ));
@@ -125,8 +125,8 @@ describe("Node transform", function () {
     });
 
     it("evaluate t2", function () {
-      const anim = gltf.getElement<Animation>( GltfTypes.ANIMATION, 0 );
-      const m = gltf.getElement<Node>( GltfTypes.NODE, 0 );
+      const anim = gltf.getElement( GltfTypes.ANIMATION, 0 );
+      const m = gltf.getElement( GltfTypes.NODE, 0 );
       
       anim.evaluate( 2 );
       expectEqualArray( m.rotation, new Float32Array( [0.00000, -SIN45, 0.00000, SIN45] ));
@@ -134,8 +134,8 @@ describe("Node transform", function () {
     });
 
     it("evaluate t10", function () {
-      const anim = gltf.getElement<Animation>( GltfTypes.ANIMATION, 0 );
-      const m = gltf.getElement<Node>( GltfTypes.NODE, 0 );
+      const anim = gltf.getElement( GltfTypes.ANIMATION, 0 );
+      const m = gltf.getElement( GltfTypes.NODE, 0 );
       
       anim.evaluate( 10 );
       expectEqualArray( m.rotation, new Float32Array( [0.00000, SIN45, 0.00000, SIN45] ));
@@ -154,8 +154,8 @@ describe("Node transform", function () {
     });
 
     it("evaluate t-10", function () {
-      const anim = gltf.getElement<Animation>( GltfTypes.ANIMATION, 0 );
-      const m = gltf.getElement<Node>( GltfTypes.NODE, 0 );
+      const anim = gltf.getElement( GltfTypes.ANIMATION, 0 );
+      const m = gltf.getElement( GltfTypes.NODE, 0 );
       
       anim.evaluate( -10 );
       expectEqualArray( m.scale, new Float32Array( [.8, .8, .8] ));
@@ -164,8 +164,8 @@ describe("Node transform", function () {
 
 
     it("evaluate t0", function () {
-      const anim = gltf.getElement<Animation>( GltfTypes.ANIMATION, 0 );
-      const m = gltf.getElement<Node>( GltfTypes.NODE, 0 );
+      const anim = gltf.getElement( GltfTypes.ANIMATION, 0 );
+      const m = gltf.getElement( GltfTypes.NODE, 0 );
       
       anim.evaluate( 0 );
       expectEqualArray( m.scale, new Float32Array( [.8, .8, .8] ));
@@ -173,8 +173,8 @@ describe("Node transform", function () {
     });
 
     it("evaluate t1", function () {
-      const anim = gltf.getElement<Animation>( GltfTypes.ANIMATION, 0 );
-      const m = gltf.getElement<Node>( GltfTypes.NODE, 0 );
+      const anim = gltf.getElement( GltfTypes.ANIMATION, 0 );
+      const m = gltf.getElement( GltfTypes.NODE, 0 );
       
       anim.evaluate( 1 );
       expectEqualArray( m.scale, new Float32Array( [1.2, 1.2, 1.2] ));
@@ -182,15 +182,15 @@ describe("Node transform", function () {
     });
 
     it("evaluate t2", function () {
-      const anim = gltf.getElement<Animation>( GltfTypes.ANIMATION, 0 );
-      const m = gltf.getElement<Node>( GltfTypes.NODE, 0 );
+      const anim = gltf.getElement( GltfTypes.ANIMATION, 0 );
+      const m = gltf.getElement( GltfTypes.NODE, 0 );
       anim.evaluate( 2 );
       expectEqualArray( m.scale, new Float32Array( [.8, .8, .8] ));
     });
 
     it("evaluate t10", function () {
-      const anim = gltf.getElement<Animation>( GltfTypes.ANIMATION, 0 );
-      const m = gltf.getElement<Node>( GltfTypes.NODE, 0 );
+      const anim = gltf.getElement( GltfTypes.ANIMATION, 0 );
+      const m = gltf.getElement( GltfTypes.NODE, 0 );
       anim.evaluate( 10 );
       expectEqualArray( m.scale, new Float32Array( [.8, .8, .8] ));
     });
@@ -208,9 +208,9 @@ describe("Node transform", function () {
     });
 
     it("evaluate t-10", function () {
-      const anim0 = gltf.getElement<Animation>( GltfTypes.ANIMATION, 0 );
-      const anim1 = gltf.getElement<Animation>( GltfTypes.ANIMATION, 1 );
-      const m = gltf.getElement<Node>( GltfTypes.NODE, 0 );
+      const anim0 = gltf.getElement( GltfTypes.ANIMATION, 0 );
+      const anim1 = gltf.getElement( GltfTypes.ANIMATION, 1 );
+      const m = gltf.getElement( GltfTypes.NODE, 0 );
       
       anim0.evaluate( 2 );
       anim1.evaluate( 2 );

@@ -22,8 +22,6 @@ export default class Mesh extends BaseElement {
     
     super.parse( gltfLoader, data );
     
-
-
     const channelPromises = data.primitives.map( (data)=>gltfLoader._loadElement(data) );
     this.primitives = await Promise.all( channelPromises );
     
@@ -32,16 +30,6 @@ export default class Mesh extends BaseElement {
     }
     
   }
-    
-    
-    
-  allocateGl( gl : GLContext ) {
-    for( const primitive of this.primitives ) {
-      primitive.allocateGl( gl );
-    }
-  }
-
-  
 
 }
 

@@ -5,7 +5,6 @@
 
 vec3 perturbWorldNormalDerivatives( vec3 nrm, vec3 n, vec2 texcoord ){
   // compute derivations of the world position
-  n = 2.0 * n - 1.0;
 
   vec3 p_dx = dFdx(vWorldPosition);
   vec3 p_dy = dFdy(vWorldPosition);
@@ -40,7 +39,6 @@ vec3 perturbWorldNormalDerivatives( vec3 nrm, vec3 n, vec2 texcoord ){
 #endif
 
 vec3 perturbWorldNormal( vec3 nrm, vec3 n, vec3 wtan, vec3 wbitan ){
-  n = 2.0*n - 1.0;
   return wtan * n.x + wbitan*n.y + nrm * n.z;
 }
 

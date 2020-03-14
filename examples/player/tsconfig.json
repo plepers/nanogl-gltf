@@ -6,17 +6,23 @@
       "module": "ES6",
       "preserveConstEnums": true,
       "outDir": "dist",
-      "sourceMap": false
+      "sourceMap": false,
+      "allowSyntheticDefaultImports": true,
+      "skipLibCheck": true,
+      "baseUrl": "./",
+      "paths": {
+        "nanogl-gltf" : [
+          "../../src/*"
+        ],
+        "*": [
+          "./src/*",
+          "../../node_modules/*"
+        ]
+      }
     },
-    "files" : [
-      "src/index.ts"
-    ],
-    "include": [
-      "./src/**/*",
-      "../../src/**/*"
-      // "test/*_test.ts"
-    ],
-    "exclude": [
+    "include" : [
+      "src/**/*",
+      "../../src/**/*",
     ]
   }
   

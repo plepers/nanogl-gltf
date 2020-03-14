@@ -6,7 +6,7 @@
   "scripts": {
     "test": "karma start",
     "build": "tsc && ./build/make-glsl",
-    "gentypes": "json2ts -i src/schema/glTF.schema.json -o src/schema/glTF.d.ts --cwd=src/schema/"
+    "player": "webpack-dev-server --config examples/player/webpack.config.js"
   },
   "repository": {
     "type": "git",

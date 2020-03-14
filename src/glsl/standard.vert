@@ -40,7 +40,7 @@ OUT mediump vec3 vWorldNormal;
 #if perVertexIrrad
   OUT vec3 vIrradiance;
   uniform vec4 uSHCoeffs[7];
-  #include "./sh.glsl"
+  #include "./includes/sh.glsl"
 #endif
 
 
@@ -79,7 +79,7 @@ void main( void ){
   #if HAS_normal
     #if useDerivatives == 0
     vWorldTangent   = normalize( rotate( worldMatrix, aTangent.xyz ) );
-    vWorldBitangent = normalize( cross( vWorldNormal, vWorldTangent ) * -aTangent.w );
+    vWorldBitangent = normalize( cross( vWorldNormal, vWorldTangent ) * aTangent.w );
     #endif
   #endif
 

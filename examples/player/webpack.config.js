@@ -1,27 +1,52 @@
 
 
 const path = require('path');
+const resolvePath = (p)=>path.resolve( __dirname, p )
+
 
 module.exports = {
-  entry: path.resolve( __dirname, 'src/index.ts' ),
+
+  mode : 'development',
+  devtool: '(none)',
+
+  entry: resolvePath( 'src/index.ts' ),
   
   module: {
     rules: [
+      
       {
-        test: /\.tsx?$/,
+        test: /\.ts$/,
         use: 'ts-loader',
         exclude: /node_modules/,
       },
+
+      // GLSL
+      {
+        test: /\.(vert|frag|glsl)$/,
+        use: 'nanogl-template/lib/compiler'
+      },
+
     ],
   },
   
   resolve: {
-    extensions: [ '.tsx', '.ts', '.js' ],
+
+    extensions: [ '.ts', '.js' ],
+
+    modules: [
+      resolvePath('src'),
+      resolvePath('../../src'),
+      resolvePath('../../node_modules'),
+    ],
+
+    alias: {
+      'nanogl-gltf': resolvePath('../../src/'),
+    }
   },
 
   output: {
     filename: 'main.js',
-    path: path.resolve( __dirname, 'dist' ),
+    path: resolvePath( 'dist' ),
   },
 
   devServer: {

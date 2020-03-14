@@ -13,6 +13,9 @@ import { mat4 } from 'gl-matrix';
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
+import MeshRenderer from '../renderer/MeshRenderer';
+import IRenderable from '../renderer/IRenderable';
+import { GLContext } from 'nanogl/types';
 
 
 
@@ -21,11 +24,12 @@ export default class Node extends ElementMixin( NGLNode ) {
 
   readonly gltftype : GltfTypes.NODE = GltfTypes.NODE;
 
-  camera      : Camera;
-  skin        : Skin;
-  mesh        : Mesh;
-  weights     : Float32Array;
+  camera?     : Camera;
+  skin?       : Skin;
+  mesh?       : Mesh;
+  weights?    : Float32Array;
 
+  renderable? : IRenderable;
 
   async parse( gltfLoader:GltfLoader, data: Gltf2.INode ){
     // super.parse();
@@ -77,6 +81,13 @@ export default class Node extends ElementMixin( NGLNode ) {
 
 
   
+  allocateGl( gl : GLContext ) : void {
+    
+    if( this.mesh ){
+      this.renderable = new MeshRenderer( gl, this );
+    }
+    
+  }
   // set weights( weights ){
   //   this.mesh.weights.set( weights );
   // }

@@ -10,13 +10,7 @@ import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
 
 
-type ProjectionType = "perspective" | "orthographic" | string;
 type ProjectionData = Gltf2.ICameraPerspective | Gltf2.ICameraOrthographic;
-
-
-export const PROJ_PERSPECTIVE      : ProjectionType = 'perspective';
-export const PROJ_ORTHOGRAPHIC     : ProjectionType = 'orthographic';
-
 
 
 
@@ -25,7 +19,7 @@ export default class Camera extends BaseElement {
   
   readonly gltftype : GltfTypes.CAMERA = GltfTypes.CAMERA;
 
-  type : ProjectionType;
+  type : Gltf2.CameraType;
   projectionData : ProjectionData;
   projection : mat4;
 
@@ -40,12 +34,12 @@ export default class Camera extends BaseElement {
 
     switch( this.type ){
       
-      case PROJ_PERSPECTIVE:
+      case Gltf2.CameraType.PERSPECTIVE:
         this.projectionData = data.perspective;
         this.createPerpective( this.projectionData );
         break;
       
-      case PROJ_ORTHOGRAPHIC:
+      case Gltf2.CameraType.ORTHOGRAPHIC:
         this.projectionData = data.orthographic;
         this.createOrtho( this.projectionData );
         break;

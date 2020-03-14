@@ -38,69 +38,69 @@ describe("Primitives", function () {
 
 
     it("mesh has primitives", function () {
-      const m = gltf.getElement<Mesh>( GltfTypes.MESH, 0 );
+      const m = gltf.getElement( GltfTypes.MESH, 0 );
       expect( m.primitives ).to.be.ok()
     });
     
     it("mesh has one primitive", function () {
-      const m = gltf.getElement<Mesh>( GltfTypes.MESH, 0 );
+      const m = gltf.getElement( GltfTypes.MESH, 0 );
       expect( m.primitives.length ).to.be(1)
     });
     
     it("primitive has attributes", function () {
-      const m = gltf.getElement<Mesh>( GltfTypes.MESH, 0 );
+      const m = gltf.getElement( GltfTypes.MESH, 0 );
       const prim = m.primitives[0];
       expect( prim.attributes ).to.be.ok()
     })
 
     it("primitive has position", function () {
-      const m = gltf.getElement<Mesh>( GltfTypes.MESH, 0 );
+      const m = gltf.getElement( GltfTypes.MESH, 0 );
       const prim = m.primitives[0];
       expect( prim.attributes.getSemantic( 'POSITION' ) ).to.be.ok()
     });
 
     it("primitive has normal", function () {
-      const m = gltf.getElement<Mesh>( GltfTypes.MESH, 0 );
+      const m = gltf.getElement( GltfTypes.MESH, 0 );
       const prim = m.primitives[0];
       expect( prim.attributes.getSemantic( 'NORMAL' ) ).to.be.ok()
     });
 
     it("primitive has 2 attribs", function () {
-      const m = gltf.getElement<Mesh>( GltfTypes.MESH, 0 );
+      const m = gltf.getElement( GltfTypes.MESH, 0 );
       const prim = m.primitives[0];
       expect( prim.attributes.length ).to.be(2)
     });
 
 
     it("primitive position has correct accessor", function () {
-      const m = gltf.getElement<Mesh>( GltfTypes.MESH, 0 );
+      const m = gltf.getElement( GltfTypes.MESH, 0 );
       const prim = m.primitives[0];
       const pos = prim.attributes.getSemantic( 'POSITION' );
-      const accessor = gltf.getElement<Accessor>( GltfTypes.ACCESSOR, 2 );
+      const accessor = gltf.getElement( GltfTypes.ACCESSOR, 2 );
       expect( pos.accessor.byteOffset ).to.be(288)
       expect( pos.accessor ).to.be(accessor)
     });
 
 
     it("primitive mode is ok", function () {
-      const m = gltf.getElement<Mesh>( GltfTypes.MESH, 0 );
+      const m = gltf.getElement( GltfTypes.MESH, 0 );
       const prim = m.primitives[0];
       expect( prim.mode ).to.be(4)
     });
 
 
     it("primitive has indices", function () {
-      const m = gltf.getElement<Mesh>( GltfTypes.MESH, 0 );
+      const m = gltf.getElement( GltfTypes.MESH, 0 );
       const prim = m.primitives[0];
       expect( prim.indices ).to.be.ok()
 
-      const accessor = gltf.getElement<Accessor>( GltfTypes.ACCESSOR, 0 );
+      const accessor = gltf.getElement( GltfTypes.ACCESSOR, 0 );
       expect( prim.indices ).to.be( accessor )
     });
 
 
     it("primitive has material", function () {
-      const m = gltf.getElement<Mesh>( GltfTypes.MESH, 0 );
+      const m = gltf.getElement( GltfTypes.MESH, 0 );
       const prim = m.primitives[0];
       expect( prim.material ).to.be.ok()
 
@@ -189,7 +189,7 @@ describe("Primitives", function () {
 
     it("primitive 0 position has correct accessor", function () {
       const pos = meshA.primitives[0].attributes.getSemantic( 'POSITION' );
-      const accessor = gltf.getElement<Accessor>( GltfTypes.ACCESSOR, 92 );
+      const accessor = gltf.getElement( GltfTypes.ACCESSOR, 92 );
       expect( pos.accessor ).to.be(accessor)
     });
 
@@ -210,7 +210,7 @@ describe("Primitives", function () {
 
     it("primitive 1 position has correct accessor", function () {
       const pos = meshA.primitives[1].attributes.getSemantic( 'POSITION' );
-      const accessor = gltf.getElement<Accessor>( GltfTypes.ACCESSOR, 95 );
+      const accessor = gltf.getElement( GltfTypes.ACCESSOR, 95 );
       expect( pos.accessor ).to.be(accessor)
     });
 
@@ -224,9 +224,9 @@ describe("Primitives", function () {
 
       let accessor;
 
-      accessor = gltf.getElement<Accessor>( GltfTypes.ACCESSOR, 90 );
+      accessor = gltf.getElement( GltfTypes.ACCESSOR, 90 );
       expect( meshA.primitives[0].indices ).to.be( accessor )
-      accessor = gltf.getElement<Accessor>( GltfTypes.ACCESSOR, 93 );
+      accessor = gltf.getElement( GltfTypes.ACCESSOR, 93 );
       expect( meshA.primitives[1].indices ).to.be( accessor )
     });
 

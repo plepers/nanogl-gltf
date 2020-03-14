@@ -2,9 +2,6 @@ import Gltf from '../src'
 import expect from 'expect.js'
 import { expectEqualArray, describeMulti } from './test-utils';
 import WebGltfIO from '../src/io/web';
-import Mesh from '../src/elements/Mesh';
-import Accessor from '../src/elements/Accessor';
-import { PROJ_PERSPECTIVE, PROJ_ORTHOGRAPHIC } from '../src/elements/Camera';
 import Gltf2 from '../src/types/Gltf2';
 
 
@@ -34,7 +31,7 @@ describe("Cameras", function () {
     
     it(" has correct type", function () {
       let cam = gltf.cameras[0];
-      expect( cam.type ).to.be( PROJ_PERSPECTIVE )
+      expect( cam.type ).to.be( Gltf2.CameraType.PERSPECTIVE )
     });
     
     it(" has proj data", function () {
@@ -80,7 +77,7 @@ describe("Cameras", function () {
     
     it(" has correct type", function () {
       let cam = gltf.cameras[1];
-      expect( cam.type ).to.be( PROJ_ORTHOGRAPHIC )
+      expect( cam.type ).to.be( Gltf2.CameraType.ORTHOGRAPHIC )
     });
     
     it(" has proj data", function () {

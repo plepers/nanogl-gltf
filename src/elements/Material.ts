@@ -1,88 +1,186 @@
 
 
 import { vec3 } from 'gl-matrix';
-import GLConfig             from 'nanogl-state/config'    ;
+import GLConfig from 'nanogl-state/config';
 
-import Gltf                 from '../index';
-import BaseElement          from './BaseElement'         ;
+import Gltf from '../index';
+import BaseElement from './BaseElement';
 import PbrMetallicRoughness from './PbrMetallicRoughness';
-import NormalTextureInfo    from './NormalTextureInfo'   ;
+import NormalTextureInfo from './NormalTextureInfo';
 import OcclusionTextureInfo from './OcclusionTextureInfo';
-import TextureInfo          from './TextureInfo'         ;
+import TextureInfo from './TextureInfo';
 
 import { GLContext } from 'nanogl/types';
 import MaterialPass from 'nanogl-pbr/MaterialPass';
-import StandardPass from 'nanogl-pbr/StandardPass'
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
+import StandardPass from '../glsl/StandardPass';
+import { Sampler } from 'nanogl-pbr/Input';
+import BaseMaterial from 'nanogl-pbr/BaseMaterial';
 
 
-export enum AlphaMode {
-  OPAQUE = "OPAQUE" ,
-  MASK   = "MASK"   ,
-  BLEND  = "BLEND"  ,
+function _isAllOnes( a : ArrayLike<number> ) : boolean {
+  for (let i = 0; i < a.length; i++) {
+    if( a[i] !== 1 ) return false;
+  }
+  return true;
 }
 
+function _isAllZeros( a : ArrayLike<number> ) : boolean {
+  for (let i = 0; i < a.length; i++) {
+    if( a[i] !== 0 ) return false;
+  }
+  return true;
+}
+
+
+const SRC_ALPHA             = 0x0302;
+const ONE_MINUS_SRC_ALPHA   = 0x0303;
+
 export default class Material extends BaseElement {
-  
-  readonly gltftype : GltfTypes.MATERIAL = GltfTypes.MATERIAL;
+
+  readonly gltftype: GltfTypes.MATERIAL = GltfTypes.MATERIAL;
 
   pbrMetallicRoughness?: PbrMetallicRoughness;
-  normalTexture?       : NormalTextureInfo   ;
-  occlusionTexture?    : OcclusionTextureInfo;
-  emissiveTexture?     : TextureInfo         ;
-  emissiveFactor       : vec3                ;
-  alphaMode            : AlphaMode | string  ;
-  alphaCutoff          : number              ;
-  doubleSided          : boolean             ;
-  
-  
+  normalTexture?: NormalTextureInfo;
+  occlusionTexture?: OcclusionTextureInfo;
+  emissiveTexture?: TextureInfo;
+  emissiveFactor: vec3;
+  alphaMode: Gltf2.MaterialAlphaMode;
+  alphaCutoff: number;
+  doubleSided: boolean;
+
+
   glconfig: GLConfig;
 
+  private _materialPass   : MaterialPass
 
-  async parse( gltfLoader:GltfLoader, data: Gltf2.IMaterial ) : Promise<any>{
+  get materialPass() : MaterialPass{
+    return this._materialPass;
+  }
 
-    super.parse( gltfLoader, data );
 
-    this.emissiveFactor = <vec3> new Float32Array(data.emissiveFactor || [0,0,0]);
+  async parse(gltfLoader: GltfLoader, data: Gltf2.IMaterial): Promise<any> {
 
-    this.alphaMode   = data.alphaMode || AlphaMode.OPAQUE;
+    super.parse(gltfLoader, data);
+
+    this.emissiveFactor = <vec3>new Float32Array(data.emissiveFactor || [0, 0, 0]);
+
+    this.alphaMode = data.alphaMode || Gltf2.MaterialAlphaMode.OPAQUE;
     this.alphaCutoff = data.alphaCutoff ?? 0.5;
     this.doubleSided = data.doubleSided ?? false;
 
-    if( data.pbrMetallicRoughness !== undefined ){
+    if (data.pbrMetallicRoughness !== undefined) {
       this.pbrMetallicRoughness = new PbrMetallicRoughness()
-      await this.pbrMetallicRoughness.parse( gltfLoader, data.pbrMetallicRoughness )
+      await this.pbrMetallicRoughness.parse(gltfLoader, data.pbrMetallicRoughness)
     }
 
-    if( data.normalTexture !== undefined ){
-      this.normalTexture = await gltfLoader._loadElement( data.normalTexture );
+    if (data.normalTexture !== undefined) {
+      this.normalTexture = await gltfLoader._loadElement(data.normalTexture);
     }
-    
-    if( data.occlusionTexture !== undefined ){
-      this.occlusionTexture = await gltfLoader._loadElement( data.occlusionTexture );
+
+    if (data.occlusionTexture !== undefined) {
+      this.occlusionTexture = await gltfLoader._loadElement(data.occlusionTexture);
     }
-    
-    if( data.emissiveTexture !== undefined ){
-      this.emissiveTexture = await gltfLoader._loadElement( data.emissiveTexture );
+
+    if (data.emissiveTexture !== undefined) {
+      this.emissiveTexture = await gltfLoader._loadElement(data.emissiveTexture);
     }
+
+    this.setupMaterialPass();
+
   }
 
 
-  materialPass : MaterialPass
-  
-  
-  allocateGl( gl : GLContext ) {
 
-    const pass = new StandardPass( this.name );
+
+// TODO: don't really need to be in gl allocation step
+  setupMaterialPass(): void {
+
+    const pass = new StandardPass(this.name);
+
+    pass.glconfig.enableCullface(!this.doubleSided);
+    pass.doubleSided.set( this.doubleSided );
+
+
+    if( this.alphaMode === Gltf2.MaterialAlphaMode.BLEND ){
+      pass.glconfig.enableBlend()
+      pass.glconfig.blendFunc( SRC_ALPHA, ONE_MINUS_SRC_ALPHA );
+    }
+
+    pass.alphaMode.set( this.alphaMode );
+    if( this.alphaMode === Gltf2.MaterialAlphaMode.MASK ){
+      pass.alphaCutoff.attachUniform('uAlphaCutoff').set( this.alphaCutoff );
+    }
+
+    const pbr = this.pbrMetallicRoughness;
+
+    if (pbr !== undefined) {
+
+      if (pbr.baseColorTexture) {
+        const baseColorSampler = new Sampler('tBaseColor', pass.getTexCoords(pbr.baseColorTexture.texCoord));
+        pass.baseColor.attach(baseColorSampler, 'rgb')
+        pass.alpha.attach(baseColorSampler, 'a')
+      }
+
+      if (pbr.metallicRoughnessTexture) {
+        const mrSampler = new Sampler('tMetalicRoughness', pass.getTexCoords(pbr.metallicRoughnessTexture.texCoord));
+        pass.metalness.attach(mrSampler, 'b')
+        pass.roughness.attach(mrSampler, 'g')
+      }
+
+      if( ! _isAllOnes( pbr.baseColorFactor ) ){
+        pass.baseColorFactor.attachUniform('uBasecolorFactor').set(...pbr.baseColorFactor)
+      }
+
+      if (pbr.metallicFactor !== 1) {
+        pass.metalnessFactor.attachUniform('uMetalnessFactor').set(pbr.metallicFactor)
+      }
+      
+      if (pbr.roughnessFactor !== 1) {
+        pass.roughnessFactor.attachUniform('uRoughnessFactor').set(pbr.roughnessFactor)
+      }
+      
+      
+    }
     
-    pass.glconfig.enableCullface( !this.doubleSided );
 
-    pass.occlusion.attachSampler
+    if ( this.emissiveTexture ) {
+      const sampler = pass.emissive.attachSampler('tEmissive', pass.getTexCoords(this.emissiveTexture.texCoord));
+      sampler.set(this.emissiveTexture.texture.glTexture);
+    }
+    
+    if( !_isAllZeros( this.emissiveFactor) ){
+      pass.emissiveFactor.attachUniform('uEmissFactor').set(...this.emissiveFactor);
+    }
+    
+    
+    const nrm = this.normalTexture;
+    if ( nrm ) {
+      const sampler = pass.normal.attachSampler('tNormal', pass.getTexCoords(nrm.texCoord));
+      sampler.set(nrm.texture.glTexture);
+      
+      if (nrm.scale !== 1) {
+        pass.normalScale.attachUniform('uNormalScale').set(nrm.scale)
+      }
+    }
+    
 
-    this.materialPass = pass;
+    const occlu = this.occlusionTexture;
+    if (occlu) {
+      const sampler = pass.occlusion.attachSampler('tOcclusion', pass.getTexCoords(occlu.texCoord));
+      sampler.set(occlu.texture.glTexture);
+
+      if (occlu.strength !== 1) {
+        pass.occlusionStrength.attachUniform('uOccluStrength').set(occlu.strength)
+      }
+    }
+
+    this._materialPass = pass;
+
   }
 
 }
+
 

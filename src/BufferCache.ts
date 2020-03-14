@@ -1,5 +1,6 @@
 import BufferView from "./elements/BufferView";
 import { GLContext } from "nanogl/types";
+import Assert from "./lib/assert";
 
 
 export const enum ArrayBufferType {
@@ -45,6 +46,8 @@ export default class BufferCache {
 
       this._buffers[uid] = glBuffer;
     }
+
+    // TODO: assert target match if existing buffer
 
     return glBuffer;
   } 

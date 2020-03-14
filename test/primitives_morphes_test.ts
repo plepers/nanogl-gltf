@@ -38,14 +38,14 @@ describe("Primitives Morph Targets", function () {
 
 
     it("mesh has targets", function () {
-      const m = gltf.getElement<Mesh>( GltfTypes.MESH, 0 );
+      const m = gltf.getElement( GltfTypes.MESH, 0 );
       const prim = m.primitives[0]; 
       expect( prim.targets ).to.be.ok()
     });
   
 
     it("mesh has 1 targets", function () {
-      const m = gltf.getElement<Mesh>( GltfTypes.MESH, 0 );
+      const m = gltf.getElement( GltfTypes.MESH, 0 );
       const prim = m.primitives[0]; 
       expect( prim.targets.length ).to.be(1)
     });
@@ -54,7 +54,7 @@ describe("Primitives Morph Targets", function () {
   
     it("primitive has position", function () {
       
-      const m = gltf.getElement<Mesh>( GltfTypes.MESH, 0 );
+      const m = gltf.getElement( GltfTypes.MESH, 0 );
       const prim = m.primitives[0]; 
       const morph = prim.targets[0];
       expect( morph.getSemantic( 'POSITION' ) ).to.be.ok()
@@ -64,11 +64,11 @@ describe("Primitives Morph Targets", function () {
 
     it("primitive position has correct accessor", function () {
       
-      const m = gltf.getElement<Mesh>( GltfTypes.MESH, 0 );
+      const m = gltf.getElement( GltfTypes.MESH, 0 );
       const prim = m.primitives[0]; 
       const morph = prim.targets[0];
       const pos = morph.getSemantic( 'POSITION' );
-      const accessor = gltf.getElement<Accessor>( GltfTypes.ACCESSOR, 4 );
+      const accessor = gltf.getElement( GltfTypes.ACCESSOR, 4 );
       expect( pos.accessor ).to.be(accessor)
     });
 
