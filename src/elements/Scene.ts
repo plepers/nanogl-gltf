@@ -1,20 +1,21 @@
 
-import BaseElement from './BaseElement';
 import Node        from './Node'       ;
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
+import { IElement } from '../types/Elements';
 
 
-export default class Scene extends BaseElement {
+export default class Scene implements IElement {
 
   readonly gltftype : GltfTypes.SCENE = GltfTypes.SCENE;
 
+  name        : undefined | string;
+  extras      : any   ;
+  
   nodes : Node[]
 
   async parse( gltfLoader:GltfLoader, data: Gltf2.IScene ){
-
-    super.parse( gltfLoader, data );
 
     if( data.nodes !== undefined ){
       const nodePromises = data.nodes.map( idx=>gltfLoader.getElement( GltfTypes.NODE, idx ) )

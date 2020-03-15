@@ -1,17 +1,17 @@
-import BaseElement from "./BaseElement";
 import GltfTypes from "../types/GltfTypes";
 import GltfLoader from "../io/GltfLoader";
 import Gltf2 from "../types/Gltf2";
 import { BaseAccessor, getArrayForDataType } from "./Accessor";
 import Assert from "../lib/assert";
+import { IElement } from "../types/Elements";
 
-export default class AccessorSparseIndices extends BaseAccessor {
+export default class AccessorSparseIndices extends BaseAccessor implements IElement {
 
   readonly gltftype : GltfTypes.ACCESSOR_SPARSE_INDICES = GltfTypes.ACCESSOR_SPARSE_INDICES;
+  name        : undefined | string;
+  extras      : any   ;
 
   async parse( gltfLoader : GltfLoader, data : Gltf2.IAccessorSparseIndices ) : Promise<any> {
-
-    super.parse( gltfLoader, data );
 
     const sparseData : Gltf2.IAccessorSparse = data.elementParent as Gltf2.IAccessorSparse;
       

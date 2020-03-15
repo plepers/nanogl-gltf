@@ -1,8 +1,6 @@
 
 
 
-import Gltf        from '../index'     ;
-import BaseElement from './BaseElement';
 import Sampler from './Sampler';
 import Image from './Image';
 import Gltf2 from '../types/Gltf2';
@@ -10,6 +8,7 @@ import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
 import { GLContext } from 'nanogl/types';
 import Texture2D from 'nanogl/texture-2d';
+import { IElement } from '../types/Elements';
 
 
 const GL_REPEAT                         = 0x2901;
@@ -27,18 +26,19 @@ export function isPowerOf2(n : number ) : boolean {
   return (n != 0 && (n & (n-1)) === 0);
 }
 
-export default class Texture extends BaseElement {
+export default class Texture implements IElement {
 
   readonly gltftype : GltfTypes.TEXTURE = GltfTypes.TEXTURE;
 
+  name        : undefined | string;
+  extras      : any   ;
+  
   sampler:Sampler
   source: Image;
 
   glTexture : Texture2D;
 
   async parse( gltfLoader:GltfLoader, data: Gltf2.ITexture ){
-
-    super.parse( gltfLoader, data );
 
     if( data.sampler !== undefined ){
       this.sampler = await gltfLoader.getElement( GltfTypes.SAMPLER, data.sampler );

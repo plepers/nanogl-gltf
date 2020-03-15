@@ -1,28 +1,26 @@
 
 
 
-import Gltf        from '../index'     ;
-import BaseElement from './BaseElement';
-import Accessor    from './Accessor'   ;
 import Node        from './Node'       ;
 import { mat4 } from 'gl-matrix';
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
+import { IElement } from '../types/Elements';
 
 
-export default class Skin extends BaseElement {
+export default class Skin implements IElement {
 
   readonly gltftype : GltfTypes.SKIN = GltfTypes.SKIN;
 
+  name        : undefined | string;
+  extras      : any   ;
+  
   inverseBindMatrices: mat4[];
   skeletonRoot : Node;
   joints       : Node[];
 
   async parse( gltfLoader:GltfLoader, data: Gltf2.ISkin ){
-
-    super.parse( gltfLoader, data );
-    
 
     const jointPromises = data.joints.map( idx=>gltfLoader.getElement( GltfTypes.NODE, idx ) )
     this.joints = await Promise.all( jointPromises );

@@ -1,19 +1,18 @@
 
-
-
-import Gltf        from '../index'     ;
-import TextureInfo from './TextureInfo';
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
-import BaseElement from './BaseElement';
 import Texture from './Texture';
+import { IElement } from '../types/Elements';
 
 
-export default class NormalTextureInfo extends BaseElement {
+export default class NormalTextureInfo implements IElement {
 
   readonly gltftype : GltfTypes.NORMAL_TEXTURE_INFO = GltfTypes.NORMAL_TEXTURE_INFO;
   
+  name        : undefined | string;
+  extras      : any   ;
+
   texture : Texture;
   texCoord: number;
   
@@ -21,8 +20,6 @@ export default class NormalTextureInfo extends BaseElement {
 
 
   async parse( gltfLoader:GltfLoader, data: Gltf2.IMaterialNormalTextureInfo ) : Promise<any>{
-    
-    super.parse( gltfLoader, data );
     
     this.texture = await gltfLoader.getElement( GltfTypes.TEXTURE, data.index );
     this.texCoord = data.texCoord ?? 0;

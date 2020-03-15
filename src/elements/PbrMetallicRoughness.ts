@@ -1,11 +1,8 @@
 
 
 
-import Gltf        from '../index'     ;
 import { vec4 } from 'gl-matrix';
 import TextureInfo from './TextureInfo';
-import BaseElement from './BaseElement';
-import Texture from './Texture';
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 
@@ -22,7 +19,6 @@ export default class PbrMetallicRoughness {
 
 
   async parse( gltfLoader:GltfLoader, data: Gltf2.IMaterialPbrMetallicRoughness ) : Promise<any>{
-
 
     this.baseColorFactor = <vec4> new Float32Array(data.baseColorFactor || [1,1,1,1]);
     

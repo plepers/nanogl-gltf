@@ -1,13 +1,8 @@
 
 
-
-import BaseElement from './BaseElement';
-
-
 import Accessor from './Accessor'
-import Material from './Material'
+import { IMaterial } from './Material'
 import { GLContext } from 'nanogl/types';
-import { ArrayBufferType } from '../BufferCache';
 import GLArrayBuffer from 'nanogl/arraybuffer';
 import Program from 'nanogl/program';
 import Vao from 'nanogl-vao';
@@ -15,6 +10,9 @@ import GLIndexBuffer from 'nanogl/indexbuffer';
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
+import BufferView from './BufferView';
+import Gltf from '..';
+import { IElement } from '../types/Elements';
 
 
 class Attribute {
@@ -80,10 +78,10 @@ class AttributesSet {
    */
   getBuffersViewSets() : BufferInfos[] {
 
-    const map : Map<string, BufferInfos> = new Map();
-
+    const map : Map<BufferView, BufferInfos> = new Map();
+    
     for (var a of this._attributes ) {
-      var bId = a.accessor.bufferView.uuid;
+      var bId = a.accessor.bufferView;
       if( !map.has( bId ) ){
         map.set( bId, new BufferInfos( a.accessor) );
       }
@@ -98,16 +96,21 @@ class AttributesSet {
 
 
 
+const ELEMENT_ARRAY_BUFFER = 0x8893 
+const ARRAY_BUFFER = 0x8892
 
 
-export default class Primitive extends BaseElement {
+export default class Primitive implements IElement {
 
   readonly gltftype : GltfTypes.PRIMITIVE = GltfTypes.PRIMITIVE;
+  
+  name        : undefined | string;
+  extras      : any   ;
   
   // gltf
   attributes : AttributesSet;
   mode       : Gltf2.MeshPrimitiveMode;
-  material   : Material = null;
+  material   : IMaterial = null;
   indices    : Accessor = null;
   targets    : AttributesSet[] = null;
   
@@ -121,9 +124,6 @@ export default class Primitive extends BaseElement {
 
   async parse( gltfLoader:GltfLoader, data:Gltf2.IMeshPrimitive ) : Promise<any> {
 
-    super.parse( gltfLoader, data );
-
-    
     this.attributes = new AttributesSet();
     await this.parseAttributeSet( gltfLoader, this.attributes, data.attributes );
 
@@ -177,7 +177,7 @@ export default class Primitive extends BaseElement {
     }
 
     if( this.indices !== null ){
-      const glBuffer = this.gltf.bufferCache.getBuffer( this.indices.bufferView, ArrayBufferType.ELEMENT_ARRAY_BUFFER )
+      const glBuffer = this.indices.bufferView.getWebGLBuffer( gl, ELEMENT_ARRAY_BUFFER )
       this.indexBuffer = new GLIndexBuffer( gl, this.indices.componentType, undefined, gl.STATIC_DRAW, glBuffer )
     }
 
@@ -187,7 +187,7 @@ export default class Primitive extends BaseElement {
   createArrayBuffer( gl: GLContext, set : BufferInfos ){
 
     const bufferView = set.accessor.bufferView
-    const glBuffer = this.gltf.bufferCache.getBuffer( bufferView, ArrayBufferType.ARRAY_BUFFER )
+    const glBuffer = bufferView.getWebGLBuffer( gl, ARRAY_BUFFER )
 
     const glArraybuffer = new GLArrayBuffer(gl, undefined, gl.STATIC_DRAW, glBuffer );
     glArraybuffer.byteLength = bufferView.byteLength;
@@ -207,7 +207,7 @@ export default class Primitive extends BaseElement {
   createAttributeDefinition( attribute : Attribute ){
     const accessor = attribute.accessor;
     return {
-      name      : this.gltf.semantics.getAttributeName(attribute.semantic),
+      name      : Gltf.getSemantics().getAttributeName(attribute.semantic),
       type      : accessor .componentType,
       size      : accessor .numComps     ,
       normalize : accessor .normalized   ,

@@ -2,30 +2,29 @@
 import { mat4 } from 'gl-matrix';
 
 
-import BaseElement from './BaseElement';
-
-import Gltf from '../index';
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
+import { IElement } from '../types/Elements';
 
 
 type ProjectionData = Gltf2.ICameraPerspective | Gltf2.ICameraOrthographic;
 
 
 
-export default class Camera extends BaseElement {
+export default class Camera implements IElement {
 
   
   readonly gltftype : GltfTypes.CAMERA = GltfTypes.CAMERA;
 
+  name        : undefined | string;
+  extras      : any   ;
+  
   type : Gltf2.CameraType;
   projectionData : ProjectionData;
   projection : mat4;
 
   parse( gltfLoader:GltfLoader, data: Gltf2.ICamera ) : Promise<any>{
-
-    super.parse( gltfLoader, data );
 
     this.projection = mat4.create();
 

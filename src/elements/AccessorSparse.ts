@@ -1,15 +1,18 @@
-import BaseElement from "./BaseElement";
 import Accessor from "./Accessor";
 import GltfLoader from "../io/GltfLoader";
 import Gltf2 from "../types/Gltf2";
 import GltfTypes from "../types/GltfTypes";
 import AccessorSparseIndices from "./AccessorSparseIndices";
 import AccessorSparseValues from "./AccessorSparseValues";
+import { IElement } from "../types/Elements";
+import { GLContext } from "nanogl/types";
 
-export default class AccessorSparse extends BaseElement {
+export default class AccessorSparse implements IElement {
 
 
   readonly gltftype : GltfTypes.ACCESSOR_SPARSE = GltfTypes.ACCESSOR_SPARSE;
+  name        : undefined | string;
+  extras      : any   ;
 
   accessor:Accessor;
   indices :AccessorSparseIndices;
@@ -20,8 +23,6 @@ export default class AccessorSparse extends BaseElement {
 
   
   async parse( gltfLoader : GltfLoader, data : Gltf2.IAccessorSparse, ...args : any ) : Promise<any> {
-
-    super.parse( gltfLoader, data );
 
     this.accessor = await gltfLoader.getElement( GltfTypes.ACCESSOR, data.elementParent.elementIndex );
 

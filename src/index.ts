@@ -9,7 +9,7 @@ import BufferView from './elements/BufferView';
 import Buffer from './elements/Buffer';
 import Animation from './elements/Animation';
 import Node from './elements/Node';
-import Material from './elements/Material';
+import { IMaterial } from './elements/Material';
 import Mesh from './elements/Mesh';
 import Skin from './elements/Skin';
 import Camera from './elements/Camera';
@@ -20,7 +20,7 @@ import { GLContext } from 'nanogl/types';
 import { ISemantics, DefaultSemantics } from './Semantics';
 import { IExtensionFactory } from './extensions/IExtension';
 import GltfTypes from './types/GltfTypes';
-import { AnyElement, ElementOfType } from './types/Elements';
+import { AnyElement, ElementOfType, IElement } from './types/Elements';
 import IRenderable from './renderer/IRenderable';
 import Assert from './lib/assert';
 
@@ -31,12 +31,22 @@ import Assert from './lib/assert';
 export default class Gltf {
 
 
-  static _extensionsRegistry: ExtensionsRegistry = new ExtensionsRegistry();
+  private static _extensionsRegistry: ExtensionsRegistry = new ExtensionsRegistry();
+  private static _semantics : ISemantics = new DefaultSemantics();
   
   static addExtension(ext: IExtensionFactory) {
     Gltf._extensionsRegistry.addExtension(ext);
   }
+
+  static getSemantics():ISemantics {
+    return this._semantics;
+  }
+
+  static getExtensionsRegistry(): ExtensionsRegistry {
+    return this._extensionsRegistry;
+  }
   
+
   
   
   _url: string
@@ -47,7 +57,6 @@ export default class Gltf {
   renderables: IRenderable[];
 
   bufferCache: BufferCache;
-  semantics: ISemantics;
 
 
   constructor( ) {
@@ -84,8 +93,6 @@ export default class Gltf {
 
     this._elements = []
 
-    this.semantics = new DefaultSemantics();
-
   }
 
 
@@ -95,8 +102,8 @@ export default class Gltf {
 
 
     const allocPromises: Promise<any>[] = []
-    for (const element of this._elements) {
-      const p = element.allocateGl(gl);
+    for (const element of <IElement[]>this._elements) {
+      const p = element.allocateGl?.(gl);
       p ?? allocPromises.push(p as Promise<any>);
     }
 
@@ -133,7 +140,7 @@ export default class Gltf {
     return this._getTypeHolder(GltfTypes.NODE);
   }
 
-  get materials(): Material[] {
+  get materials(): IMaterial[] {
     return this._getTypeHolder(GltfTypes.MATERIAL);
   }
 
@@ -156,10 +163,11 @@ export default class Gltf {
   }
 
 
-  addElement(element: AnyElement) {
-    const a: AnyElement[] = this._getTypeHolder(element.gltftype);
-    if( element.elementIndex>-1 )
-      a[element.elementIndex] = element;
+  addElement(element: AnyElement, index : number = -1 ) {
+    if( index>-1 ){
+      const a: AnyElement[] = this._getTypeHolder(element.gltftype);
+      a[index] = element;
+    }
     this._elements.push(element);
   }
 

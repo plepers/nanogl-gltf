@@ -1,27 +1,29 @@
 
 
-import BaseElement from './BaseElement';
 import AnimationChannel from './AnimationChannel';
 import AnimationSampler from './AnimationSampler';
 
 import Gltf2 from '../types/Gltf2'
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
+import { IElement } from '../types/Elements';
+import { GLContext } from 'nanogl/types';
 
 
 
 
-export default class Animation extends BaseElement {
+export default class Animation implements IElement {
 
   readonly gltftype : GltfTypes.ANIMATION = GltfTypes.ANIMATION;
+
+  name        : undefined | string;
+  extras      : any   ;
 
   samplers : AnimationSampler[];
   channels : AnimationChannel[]
 
-
+  
   async parse(gltfLoader:GltfLoader, data : Gltf2.IAnimation) : Promise<any> {
-
-    super.parse(gltfLoader, data);
 
     const samplerPromises = data.samplers.map( (data)=>gltfLoader._loadElement(data) );
     this.samplers = await Promise.all( samplerPromises );

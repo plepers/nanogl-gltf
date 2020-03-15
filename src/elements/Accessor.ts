@@ -1,13 +1,13 @@
 
-import BaseElement from './BaseElement';
 import Assert from '../lib/assert';
-import Gltf from '../index'
 import BufferView from './BufferView'
 import {TypedArrayConstructor, TypedArray} from '../consts'
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
 import AccessorSparse from './AccessorSparse';
+import { IElement } from '../types/Elements';
+import { GLContext } from 'nanogl/types';
 
 
 const enum ComponentType {
@@ -90,7 +90,7 @@ function getSizeForComponentType( t:VType )
 
 export type BaseAccessorData = Gltf2.IAccessor | Gltf2.IAccessorSparseIndices | Gltf2.IAccessorSparseValues;
 
-export class BaseAccessor extends BaseElement {
+export class BaseAccessor {
 
   normalized     : boolean      ;
   byteOffset     : number       ;
@@ -106,8 +106,6 @@ export class BaseAccessor extends BaseElement {
   _array         : TypedArray   ;
   _normalizeFunc : normalizeFunc;
   sparse         : AccessorSparse|null  ;
-
-
 
 
   get numComps(){
@@ -220,13 +218,13 @@ export class BaseAccessor extends BaseElement {
 
 
 
-export default class Accessor extends BaseAccessor {
+export default class Accessor extends BaseAccessor implements IElement {
 
   readonly gltftype : GltfTypes.ACCESSOR = GltfTypes.ACCESSOR;
+  name        : undefined | string;
+  extras      : any   ;
 
   async parse( gltfLoader:GltfLoader, data:Gltf2.IAccessor ) : Promise<any>{
-
-    super.parse( gltfLoader, data );
 
       
     const { 

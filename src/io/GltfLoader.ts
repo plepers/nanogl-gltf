@@ -5,14 +5,12 @@ import IOInterface from "./IOInterface";
 import { MAGIC, GLB_HEADER_SIZE, JSON_MAGIC } from "../consts";
 import { ExtensionList } from "../extensions/Registry";
 import Gltf2 from "../types/Gltf2";
-import { ElementOfType, PropertyType, AnyElement, PropertyOfType } from "../types/Elements";
+import { ElementOfType, PropertyType, AnyElement } from "../types/Elements";
 import GltfTypes from "../types/GltfTypes";
-import BaseElement from "../elements/BaseElement";
-import Assert from "../lib/assert";
 
 import "../extensions/DefaultExtension"
 import { GltfLoaderOptions } from "./GltfLoaderOptions";
-import Material from "../elements/Material";
+import { IMaterial } from "../elements/Material";
 
 
 let UID = 0;
@@ -29,6 +27,22 @@ const defaultMaterialData : Gltf2.IMaterial = {
   uuid : '_default_mat_',
   name : 'default',
 }
+
+
+class PendingElement {
+
+  readonly data : Gltf2.IProperty;
+  readonly promise : Promise<AnyElement>
+
+  constructor( data: Gltf2.IProperty, element: Promise<AnyElement> ){
+    this.data = data;
+    this.promise = element;
+  }
+
+  
+
+}
+
 
 export default class GltfLoader {
 
@@ -47,7 +61,7 @@ export default class GltfLoader {
   _extensions: ExtensionList;
 
   _elements: Map<string, Promise<AnyElement>> = new Map();
-  _pendingElements : Promise<AnyElement>[] = []
+  _pendingElements : PendingElement[] = []
   _byType  : Map<GltfTypes, Promise<AnyElement>[]> = new Map();
   _propertyMaps  : Map<GltfTypes, Gltf2.Property[]> = new Map();
 
@@ -65,7 +79,7 @@ export default class GltfLoader {
     this._data = null;
 
     this._extensions = new ExtensionList();
-    Gltf._extensionsRegistry.setupExtensions( this, options.extensions );
+    Gltf.getExtensionsRegistry().setupExtensions( this, options.extensions );
 
   }
 
@@ -112,32 +126,9 @@ export default class GltfLoader {
     this.prepareGltfDatas(this._data);
 
 
-    // const mbuffer = new Buffer()
-    // const bufferData : Gltf2.IBuffer = {
-    //   byteLength: bbytes.byteLength,
-    //   gltftype: GltfTypes.BUFFER,
-    //   uuid: getUUID()
-    // }
-    // mbuffer.parse(this, bufferData );
-    // mbuffer._bytes = bbytes;
-    // this._elements.set(bufferData.uuid, Promise.resolve(mbuffer));
-    // this.gltf.addElement(mbuffer)
-
   }
 
 
-
-  // loadBuffers = () => {
-  //   const buffers: Buffer[] = this.gltf._getTypeHolder(GltfTypes.BUFFER);
-  //   for (var i = buffers.length; i < this._data.buffers.length; i++) {
-  //     var buffer = new Buffer();
-  //     buffer.parse(this, this._data.buffers[i]);
-  //     this.gltf.addElement(buffer);
-  //   }
-
-  //   return Promise.all(buffers.map(b => this.loadBuffer(b)));
-
-  // }
 
   resolveUri( uri : string ) : string {
     return this.gltfIO.resolvePath(uri, this._baseUrl);
@@ -145,13 +136,11 @@ export default class GltfLoader {
 
   // loadBuffer = (b: Buffer) => {
   loadBufferUri = (uri? : string):Promise<ArrayBuffer> =>  {
-
     if (uri === undefined)
       return Promise.resolve(this._glbData);
 
-    const resolvedUri = this.gltfIO.resolvePath(uri, this._baseUrl);
+      const resolvedUri = this.gltfIO.resolvePath(uri, this._baseUrl);
     return this.gltfIO.loadBinaryResource(resolvedUri)
-
   }
 
 
@@ -176,14 +165,15 @@ export default class GltfLoader {
     let res = this._elements.get(data.uuid) as Promise<ElementOfType<PropertyType<P>>>;
     if (res === undefined) {
       res = this._createElement(data);
-      this._pendingElements.push( res );
+      const pe = new PendingElement( data, res );
+      this._pendingElements.push( pe );
       this._elements.set(data.uuid, res);
     }
     return res;
   }
 
 
-  loadDefaultMaterial() : Promise<Material>{
+  loadDefaultMaterial() : Promise<IMaterial>{
     return this._loadElement(defaultMaterialData);
   }
 
@@ -211,7 +201,6 @@ export default class GltfLoader {
 
   parseAll = async () => {
 
-    const gltf = this.gltf;
 
     // verify that required extensions are available
     //, this._data.extensionsUsed, this._data.extensionsRequired
@@ -240,14 +229,23 @@ export default class GltfLoader {
 
   }
 
-
+  /**
+   * wait for all pending elements creation to complete
+   * and register them in Gltf object
+   */
   async resolveElements() {
 
     while( this._pendingElements.length > 0 ){
 
-      const allPromises = this._pendingElements.splice( 0, this._pendingElements.length )
-      const allElements = await Promise.all( allPromises );
-      this.gltf.addElements( allElements )
+      const pelements = this._pendingElements.splice( 0, this._pendingElements.length )
+      const elements = await Promise.all( pelements.map( (pe)=>pe.promise ) );
+      for (let i = 0; i < pelements.length; i++) {
+        const element = elements[i];
+        const data    = pelements[i].data;
+        element.name = (data as any).name;
+        element.extras = data.extras;
+        this.gltf.addElement( elements[i], pelements[i].data.elementIndex );
+      }
     }
 
   }

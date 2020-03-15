@@ -1,18 +1,11 @@
 
-
-
-import BaseElement from './BaseElement';
-
 import { quat } from 'gl-matrix';
-
-
-import Gltf from '../index'
 import Accessor from './Accessor'
-import Animation from './Animation'
 import {TypedArray} from '../consts'
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
+import { IElement } from '../types/Elements';
 
 type LerpFunc = (out:TypedArray, a:TypedArray, b:TypedArray, p:number )=>void;
 
@@ -303,9 +296,12 @@ function InterpolatorFactory(sampler:AnimationSampler) : Interpolator {
 
 
 
-export default class AnimationSampler extends BaseElement {
+export default class AnimationSampler implements IElement {
 
   readonly gltftype : GltfTypes.ANIMATION_SAMPLER = GltfTypes.ANIMATION_SAMPLER
+
+  name        : undefined | string;
+  extras      : any   ;
 
 
   interpolation :Gltf2.AnimationSamplerInterpolation ;
@@ -315,8 +311,6 @@ export default class AnimationSampler extends BaseElement {
 
 
   async parse( gltfLoader:GltfLoader, data:Gltf2.IAnimationSampler ) : Promise<any> {
-    super.parse( gltfLoader, data );
-
 
     this.input  = await gltfLoader.getElement( GltfTypes.ACCESSOR, data.input );
     this.output = await gltfLoader.getElement( GltfTypes.ACCESSOR, data.output );

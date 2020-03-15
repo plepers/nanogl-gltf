@@ -1,6 +1,5 @@
 import BufferView from "./elements/BufferView";
 import { GLContext } from "nanogl/types";
-import Assert from "./lib/assert";
 
 
 export const enum ArrayBufferType {
@@ -12,13 +11,13 @@ export default class BufferCache {
 
   readonly gl: GLContext;
 
-  private _buffers : Record<number, WebGLBuffer> 
+  private _buffers : Map<BufferView, WebGLBuffer> 
   // private _ibuffers : Record<number, WebGLBuffer> 
 
   constructor( gl : GLContext ){
     this.gl = gl;
 
-    this._buffers = {};
+    this._buffers = new Map();
     // this._abuffers = {};
   }
 
@@ -27,8 +26,7 @@ export default class BufferCache {
     
     // const dict = (target == ArrayBufferType.ARRAY_BUFFER) ? this._abuffers : this._ibuffers;
     
-    const uid = bufferView.uuid;
-    let glBuffer= this._buffers[uid];
+    let glBuffer = this._buffers.get( bufferView );
 
     if( glBuffer === undefined ){
 
@@ -44,7 +42,7 @@ export default class BufferCache {
       gl.bufferData(target, data, gl.STATIC_DRAW );
       gl.bindBuffer(target, null);
 
-      this._buffers[uid] = glBuffer;
+      this._buffers.set( bufferView, glBuffer );
     }
 
     // TODO: assert target match if existing buffer

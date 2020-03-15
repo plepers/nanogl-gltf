@@ -1,19 +1,21 @@
 
 
 
-import BaseElement from './BaseElement';
 import BufferView from './BufferView';
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
+import { IElement } from '../types/Elements';
 
 
 const _HAS_CIB : boolean = ( window.createImageBitmap !== undefined );
 
-export default class Image extends BaseElement {
+export default class Image implements IElement {
 
   readonly gltftype : GltfTypes.IMAGE = GltfTypes.IMAGE;
 
+  name        : undefined | string;
+  extras      : any   ;
 
   uri?         : string;
   resolvedUri? : string;
@@ -23,8 +25,6 @@ export default class Image extends BaseElement {
   texImageSource : TexImageSource;
 
   async parse( gltfLoader:GltfLoader, data: Gltf2.IImage ) : Promise<any>{
-
-    super.parse( gltfLoader, data );
 
     if( data.uri ){
       this.uri = data.uri;

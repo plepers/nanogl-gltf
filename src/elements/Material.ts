@@ -1,10 +1,6 @@
 
 
 import { vec3 } from 'gl-matrix';
-import GLConfig from 'nanogl-state/config';
-
-import Gltf from '../index';
-import BaseElement from './BaseElement';
 import PbrMetallicRoughness from './PbrMetallicRoughness';
 import NormalTextureInfo from './NormalTextureInfo';
 import OcclusionTextureInfo from './OcclusionTextureInfo';
@@ -20,6 +16,7 @@ import { Sampler } from 'nanogl-pbr/Input';
 import BaseMaterial from 'nanogl-pbr/BaseMaterial';
 import Primitive from './Primitive';
 import Node from './Node';
+import { IElement } from '../types/Elements';
 
 
 function _isAllOnes( a : ArrayLike<number> ) : boolean {
@@ -40,9 +37,22 @@ function _isAllZeros( a : ArrayLike<number> ) : boolean {
 const SRC_ALPHA             = 0x0302;
 const ONE_MINUS_SRC_ALPHA   = 0x0303;
 
-export default class Material extends BaseElement {
 
-  readonly gltftype: GltfTypes.MATERIAL = GltfTypes.MATERIAL;
+
+export interface IMaterial extends IElement {
+  readonly gltftype: GltfTypes.MATERIAL;
+  name : string|undefined;
+  materialPass : MaterialPass;
+  createMaterialForPrimitive( gl : GLContext, node : Node, primitive : Primitive ) : BaseMaterial;
+}
+
+
+export default class Material implements IElement, IMaterial {
+
+  readonly gltftype = GltfTypes.MATERIAL;
+  
+  name        : undefined | string;
+  extras      : any   ;
 
   pbrMetallicRoughness?: PbrMetallicRoughness;
   normalTexture?: NormalTextureInfo;
@@ -52,6 +62,9 @@ export default class Material extends BaseElement {
   alphaMode: Gltf2.MaterialAlphaMode;
   alphaCutoff: number;
   doubleSided: boolean;
+
+
+
   
   protected _materialPass   : MaterialPass
 
@@ -82,8 +95,6 @@ export default class Material extends BaseElement {
 
 
   async parse(gltfLoader: GltfLoader, data: Gltf2.IMaterial): Promise<any> {
-
-    super.parse(gltfLoader, data);
 
     this.emissiveFactor = <vec3>new Float32Array(data.emissiveFactor || [0, 0, 0]);
 

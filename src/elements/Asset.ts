@@ -1,15 +1,16 @@
 
-
-import Gltf        from '../index'     ;
-import BaseElement from './BaseElement';
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
+import { IElement } from '../types/Elements';
 
 
-export default class Asset extends BaseElement {
+export default class Asset implements IElement {
 
   readonly gltftype : GltfTypes.ASSET = GltfTypes.ASSET;
+
+  name        : undefined | string;
+  extras      : any   ;
 
   version    : string;
   copyright? : string;
@@ -17,8 +18,6 @@ export default class Asset extends BaseElement {
   minVersion?: string;
 
   parse( gltfLoader:GltfLoader, data: Gltf2.IAsset ) : Promise<any> {
-
-    super.parse( gltfLoader, data );
 
     this.version    = data.version;
     this.copyright  = data.copyright;

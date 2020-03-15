@@ -1,17 +1,12 @@
 
-
-
-import BaseElement from './BaseElement';
-
-
-import Gltf from '../index'
-import Animation from './Animation'
 import AnimationSampler from './AnimationSampler'
 import Node from './Node'
 import {TypedArray} from '../consts'
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
+import { IElement } from '../types/Elements';
+import { GLContext } from 'nanogl/types';
 
 type applyFunc = (node:Node, value:TypedArray)=>void
 
@@ -63,9 +58,12 @@ function getApplyFunctionFromPath(path:PathType):applyFunc {
 }
 
 
-export default class AnimationChannel extends BaseElement {
+export default class AnimationChannel implements IElement {
 
   readonly gltftype : GltfTypes.ANIMATION_CHANNEL = GltfTypes.ANIMATION_CHANNEL
+
+  name        : undefined | string;
+  extras      : any   ;
 
   _active       : boolean         ;
   sampler       : AnimationSampler;
@@ -76,8 +74,6 @@ export default class AnimationChannel extends BaseElement {
 
 
   async parse(gltfLoader:GltfLoader, data:Gltf2.IAnimationChannel) : Promise<any> {
-
-    super.parse(gltfLoader, data);
 
     this._active = false;
 

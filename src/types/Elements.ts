@@ -3,7 +3,7 @@ import Asset                from "../elements/Asset";
 import Buffer               from "../elements/Buffer"               ;
 import BufferView           from "../elements/BufferView"           ;
 import Camera               from "../elements/Camera"               ;
-import Material             from "../elements/Material"             ;
+import { IMaterial }             from "../elements/Material"             ;
 import Mesh                 from "../elements/Mesh"                 ;
 import Primitive            from "../elements/Primitive"            ;
 import Skin                 from "../elements/Skin"                 ;
@@ -12,7 +12,6 @@ import AnimationChannel     from "../elements/AnimationChannel"     ;
 import AnimationSampler     from "../elements/AnimationSampler"     ;
 import NormalTextureInfo    from "../elements/NormalTextureInfo"    ;
 import OcclusionTextureInfo from "../elements/OcclusionTextureInfo" ;
-import PbrMetallicRoughness from "../elements/PbrMetallicRoughness" ;
 import Sampler              from "../elements/Sampler"              ;
 import Scene                from "../elements/Scene"                ;
 import Texture              from "../elements/Texture"              ;
@@ -25,6 +24,30 @@ import GltfTypes from "./GltfTypes";
 import AccessorSparse from "../elements/AccessorSparse";
 import AccessorSparseIndices from "../elements/AccessorSparseIndices";
 import AccessorSparseValues from "../elements/AccessorSparseValues";
+import GltfLoader from "../io/GltfLoader";
+import { GLContext } from "nanogl/types";
+
+
+
+export interface IElement {
+  
+  readonly gltftype : GltfTypes;
+  // uuid         : string;
+  // elementIndex : number;
+  
+  name        : undefined | string;
+  extras      : any   ;
+  // extensions? : Record<string,any>;
+  
+  parse( gltfLoader : GltfLoader, data : Gltf2.IProperty ) : Promise<any>;
+  
+  allocateGl?( gl : GLContext ) : void | Promise<any>;
+  
+}
+
+
+
+
 
 
 export type AnyElement = 
@@ -40,7 +63,7 @@ export type AnyElement =
   BufferView            |
   Camera                |
   Image                 |
-  Material              |
+  IMaterial             |
   Mesh                  |
   Node                  |
   NormalTextureInfo     |

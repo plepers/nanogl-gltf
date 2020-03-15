@@ -1,30 +1,34 @@
 
 
-import BaseElement from './BaseElement';
-
-
-import  Gltf         from '../index'
 import  Buffer       from './Buffer'
-import GLArrayBuffer from 'nanogl/arraybuffer';
-import GLIndexBuffer from 'nanogl/indexbuffer';
 import { GLContext } from 'nanogl/types';
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
+import { IElement } from '../types/Elements';
 
-export default class BufferView extends BaseElement {
+
+type ELEMENT_ARRAY_BUFFER = 0x8893 
+type ARRAY_BUFFER = 0x8892
+type ArrayBufferTarget = ELEMENT_ARRAY_BUFFER | ARRAY_BUFFER
+
+export default class BufferView implements IElement {
 
   readonly gltftype : GltfTypes.BUFFERVIEW = GltfTypes.BUFFERVIEW;
 
+  name        : undefined | string;
+  extras      : any   ;
+  
   byteOffset : number = 0;
   byteLength : number = 0;
   byteStride : number = 0;
   target     : number = 0;
   buffer     : Buffer;
 
-  async parse( gltfLoader:GltfLoader , data:Gltf2.IBufferView ) : Promise<any> {
+  private glBuffer   : WebGLBuffer = null;
+  private glBufferTarget : number = 0;
 
-    super.parse( gltfLoader, data );
+  async parse( gltfLoader:GltfLoader , data:Gltf2.IBufferView ) : Promise<any> {
 
     const {
       byteLength,
@@ -48,8 +52,35 @@ export default class BufferView extends BaseElement {
   }
 
 
-  allocateGl( gl: GLContext ){
+  getWebGLBuffer( gl:GLContext, inferedTarget : ArrayBufferTarget ) : WebGLBuffer {
 
+    if( this.target !== 0 && this.target !== inferedTarget ){
+      throw new Error(`BufferView's target ${this.target} doesn't match infered one ${inferedTarget}` );
+    }
+    
+    if( this.glBuffer !== null ){
+      if( this.glBufferTarget !== inferedTarget ){
+        // Is this really an error?
+        throw new Error(`WebglBuffers with different target requested on BufferView` );
+      }
+    } else {
+
+      const data = new Uint8Array( 
+        this.buffer._bytes, 
+        this.getByteOffset(), 
+        this.byteLength 
+      );
+        
+      this.glBufferTarget = inferedTarget;
+      this.glBuffer = gl.createBuffer();
+
+      gl.bindBuffer(inferedTarget, this.glBuffer);
+      gl.bufferData(inferedTarget, data, gl.STATIC_DRAW );
+      gl.bindBuffer(inferedTarget, null);
+
+    }
+
+    return this.glBuffer;
   }
 
  

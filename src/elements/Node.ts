@@ -1,11 +1,5 @@
 
-
-
-import BaseElement, { ElementMixin } from './BaseElement';
 import NGLNode from 'nanogl-node'
-
-
-import  Gltf   from '../index';
 import  Skin   from './Skin'  ;
 import  Camera from './Camera';
 import  Mesh   from './Mesh'  ;
@@ -16,13 +10,17 @@ import GltfTypes from '../types/GltfTypes';
 import MeshRenderer from '../renderer/MeshRenderer';
 import IRenderable from '../renderer/IRenderable';
 import { GLContext } from 'nanogl/types';
+import { IElement } from '../types/Elements';
 
 
 
-export default class Node extends ElementMixin( NGLNode ) {
+export default class Node extends NGLNode implements IElement {
 
 
   readonly gltftype : GltfTypes.NODE = GltfTypes.NODE;
+
+  name        : undefined | string;
+  extras      : any   ;
 
   camera?     : Camera;
   skin?       : Skin;
@@ -33,12 +31,12 @@ export default class Node extends ElementMixin( NGLNode ) {
 
   async parse( gltfLoader:GltfLoader, data: Gltf2.INode ){
     // super.parse();
-    this.uuid         = data.uuid;
-    this.elementIndex = data.elementIndex;
-    this.gltf         = gltfLoader.gltf;
+    // this.uuid         = data.uuid;
+    // this.elementIndex = data.elementIndex;
+    // this.gltf         = gltfLoader.gltf;
     this.name         = data.name      
     this.extras       = data.extras    
-    this.extensions   = data.extensions
+    // this.extensions   = data.extensions
 
     if( data.camera !== undefined )
       this.camera = await gltfLoader.getElement( GltfTypes.CAMERA, data.camera );
