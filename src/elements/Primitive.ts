@@ -179,6 +179,8 @@ export default class Primitive implements IElement {
     if( this.indices !== null ){
       const glBuffer = this.indices.bufferView.getWebGLBuffer( gl, ELEMENT_ARRAY_BUFFER )
       this.indexBuffer = new GLIndexBuffer( gl, this.indices.componentType, undefined, gl.STATIC_DRAW, glBuffer )
+      this.indexBuffer.byteLength = this.indices.bufferView.byteLength;
+      
     }
 
   }
@@ -238,7 +240,7 @@ export default class Primitive implements IElement {
 
   render(){
     if( this.indexBuffer )
-      this.indexBuffer.draw( this.mode );
+      this.indexBuffer.draw( this.mode, this.indices.count, this.indices.byteOffset / this.indices.bytesPerElem );
     else 
       this.buffers[0].draw( this.mode );    
   }

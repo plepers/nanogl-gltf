@@ -3,13 +3,29 @@ import GltfLoader from "../io/GltfLoader";
 import Gltf2 from "../types/Gltf2";
 import { ElementOfType, PropertyType, AnyElement } from "../types/Elements";
 import GltfTypes from "../types/GltfTypes";
-import MaterialPass from "nanogl-pbr/MaterialPass";
-import Material from "../elements/Material";
+import { IMaterial } from "../elements/Material";
 import BaseMaterial from "nanogl-pbr/BaseMaterial";
+import { GLContext } from "nanogl/types";
+import Primitive from "../elements/Primitive";
+import Node from "../elements/Node";
 
 
 
-class OverrideMaterial extends Material {
+class OverrideMaterial implements IMaterial {
+
+  readonly gltftype: GltfTypes.MATERIAL = GltfTypes.MATERIAL;
+
+  name: string | undefined;
+  extras: any;
+
+  createMaterialForPrimitive(gl: GLContext, node: Node, primitive: Primitive ): BaseMaterial {
+    return this._material;  
+  }
+
+
+  parse(gltfLoader: GltfLoader, data: Gltf2.IProperty): Promise<any> {
+    return null;
+  }
 
   _material: BaseMaterial;
 
@@ -17,7 +33,6 @@ class OverrideMaterial extends Material {
     this._material = m;
   }
   
-  setupMaterialPass(): void {}
 }
 
 
@@ -47,7 +62,7 @@ class MaterialOverride implements IExtensionInstance {
   }
 
 
-  createMaterial(data: Gltf2.IMaterial): Promise<Material> {
+  createMaterial(data: Gltf2.IMaterial): Promise<IMaterial> {
     const material = this.materials[data.name];
     if( material !== undefined ){
       const el = new OverrideMaterial();

@@ -4,22 +4,25 @@
 const glob       = require( 'glob' );
 const replaceExt = require( 'replace-ext' );
 const fs         = require( 'fs' );
+const path       = require( 'path' );
+const mkdirp     = require( 'mkdirp' );
 const compiler   = require( 'nanogl-template/lib/compiler' );
 
 const globPattern = 'src/glsl/**/*.+(vert|frag|glsl)';
 
 
-function compile( path ){
+function compile( glslpath ){
   // console.log( path )
-  var jsPath = path+'.js';//replaceExt( path, '.js' );
-  jsPath = jsPath.replace( 'src/', 'dist/' );
+  var jsPath = glslpath+'.js';//replaceExt( path, '.js' );
+  jsPath = jsPath.replace( 'src/', 'lib/' );
 
-  var src = fs.readFile( path, {encoding:'utf-8'}, function(e, data){
+  var src = fs.readFile( glslpath, {encoding:'utf-8'}, function(e, data){
     if( e ){ return };
     var js = compiler( data, {module:'esm'} );
+    mkdirp.sync( path.dirname( jsPath ) );
     fs.writeFile( jsPath, js, {encoding:'utf-8'}, function( e ){
       //done
-      //  console.log( e, jsPath )
+      console.log( e, jsPath )
     })
   });
 }

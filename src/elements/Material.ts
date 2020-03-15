@@ -40,14 +40,16 @@ const ONE_MINUS_SRC_ALPHA   = 0x0303;
 
 
 export interface IMaterial extends IElement {
+
   readonly gltftype: GltfTypes.MATERIAL;
+  
   name : string|undefined;
-  materialPass : MaterialPass;
+  
   createMaterialForPrimitive( gl : GLContext, node : Node, primitive : Primitive ) : BaseMaterial;
 }
 
 
-export default class Material implements IElement, IMaterial {
+export default class Material implements IMaterial {
 
   readonly gltftype = GltfTypes.MATERIAL;
   
@@ -74,9 +76,8 @@ export default class Material implements IElement, IMaterial {
 
   createMaterialForPrimitive( gl : GLContext, node : Node, primitive : Primitive ) : BaseMaterial {
 
-    const pass = primitive.material.materialPass;
     const material = new BaseMaterial( gl, this._materialPass.name );
-    material.addPass( pass, 'color' )
+    material.addPass( this._materialPass, 'color' )
 
     if( node.skin ){
       // add skin deformer

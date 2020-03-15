@@ -11,6 +11,7 @@ import GltfTypes from "../types/GltfTypes";
 import "../extensions/DefaultExtension"
 import { GltfLoaderOptions } from "./GltfLoaderOptions";
 import { IMaterial } from "../elements/Material";
+import Assert from "../lib/assert";
 
 
 let UID = 0;
@@ -242,6 +243,7 @@ export default class GltfLoader {
       for (let i = 0; i < pelements.length; i++) {
         const element = elements[i];
         const data    = pelements[i].data;
+        Assert.isDefined( element.gltftype );
         element.name = (data as any).name;
         element.extras = data.extras;
         this.gltf.addElement( elements[i], pelements[i].data.elementIndex );

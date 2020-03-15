@@ -38,21 +38,8 @@ export default class MeshRenderer implements IRenderable {
   setupMaterials(gl : GLContext) {
     
     for (const primitive of this.mesh.primitives ) {
-
-      const pass = primitive.material.materialPass;
-      const material = new BaseMaterial( gl, pass.name );
-      material.addPass( pass, 'color' )
-
-      if( this.node.skin ){
-        //material.setSkin ...
-      }
-
-      if( this.node.weights ){
-        primitive.targets[0]
-      }
-
+      const material = primitive.material.createMaterialForPrimitive( gl, this.node, primitive );
       this.materials.push( material );
-
     }
 
   }
@@ -82,19 +69,22 @@ export default class MeshRenderer implements IRenderable {
       // push configs
       // -------------
 
+
+      glstate.push( passInstance.pass.glconfig );
       mat.glconfig  && glstate.push(mat.glconfig);
       this.glconfig && glstate.push(this.glconfig);
       glconfig      && glstate.push(glconfig);
-
+      
       glstate.apply()
-
+      
       // render
       // ----------
       this.drawCall(camera, passInstance.getProgram(), primitive);
-
+      
       // pop configs
       // -------------
-
+      
+      glstate.pop();
       mat.glconfig  && glstate.pop();
       this.glconfig && glstate.pop();
       glconfig      && glstate.pop();

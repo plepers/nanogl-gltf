@@ -4,26 +4,38 @@ import WebGltfIO from '../src/io/web';
 import StandardPass from '../src/glsl/StandardPass';
 import MaterialOverrideExtension from '../src/extensions/MaterialOverrideExtension';
 import GltfTypes from '../src/types/GltfTypes';
-
+import BaseMaterial from 'nanogl-pbr/BaseMaterial';
+import { GLContext } from 'nanogl/types';
+import {createContext, destroyContext} from './glcontext-utils'
+import MeshRenderer from '../src/renderer/MeshRenderer';
+import Material from '../src/elements/Material';
 
 describe("MaterialOverrideExtension", function () {
 
   let gltf : Gltf;//= new Gltf();
-  let pass : StandardPass;
-
+  let material : BaseMaterial;
+  let gl : GLContext;
 
   before(function () {
 
-    pass = new StandardPass();
+    gl = createContext();
+    material = new BaseMaterial(gl);
     const overrides = new MaterialOverrideExtension()
     overrides.overrides = {
-      'TextureClampMaterialT' : pass
+      'TextureClampMaterialT' : material
     }
 
     return WebGltfIO.loadGltf( 'samples/models/2.0/TextureSettingsTest/glTF/TextureSettingsTest.gltf', {
       extensions : [overrides]
-    } ).then( (res)=>gltf=res )
+    } ).then( (res)=>{
+      gltf=res;
+      return res.allocateGl(gl)
+     } )
   });
+
+  after( function(){
+    destroyContext( gl );
+  })
   
 
 
@@ -34,8 +46,11 @@ describe("MaterialOverrideExtension", function () {
 
   it("should override", function () {
     
-    let mat = gltf.getElementByName( GltfTypes.MATERIAL, 'TextureClampMaterialT' )
-    expect( mat.materialPass === pass ).to.be.equal(true);
+    let node = gltf.getElement( GltfTypes.NODE, 4 );
+    expect(node.renderable).to.be.ok()
+    var renderable = node.renderable as MeshRenderer
+    expect( renderable.materials.length ).to.be.equal(1)
+    expect( renderable.materials[0] === material ).to.be.equal(true);
 
   });
 
@@ -46,9 +61,8 @@ describe("MaterialOverrideExtension", function () {
   });
 
   it("should let other passes ok", function () {
-    let mat = gltf.getElementByName( GltfTypes.MATERIAL, 'BackgroundMaterial' )
+    let mat : Material = gltf.getElementByName( GltfTypes.MATERIAL, 'BackgroundMaterial' ) as Material
     expect( mat.materialPass ).to.be.ok()
-    expect( mat.materialPass ).not.to.be.equal(pass);
   });
 
 
