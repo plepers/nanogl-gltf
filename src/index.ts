@@ -4,18 +4,16 @@
 
 import ExtensionsRegistry from './extensions/Registry';
 
-import Accessor from './elements/Accessor';
-import BufferView from './elements/BufferView';
-import Buffer from './elements/Buffer';
-import Animation from './elements/Animation';
-import Node from './elements/Node';
-import { IMaterial } from './elements/Material';
-import Mesh from './elements/Mesh';
-import Skin from './elements/Skin';
-import Camera from './elements/Camera';
-import Asset from './elements/Asset';
+import type Accessor from './elements/Accessor';
+import type BufferView from './elements/BufferView';
+import type Buffer from './elements/Buffer';
+import type Animation from './elements/Animation';
+import type Node from './elements/Node';
+import type { IMaterial } from './elements/Material';
+import type Mesh from './elements/Mesh';
+import type Skin from './elements/Skin';
+import type Camera from './elements/Camera';
 
-import BufferCache from './BufferCache';
 import { GLContext } from 'nanogl/types';
 import { ISemantics, DefaultSemantics } from './Semantics';
 import { IExtensionFactory } from './extensions/IExtension';
@@ -49,19 +47,13 @@ export default class Gltf {
 
   
   
-  _url: string
-  _baseDir: string
-  
   private _elements: AnyElement[];
   private _byType: Map<GltfTypes, AnyElement[]>;
   renderables: IRenderable[];
 
-  bufferCache: BufferCache;
 
 
   constructor( ) {
-    this._url = null;
-
 
     this._byType = new Map<GltfTypes, AnyElement[]>([
 
@@ -98,9 +90,6 @@ export default class Gltf {
 
   async allocateGl(gl: GLContext): Promise<any> {
 
-    this.bufferCache = new BufferCache(gl);
-
-
     const allocPromises: Promise<any>[] = []
     for (const element of <IElement[]>this._elements) {
       const p = element.allocateGl?.(gl);
@@ -110,8 +99,8 @@ export default class Gltf {
     await Promise.all(allocPromises);
 
     this.renderables = this.nodes
-      .filter( n=>n.renderable!==undefined )
-      .map( n=>n.renderable );
+    .map( n=>n.renderable )
+    .filter( n=>n!==undefined )
 
   }
 
@@ -152,17 +141,32 @@ export default class Gltf {
     return this._getTypeHolder(GltfTypes.SKIN);
   }
 
-
-  _getTypeHolder<T extends GltfTypes>(type: T): ElementOfType<T>[] {
-    return this._byType.get(type) as ElementOfType<T>[];
-  }
-
-
+  
+  
+  
   getAllElements(): AnyElement[] {
     return this._elements;
   }
+  
+  
+  getElement<T extends GltfTypes>(type: T, index: number): ElementOfType<T> {
+    return this._getTypeHolder(type)[index];
+  }
+  
+  
+  getElementByName<T extends GltfTypes>(type: T, name: string): ElementOfType<T> {
+    const list = this._getTypeHolder(type);
+    for (var el of list) {
+      if (el.name === name) return el;
+    }
+    return null;
+  }
 
-
+  
+  private _getTypeHolder<T extends GltfTypes>(type: T): ElementOfType<T>[] {
+    return this._byType.get(type) as ElementOfType<T>[];
+  }
+  
   addElement(element: AnyElement, index : number = -1 ) {
     if( index>-1 ){
       const a: AnyElement[] = this._getTypeHolder(element.gltftype);
@@ -178,20 +182,6 @@ export default class Gltf {
       this.addElement(e);
     }
   }
-
-  getElement<T extends GltfTypes>(type: T, index: number): ElementOfType<T> {
-    return this._getTypeHolder(type)[index];
-  }
-
-
-  getElementByName<T extends GltfTypes>(type: T, name: string): ElementOfType<T> {
-    const list = this._getTypeHolder(type);
-    for (var el of list) {
-      if (el.name === name) return el;
-    }
-    return null;
-  }
-
 
 
 }

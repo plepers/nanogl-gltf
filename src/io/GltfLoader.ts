@@ -2,7 +2,6 @@
 import Gltf from "..";
 
 import IOInterface from "./IOInterface";
-import { MAGIC, GLB_HEADER_SIZE, JSON_MAGIC } from "../consts";
 import { ExtensionList } from "../extensions/Registry";
 import Gltf2 from "../types/Gltf2";
 import { ElementOfType, PropertyType, AnyElement } from "../types/Elements";
@@ -43,6 +42,13 @@ class PendingElement {
   
 
 }
+
+
+
+const MAGIC      = 0x46546C67; // "glTF"
+const JSON_MAGIC = 0x4E4F534A; // "JSON"
+const GLB_HEADER_SIZE = 20;
+
 
 
 export default class GltfLoader {

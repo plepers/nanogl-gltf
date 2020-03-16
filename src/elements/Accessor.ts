@@ -1,27 +1,17 @@
 
 import Assert from '../lib/assert';
 import BufferView from './BufferView'
-import {TypedArrayConstructor, TypedArray} from '../consts'
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
 import AccessorSparse from './AccessorSparse';
 import { IElement } from '../types/Elements';
-import { GLContext } from 'nanogl/types';
+import { TypedArrayConstructor, TypedArray } from '../types/TypedArray';
 
 
-const enum ComponentType {
-  BYTE           = 5120,
-  UNSIGNED_BYTE  = 5121,
-  SHORT          = 5122,
-  UNSIGNED_SHORT = 5123,
-  UNSIGNED_INT   = 5125,
-  FLOAT          = 5126,
-}
+
 
 type normalizeFunc = (n:number)=>number;
-type CType = ComponentType | number;
-type VType = Gltf2.AccessorType;
 
 
 
@@ -36,28 +26,28 @@ const TYPE_SIZE_MAP = {
   'MAT4':   16
 }
 
-const ARRAY_TYPES = new Map<CType, TypedArrayConstructor >([
-  [ComponentType.BYTE           , Int8Array    ], // force unsigned???
-  [ComponentType.UNSIGNED_BYTE  , Uint8Array   ],
-  [ComponentType.SHORT          , Int16Array   ],
-  [ComponentType.UNSIGNED_SHORT , Uint16Array  ],
-  [ComponentType.UNSIGNED_INT   , Uint32Array  ],
-  [ComponentType.FLOAT          , Float32Array ],
+const ARRAY_TYPES = new Map<Gltf2.AccessorComponentType, TypedArrayConstructor >([
+  [Gltf2.AccessorComponentType.BYTE           , Int8Array    ], // force unsigned???
+  [Gltf2.AccessorComponentType.UNSIGNED_BYTE  , Uint8Array   ],
+  [Gltf2.AccessorComponentType.SHORT          , Int16Array   ],
+  [Gltf2.AccessorComponentType.UNSIGNED_SHORT , Uint16Array  ],
+  [Gltf2.AccessorComponentType.UNSIGNED_INT   , Uint32Array  ],
+  [Gltf2.AccessorComponentType.FLOAT          , Float32Array ],
 ]);
 
 
 //https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md_animations
-const NORMALIZE_FUNCS = new Map<CType, normalizeFunc>([
-  [ComponentType.BYTE           , c => Math.max(c / 127.0, -1.0)	 ],
-  [ComponentType.UNSIGNED_BYTE  , c => c / 255.0	 ],
-  [ComponentType.SHORT          , c => Math.max(c / 32767.0, -1.0)	 ],
-  [ComponentType.UNSIGNED_SHORT , c => c / 65535.0	 ],
-  [ComponentType.UNSIGNED_INT   , c => c ],
-  [ComponentType.FLOAT          , c => c ],
+const NORMALIZE_FUNCS = new Map<Gltf2.AccessorComponentType, normalizeFunc>([
+  [Gltf2.AccessorComponentType.BYTE           , c => Math.max(c / 127.0, -1.0)	 ],
+  [Gltf2.AccessorComponentType.UNSIGNED_BYTE  , c => c / 255.0	 ],
+  [Gltf2.AccessorComponentType.SHORT          , c => Math.max(c / 32767.0, -1.0)	 ],
+  [Gltf2.AccessorComponentType.UNSIGNED_SHORT , c => c / 65535.0	 ],
+  [Gltf2.AccessorComponentType.UNSIGNED_INT   , c => c ],
+  [Gltf2.AccessorComponentType.FLOAT          , c => c ],
 ]);
 
 
-function getNormalizeFunction( t:CType ) : normalizeFunc 
+function getNormalizeFunction( t:Gltf2.AccessorComponentType ) : normalizeFunc 
 {
   const a : normalizeFunc = NORMALIZE_FUNCS.get(t);
   Assert.isDefined(a);
@@ -65,7 +55,7 @@ function getNormalizeFunction( t:CType ) : normalizeFunc
 }
 
 
-export function getArrayForDataType( t:CType ) : TypedArrayConstructor
+export function getArrayForDataType( t:Gltf2.AccessorComponentType ) : TypedArrayConstructor
 {
   const a : TypedArrayConstructor = ARRAY_TYPES.get(t);
   Assert.isDefined(a);
@@ -73,13 +63,13 @@ export function getArrayForDataType( t:CType ) : TypedArrayConstructor
 }  
 
 
-function getBytesLengthForDataType( t:CType ):number
+function getBytesLengthForDataType( t:Gltf2.AccessorComponentType ):number
 {
   return getArrayForDataType(t).BYTES_PER_ELEMENT;
 }  
 
 
-function getSizeForComponentType( t:VType )
+function getSizeForComponentType( t:Gltf2.AccessorType )
 {
   const a = TYPE_SIZE_MAP[t];
   Assert.isDefined(a);
@@ -92,15 +82,15 @@ export type BaseAccessorData = Gltf2.IAccessor | Gltf2.IAccessorSparseIndices | 
 
 export class BaseAccessor {
 
-  normalized     : boolean      ;
-  byteOffset     : number       ;
-  count          : number       ;
-  _stride        : number       ;
-  _strideElem    : number       ;
-  componentType  : CType        ;
-  type           : VType        ;
-  max            : number[]    ;
-  min            : number[]    ;
+  normalized     : boolean      = false;
+  byteOffset     : number       = 0;
+  count          : number       = 0;
+  _stride        : number       = 0;
+  _strideElem    : number       = 0;
+  componentType  : Gltf2.AccessorComponentType        ;
+  type           : Gltf2.AccessorType        ;
+  max          ? : number[]    ;
+  min          ? : number[]    ;
   bufferView     : BufferView   ;
   _valueHolder   : TypedArray   ;
   _array         : TypedArray   ;

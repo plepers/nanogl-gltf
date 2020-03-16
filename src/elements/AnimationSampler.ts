@@ -1,11 +1,13 @@
 
 import { quat } from 'gl-matrix';
 import Accessor from './Accessor'
-import {TypedArray} from '../consts'
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
 import { IElement } from '../types/Elements';
+import { TypedArray } from '../types/TypedArray';
+
+
 
 type LerpFunc = (out:TypedArray, a:TypedArray, b:TypedArray, p:number )=>void;
 

@@ -1,12 +1,11 @@
 
 import AnimationSampler from './AnimationSampler'
 import Node from './Node'
-import {TypedArray} from '../consts'
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
 import { IElement } from '../types/Elements';
-import { GLContext } from 'nanogl/types';
+import { TypedArray } from '../types/TypedArray';
 
 type applyFunc = (node:Node, value:TypedArray)=>void
 
