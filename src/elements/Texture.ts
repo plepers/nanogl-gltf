@@ -9,6 +9,7 @@ import GltfTypes from '../types/GltfTypes';
 import { GLContext } from 'nanogl/types';
 import Texture2D from 'nanogl/texture-2d';
 import { IElement } from '../types/Elements';
+import Deferred from '../lib/Deferred';
 
 
 const GL_REPEAT                         = 0x2901;
@@ -35,8 +36,14 @@ export default class Texture implements IElement {
   
   sampler:Sampler
   source: Image;
-
   glTexture : Texture2D;
+
+
+  private _glTextureDeferred : Deferred<Texture2D> = new Deferred();
+
+  get glTexturePromise() : Promise<Texture2D> {
+    return this._glTextureDeferred.promise;
+  }
 
   async parse( gltfLoader:GltfLoader, data: Gltf2.ITexture ){
 
@@ -47,6 +54,7 @@ export default class Texture implements IElement {
     if( data.source !== undefined ){
       this.source = await gltfLoader.getElement( GltfTypes.IMAGE, data.source );
     }
+
     
   }
   
@@ -97,6 +105,8 @@ export default class Texture implements IElement {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapS);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapT);
+
+    this._glTextureDeferred.resolve( this.glTexture );
 
   }
 

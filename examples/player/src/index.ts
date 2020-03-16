@@ -1,8 +1,23 @@
+import GLView from "./engine/GLView";
+import Scene from "./engine/Scene";
 
-import GltfIO from "nanogl-gltf/io/web";
 
-console.log('toto')
+const canvas = document.getElementById('gl-canvas') as HTMLCanvasElement
 
-GltfIO.loadGltf('./models/Avocado.glb' ).then((gltf)=>{
-  console.log( gltf );
-})
+
+const glview = new GLView(canvas);
+const scene = new Scene();
+scene.init( glview );
+
+glview.scene = scene;
+
+try{
+  scene.load().then( ()=>{
+    glview.play()
+  })
+
+}catch(e){
+  console.log( e )
+}
+
+

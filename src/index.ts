@@ -15,12 +15,14 @@ import type Skin from './elements/Skin';
 import type Camera from './elements/Camera';
 
 import { GLContext } from 'nanogl/types';
+import NanoglNode from 'nanogl-node';
 import { ISemantics, DefaultSemantics } from './Semantics';
 import { IExtensionFactory } from './extensions/IExtension';
 import GltfTypes from './types/GltfTypes';
 import { AnyElement, ElementOfType, IElement } from './types/Elements';
 import IRenderable from './renderer/IRenderable';
 import Assert from './lib/assert';
+import IRenderConfig, { DefaultRenderConfig } from './IRenderConfig';
 
 
 
@@ -31,6 +33,7 @@ export default class Gltf {
 
   private static _extensionsRegistry: ExtensionsRegistry = new ExtensionsRegistry();
   private static _semantics : ISemantics = new DefaultSemantics();
+  private static _renderConfig : IRenderConfig = DefaultRenderConfig();
   
   static addExtension(ext: IExtensionFactory) {
     Gltf._extensionsRegistry.addExtension(ext);
@@ -38,6 +41,10 @@ export default class Gltf {
 
   static getSemantics():ISemantics {
     return this._semantics;
+  }
+
+  static getRenderConfig() : IRenderConfig {
+    return this._renderConfig;
   }
 
   static getExtensionsRegistry(): ExtensionsRegistry {
@@ -50,6 +57,8 @@ export default class Gltf {
   private _elements: AnyElement[];
   private _byType: Map<GltfTypes, AnyElement[]>;
   renderables: IRenderable[];
+
+  readonly root : NanoglNode = new NanoglNode();
 
 
 
@@ -99,8 +108,15 @@ export default class Gltf {
     await Promise.all(allocPromises);
 
     this.renderables = this.nodes
-    .map( n=>n.renderable )
-    .filter( n=>n!==undefined )
+      .map( n=>n.renderable )
+      .filter( n=>n!==undefined )
+
+      
+    for (const node of this.nodes) {
+      if( !node._parent ){
+        this.root.add( node );
+      }
+    }
 
   }
 

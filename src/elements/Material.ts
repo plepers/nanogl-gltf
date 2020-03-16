@@ -17,6 +17,8 @@ import BaseMaterial from 'nanogl-pbr/BaseMaterial';
 import Primitive from './Primitive';
 import Node from './Node';
 import { IElement } from '../types/Elements';
+import Gltf from '..';
+import Texture from './Texture';
 
 
 function _isAllOnes( a : ArrayLike<number> ) : boolean {
@@ -120,18 +122,23 @@ export default class Material implements IMaterial {
       this.emissiveTexture = await gltfLoader._loadElement(data.emissiveTexture);
     }
 
-    this.setupMaterialPass();
+    this.setupMaterials();
 
   }
 
 
-
+  assignSamplerTexture( sampler : Sampler, texture : Texture ){
+    texture.glTexturePromise.then((tex)=>{
+      sampler.set( tex );
+    })
+  }
 
 // TODO: don't really need to be in gl allocation step
-  setupMaterialPass(): void {
+  setupMaterials(): void {
 
     const pass = new StandardPass(this.name);
 
+    pass.glconfig.enableDepthTest();
     pass.glconfig.enableCullface(!this.doubleSided);
     pass.doubleSided.set( this.doubleSided );
 
@@ -139,6 +146,9 @@ export default class Material implements IMaterial {
     if( this.alphaMode === Gltf2.MaterialAlphaMode.BLEND ){
       pass.glconfig.enableBlend()
       pass.glconfig.blendFunc( SRC_ALPHA, ONE_MINUS_SRC_ALPHA );
+      pass.mask = Gltf.getRenderConfig().blendedMask;
+    } else {
+      pass.mask = Gltf.getRenderConfig().opaqueMask;
     }
 
     pass.alphaMode.set( this.alphaMode );
@@ -152,12 +162,14 @@ export default class Material implements IMaterial {
 
       if (pbr.baseColorTexture) {
         const baseColorSampler = new Sampler('tBaseColor', pass.getTexCoords(pbr.baseColorTexture.texCoord));
+        this.assignSamplerTexture( baseColorSampler, pbr.baseColorTexture.texture )
         pass.baseColor.attach(baseColorSampler, 'rgb')
         pass.alpha.attach(baseColorSampler, 'a')
       }
 
       if (pbr.metallicRoughnessTexture) {
         const mrSampler = new Sampler('tMetalicRoughness', pass.getTexCoords(pbr.metallicRoughnessTexture.texCoord));
+        this.assignSamplerTexture( mrSampler, pbr.metallicRoughnessTexture.texture )
         pass.metalness.attach(mrSampler, 'b')
         pass.roughness.attach(mrSampler, 'g')
       }
@@ -180,7 +192,7 @@ export default class Material implements IMaterial {
 
     if ( this.emissiveTexture ) {
       const sampler = pass.emissive.attachSampler('tEmissive', pass.getTexCoords(this.emissiveTexture.texCoord));
-      sampler.set(this.emissiveTexture.texture.glTexture);
+      this.assignSamplerTexture( sampler, this.emissiveTexture.texture )
     }
     
     if( !_isAllZeros( this.emissiveFactor) ){
@@ -191,7 +203,7 @@ export default class Material implements IMaterial {
     const nrm = this.normalTexture;
     if ( nrm ) {
       const sampler = pass.normal.attachSampler('tNormal', pass.getTexCoords(nrm.texCoord));
-      sampler.set(nrm.texture.glTexture);
+      this.assignSamplerTexture( sampler, nrm.texture )
       
       if (nrm.scale !== 1) {
         pass.normalScale.attachUniform('uNormalScale').set(nrm.scale)
@@ -202,7 +214,7 @@ export default class Material implements IMaterial {
     const occlu = this.occlusionTexture;
     if (occlu) {
       const sampler = pass.occlusion.attachSampler('tOcclusion', pass.getTexCoords(occlu.texCoord));
-      sampler.set(occlu.texture.glTexture);
+      this.assignSamplerTexture( sampler, occlu.texture )
 
       if (occlu.strength !== 1) {
         pass.occlusionStrength.attachUniform('uOccluStrength').set(occlu.strength)

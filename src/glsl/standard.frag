@@ -150,7 +150,7 @@ void main( void ){
   #pragma SLOT lightsf
 
 
-  vec4 _baseColor = vec4(1.0);
+  vec3 _baseColor = vec3(1.0);
   #if HAS_baseColor
     _baseColor *= baseColor();
   #endif
@@ -203,7 +203,7 @@ void main( void ){
   #endif
 
 
-  vec3 alb = mix( _baseColor * vec3(1-0.04), vec3(0.0), metalness() );
+  vec3 alb = mix( _baseColor * vec3(1.0-0.04), vec3(0.0), metalness() );
   vec3 albedoSq = alb*alb;
 
   FragColor.xyz = diffuseCoef*albedoSq + specularColor;
@@ -221,7 +221,7 @@ void main( void ){
 
 
 
-  vec4 _alpha = 1.0;
+  float _alpha = 1.0;
   #if HAS_alpha
     _alpha *= alpha();
   #endif

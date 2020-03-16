@@ -2,9 +2,21 @@
 <html>
   <head>
     <title>glTF player</title>
-    <script src="https://unpkg.com/lodash@4.16.6"></script>
+
+    <style>
+      html, body {
+        margin : 0;
+      }
+
+      #gl-canvas {
+        width : 100%;
+        height : 100%;
+      }
+    </style>
+    
   </head>
   <body>
+    <canvas id="gl-canvas"></canvas>
     <script src="main.js"></script>
   </body>
 </html>
