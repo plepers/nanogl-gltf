@@ -204,7 +204,7 @@ void main( void ){
   #if HAS_occlusion
     float _occlusion = occlusion();
     #if HAS_occlusionStrength
-      // _occlusion = 1 - occlusionStrength() + _occlusion*occlusionStrength()
+      _occlusion = 1.0 - occlusionStrength() + _occlusion*occlusionStrength();
     #endif
     diffuseCoef *= _occlusion;
   #endif

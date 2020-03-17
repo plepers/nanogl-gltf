@@ -2,7 +2,6 @@
 
 
 
-import UVTransform        from './uvTransform'
 import vShader            from './standard.vert'
 import fShader            from './standard.frag'
 
@@ -14,6 +13,7 @@ import  Enum           from 'nanogl-pbr/Enum'
 import {GammaModeEnum} from 'nanogl-pbr/GammaModeEnum'
 import  Precision      from 'nanogl-pbr/ShaderPrecision'
 import  Version        from 'nanogl-pbr/ShaderVersion'
+import  TexCoordCollection   from 'nanogl-pbr/TexCoordCollection'
 import  MaterialPass   from 'nanogl-pbr/MaterialPass'
 import  Program        from 'nanogl/program'
 import  Node           from 'nanogl-node'
@@ -32,28 +32,28 @@ const MAT_ID = 'std';
 export default class StandardPass extends MaterialPass {
 
 
-
+  texCoords            : TexCoordCollection
   ibl                  : IBL
   version              : Version
   precision            : Precision
   shaderid             : Flag
-  baseColor        : Input
-  baseColorFactor  : Input
-  alpha            : Input
-  alphaFactor      : Input
-  alphaCutoff      : Input
-  metalness        : Input
-  metalnessFactor  : Input
-  roughness        : Input
-  roughnessFactor  : Input
-  emissive         : Input
-  emissiveFactor   : Input
-  normal           : Input
-  normalScale      : Input
-  occlusion        : Input
-  occlusionStrength: Input
-  iGamma           : Input
-  iExposure        : Input
+  baseColor            : Input
+  baseColorFactor      : Input
+  alpha                : Input
+  alphaFactor          : Input
+  alphaCutoff          : Input
+  metalness            : Input
+  metalnessFactor      : Input
+  roughness            : Input
+  roughnessFactor      : Input
+  emissive             : Input
+  emissiveFactor       : Input
+  normal               : Input
+  normalScale          : Input
+  occlusion            : Input
+  occlusionStrength    : Input
+  iGamma               : Input
+  iExposure            : Input
 
   alphaMode: Enum<readonly ["OPAQUE", "MASK", "BLEND"]>
 
@@ -67,7 +67,7 @@ export default class StandardPass extends MaterialPass {
   
   gammaMode: GammaModeEnum
 
-  private _uvs : Map<number, UVTransform> = new Map()
+  // private _uvs : Map<number, UVTransform> = new Map()
 
   constructor( name : string = 'gltf-std-pass' ){
 
@@ -80,29 +80,9 @@ export default class StandardPass extends MaterialPass {
     this.ibl = null;
 
 
-/*
-alphaMode : enum MaterialAlphaMode "OPAQUE","MASK","BLEND",
-
-alphaCutoff : float
-doubleSided : flag
-
-baseColorFactor          : vec4       
-metallicFactor           : number     
-roughnessFactor          : number     
-baseColorTexture         : tex
-metallicRoughnessTexture : tex
-
-emissiveTex
-emissiveFactor : vec3
-
-normalTexture : tex
-normalScale : float
-
-occlusionTex
-occlusionStrength : float
-*/
-
     const inputs = this.inputs;
+
+    this.texCoords = new TexCoordCollection( inputs );
 
     inputs.add( this.version         = new Version( '100' ) );
     inputs.add( this.precision       = new Precision( 'highp' ) );
@@ -164,16 +144,16 @@ occlusionStrength : float
 
   }
 
-
-  getTexCoords( index = 0 ) : string {
-    let tc = this._uvs.get( index );
-    if( tc === undefined ){
-      tc  = new UVTransform( 'aTexCoord'+index, 'vTexCoord'+index ) 
-      this.inputs.add( tc );
-      this._uvs.set( index, tc );
-    }
-    return tc.token();
-  }
+  
+  // getTexCoords( index = 0 ) : string {
+  //   let tc = this._uvs.get( index );
+  //   if( tc === undefined ){
+  //     tc  = new UVTransform( 'aTexCoord'+index, 'vTexCoord'+index ) 
+  //     this.inputs.add( tc );
+  //     this._uvs.set( index, tc );
+  //   }
+  //   return tc.token();
+  // }
 
   /**
    * 

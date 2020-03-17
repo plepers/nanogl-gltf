@@ -53,6 +53,8 @@ export default class Texture implements IElement {
     return this._glTextureDeferred.promise;
   }
 
+
+
   async parse( gltfLoader:GltfLoader, data: Gltf2.ITexture ){
 
     if( data.sampler !== undefined ){

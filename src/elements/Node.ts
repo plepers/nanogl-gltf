@@ -25,7 +25,7 @@ export default class Node extends NGLNode implements IElement {
   camera?     : Camera;
   skin?       : Skin;
   mesh?       : Mesh;
-  weights?    : Float32Array;
+  // weights?    : Float32Array;
 
   renderable? : IRenderable;
 
@@ -86,13 +86,14 @@ export default class Node extends NGLNode implements IElement {
     }
     
   }
-  // set weights( weights ){
-  //   this.mesh.weights.set( weights );
-  // }
 
-  // get weights( ){
-  //   return this.mesh.weights;
-  // }
+  set weights( weights : Float32Array ){
+    this.mesh.weights.set( weights );
+  }
+
+  get weights( ) : Float32Array {
+    return this.mesh.weights;
+  }
 
  
   

@@ -53,6 +53,10 @@ export default class Gltf {
     return this._semantics;
   }
 
+  static setSemantics(semantics:ISemantics) {
+    semantics ?? (this._semantics = semantics);
+  }
+
   static getRenderConfig() : IRenderConfig {
     return this._renderConfig;
   }

@@ -21,7 +21,6 @@ const enum Mode {
 }
 
 
-const PAN_SENSITIVITY = 10;
 
 function setMousePos( e:MouseEvent, el:HTMLCanvasElement, v3 ){
   v3[0] =   2 * e.clientX / (el.width /window.devicePixelRatio)- 1
@@ -45,6 +44,7 @@ export default class CameraControl implements ICameraController {
   action     : IBehaviour;
 
   orbitRadius: number ;
+  panSensitivity : number = 10
 
   constructor( el : HTMLCanvasElement ){
     this.el = el;
@@ -85,7 +85,7 @@ export default class CameraControl implements ICameraController {
         this.action = new OrbitAction()
         break;
       case Mode.PAN :
-        this.action = new PanAction()
+        this.action = new PanAction( this.panSensitivity )
         break;
       case Mode.DOLLY :
         this.action = new DollyAction()
@@ -203,15 +203,17 @@ class PanAction implements IBehaviour
   initialP: vec3;
   startMouse: vec3;
   focus: vec3;
+  sensitivity :number = 10
 
 
-  constructor(){
+  constructor( panSensitivity : number ){
 
     this.initialX   = vec3.create()
     this.initialY   = vec3.create()
     this.initialP   = vec3.create()
     this.startMouse = vec3.create()
     this.focus      = vec3.create()
+    this.sensitivity = panSensitivity;
 
   }
 
@@ -233,9 +235,8 @@ class PanAction implements IBehaviour
 
     vec3.subtract( V1, mouse, this.startMouse );
 
-    vec3.scale( V2, this.initialX, -V1[0] * PAN_SENSITIVITY )
-    vec3.scaleAndAdd( V2, V2, this.initialY, -V1[1] * PAN_SENSITIVITY )
-
+    vec3.scale( V2, this.initialX, -V1[0] * this.sensitivity )
+    vec3.scaleAndAdd( V2, V2, this.initialY, -V1[1] * this.sensitivity )
 
     vec3.add( this.cam.position, this.initialP, V2 );
 

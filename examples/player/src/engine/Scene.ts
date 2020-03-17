@@ -20,10 +20,13 @@ import GLConfig from 'nanogl-state/config'
 import Program from 'nanogl/program'
 import Bounds, { BoundingSphere } from 'nanogl-pbr/Bounds'
 import Animation from 'nanogl-gltf/elements/Animation'
+import KHR_texture_transform from 'nanogl-gltf/extensions/KHR_texture_transform'
 
 
 
 Program.debug = true;
+
+Gltf.addExtension( new KHR_texture_transform() );
 
 
 export default class Scene {
@@ -155,6 +158,7 @@ export default class Scene {
     this.devCamera.lookAt( <vec3>bs.center );
     this.devCamera.invalidate();
     this.maxcam.orbitRadius = -bs.radius[0] * 5;
+    this.maxcam.panSensitivity = bs.radius[0] * 5
     this.devCamera.lens.far = bs.radius[0] * 10
     this.devCamera.lens.near = bs.radius[0] / 10
     this.camCtrl.setControler(this.maxcam)

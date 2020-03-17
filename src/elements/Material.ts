@@ -51,6 +51,7 @@ export interface IMaterial extends IElement {
 }
 
 
+
 export default class Material implements IMaterial {
 
   readonly gltftype = GltfTypes.MATERIAL;
@@ -130,6 +131,7 @@ export default class Material implements IMaterial {
       this.emissiveTexture = await gltfLoader._loadElement(data.emissiveTexture);
     }
 
+    this.name = data.name;
     this.setupMaterials();
 
   }
@@ -143,7 +145,6 @@ export default class Material implements IMaterial {
 
 // TODO: don't really need to be in gl allocation step
   setupMaterials(): void {
-
     const pass = new StandardPass(this.name);
 
     pass.glconfig.enableDepthTest();
@@ -169,14 +170,16 @@ export default class Material implements IMaterial {
     if (pbr !== undefined) {
 
       if (pbr.baseColorTexture) {
-        const baseColorSampler = new Sampler('tBaseColor', pass.getTexCoords(pbr.baseColorTexture.texCoord));
+        const tc = pbr.baseColorTexture.createMaterialTexCoords(pass.texCoords);
+        const baseColorSampler = new Sampler('tBaseColor', tc );
         this.assignSamplerTexture( baseColorSampler, pbr.baseColorTexture.texture )
         pass.baseColor.attach(baseColorSampler, 'rgb')
         pass.alpha.attach(baseColorSampler, 'a')
       }
 
       if (pbr.metallicRoughnessTexture) {
-        const mrSampler = new Sampler('tMetalicRoughness', pass.getTexCoords(pbr.metallicRoughnessTexture.texCoord));
+        const tc = pbr.metallicRoughnessTexture.createMaterialTexCoords(pass.texCoords);
+        const mrSampler = new Sampler('tMetalicRoughness', tc );
         this.assignSamplerTexture( mrSampler, pbr.metallicRoughnessTexture.texture )
         pass.metalness.attach(mrSampler, 'b')
         pass.roughness.attach(mrSampler, 'g')
@@ -199,7 +202,8 @@ export default class Material implements IMaterial {
     
 
     if ( this.emissiveTexture ) {
-      const sampler = pass.emissive.attachSampler('tEmissive', pass.getTexCoords(this.emissiveTexture.texCoord));
+      const tc = this.emissiveTexture.createMaterialTexCoords(pass.texCoords);
+      const sampler = pass.emissive.attachSampler('tEmissive', tc);
       this.assignSamplerTexture( sampler, this.emissiveTexture.texture )
     }
     
@@ -210,7 +214,8 @@ export default class Material implements IMaterial {
     
     const nrm = this.normalTexture;
     if ( nrm ) {
-      const sampler = pass.normal.attachSampler('tNormal', pass.getTexCoords(nrm.texCoord));
+      const tc = nrm.createMaterialTexCoords(pass.texCoords);
+      const sampler = pass.normal.attachSampler('tNormal', tc);
       this.assignSamplerTexture( sampler, nrm.texture )
       
       if (nrm.scale !== 1) {
@@ -221,7 +226,9 @@ export default class Material implements IMaterial {
 
     const occlu = this.occlusionTexture;
     if (occlu) {
-      const sampler = pass.occlusion.attachSampler('tOcclusion', pass.getTexCoords(occlu.texCoord));
+
+      const tc = occlu.createMaterialTexCoords(pass.texCoords);
+      const sampler = pass.occlusion.attachSampler('tOcclusion', tc);
       this.assignSamplerTexture( sampler, occlu.texture )
 
       if (occlu.strength !== 1) {
