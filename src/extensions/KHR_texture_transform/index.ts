@@ -31,7 +31,7 @@ class Instance implements IExtensionInstance {
     
     if( data.gltftype === GltfTypes.MATERIAL ){
       if( element instanceof Material ){
-        element.materialPass.
+        // element.materialPass.get
       }
     }
     return Promise.resolve(element);
