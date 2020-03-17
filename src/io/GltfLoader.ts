@@ -4,7 +4,7 @@ import Gltf from "..";
 import IOInterface from "./IOInterface";
 import { ExtensionList } from "../extensions/Registry";
 import Gltf2 from "../types/Gltf2";
-import { ElementOfType, PropertyType, AnyElement } from "../types/Elements";
+import { ElementOfType, PropertyType, AnyElement, PromiseElementForProperty } from "../types/Elements";
 import GltfTypes from "../types/GltfTypes";
 
 import "../extensions/DefaultExtension"
@@ -152,10 +152,15 @@ export default class GltfLoader {
 
 
 
+  
+  async _createElement<P extends Gltf2.Property>(data: P): PromiseElementForProperty<P> {
+    let element = await this._createElementInstance( data );
+    return this._extensionsAccept( data, element );
+  }
 
 
   // create element
-  _createElement<P extends Gltf2.Property>(data: P): Promise<ElementOfType<PropertyType<P>>> {
+  _createElementInstance<P extends Gltf2.Property>(data: P): PromiseElementForProperty<P> {
     const extensions = this._extensions._list;
     for (const ext of extensions) {
       const res = ext.loadElement(data)
@@ -166,10 +171,24 @@ export default class GltfLoader {
     throw new Error( "Unhandled type")
   }
 
+  // create element
+  async _extensionsAccept<P extends Gltf2.Property>(data: P, element : ElementOfType<PropertyType<P>> ): PromiseElementForProperty<P> {
+    const extensions = this._extensions._list;
+    let res : PromiseElementForProperty<P>;
+
+    for (const ext of extensions) {
+      res = ext.acceptElement( data, element )  
+      if( res !== null ){
+        element = await res;
+      }
+    }
+    return element;
+  }
+
 
   // create elementif not already created
-  _loadElement<P extends Gltf2.Property,>(data: P): Promise<ElementOfType<PropertyType<P>>> {
-    let res = this._elements.get(data.uuid) as Promise<ElementOfType<PropertyType<P>>>;
+  _loadElement<P extends Gltf2.Property,>(data: P): PromiseElementForProperty<P> {
+    let res = this._elements.get(data.uuid) as PromiseElementForProperty<P>;
     if (res === undefined) {
       res = this._createElement(data);
       const pe = new PendingElement( data, res );

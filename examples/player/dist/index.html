@@ -6,16 +6,25 @@
     <style>
       html, body {
         margin : 0;
+        width: 100%;
+        height: 100%;
       }
 
       #gl-canvas {
         width : 100%;
         height : 100%;
       }
+
+      .model-selector-wrapper {
+        position: absolute;
+      }
     </style>
     
   </head>
   <body>
+    <div class='model-selector-wrapper'>
+      <select name="models" id="model-selector"></select>
+    </div>
     <canvas id="gl-canvas"></canvas>
     <script src="main.js"></script>
   </body>

@@ -36,12 +36,17 @@ class DefaultExtensionInstance implements IExtensionInstance {
 
   readonly name: 'default' = 'default';
 
-  readonly priority: number = -10;
+  readonly priority: number = 0;
 
   readonly loader: GltfLoader;
   
   constructor(gltfLoader: GltfLoader){
     this.loader = gltfLoader;
+  }
+
+
+  acceptElement<P extends Gltf2.Property>(data: P, element: ElementOfType<PropertyType<P>> ) : null | Promise<ElementOfType<PropertyType<P>>> {
+    return null;
   }
 
 

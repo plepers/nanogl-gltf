@@ -1,6 +1,22 @@
 import GLView from "./engine/GLView";
 import Scene from "./engine/Scene";
+import Models from './Models'
 
+const selector = document.getElementById('model-selector') as HTMLSelectElement
+
+const modelPaths = [];
+for (const name in Models) {
+  const path = Models[name];
+  modelPaths.push( path )
+  const option = document.createElement('option')
+  option.textContent = name
+  option.value = path
+  selector.appendChild( option );
+}
+
+selector.addEventListener( 'change', (e) => {
+  loadModel( selector.selectedOptions[0].value )
+})
 
 const canvas = document.getElementById('gl-canvas') as HTMLCanvasElement
 
@@ -11,13 +27,13 @@ scene.init( glview );
 
 glview.scene = scene;
 
-try{
-  scene.load().then( ()=>{
-    glview.play()
-  })
+scene.load().then( ()=>{
+  glview.play()
+  loadModel( modelPaths[0] )
+})
 
-}catch(e){
-  console.log( e )
+
+
+function loadModel( path ){
+  scene.loadGltf( path );
 }
-
-

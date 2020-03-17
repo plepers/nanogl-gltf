@@ -6,7 +6,8 @@
   "scripts": {
     "test": "karma start",
     "build": "tsc && ./build/make-glsl",
-    "player": "webpack-dev-server --config examples/player/webpack.config.js"
+    "player": "node examples/player/make-model-list.js && webpack-dev-server --config examples/player/webpack.config.js",
+    "models": "node examples/player/make-model-list.js"
   },
   "repository": {
     "type": "git",

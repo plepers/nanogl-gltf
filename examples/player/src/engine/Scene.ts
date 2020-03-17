@@ -12,12 +12,14 @@ import GLView           from './GLView'
 
 import { GLContext } from 'nanogl/types'
 import PerspectiveLens from 'nanogl-camera/perspective-lens'
-import { mat4 } from 'gl-matrix'
+import { mat4, vec3 } from 'gl-matrix'
 import { Passes, Masks } from './Passes'
 import Gltf from 'nanogl-gltf'
 import GltfIO from "nanogl-gltf/io/web";
 import GLConfig from 'nanogl-state/config'
 import Program from 'nanogl/program'
+import Bounds, { BoundingSphere } from 'nanogl-pbr/Bounds'
+import Animation from 'nanogl-gltf/elements/Animation'
 
 
 
@@ -42,6 +44,10 @@ export default class Scene {
   camCtrl     : CameraControler
   maxcam      : MaxControler
   gltfScene   : Gltf;
+  bounds      : Bounds
+  animation   : Animation
+  animationTime :number;
+  animationDuration :number;
 
   enableDebugDraw: boolean
   envRotation    : number
@@ -88,7 +94,6 @@ export default class Scene {
     // this.xpcam   = new OrbitControler(this              )
     this.maxcam  = new MaxControler  (this.glview.canvas)
     
-    this.camCtrl.setControler(this.maxcam)
 
     // GRAPH
     // ======
@@ -108,13 +113,20 @@ export default class Scene {
   async load( ){
     await this.iblMngr.load( 'Helipad' );
     // await this.loadGltf( 'models/Avocado.glb' )
-    await this.loadGltf( 'models/FlightHelmet/FlightHelmet.gltf' )
   }
 
   async loadGltf( url : string ){
     this.gltfScene = await GltfIO.loadGltf( url );
     await this.gltfScene.allocateGl( this.gl )
     this.setupMaterials()
+    this.computeBounds()
+    this.initCamera()
+
+    this.animationTime = 0;
+    this.animationDuration = 0;
+    for( const anim of this.gltfScene.animations ){
+      this.animationDuration = Math.max( this.animationDuration, anim.duration );
+    }
   }
 
   setupMaterials() {
@@ -123,20 +135,55 @@ export default class Scene {
     }
   }
 
+  computeBounds() {
+
+    this.gltfScene.root.updateWorldMatrix();
+    this.bounds = new Bounds();
+    this.bounds.copyFrom( this.gltfScene.renderables[0].bounds )
+    const b : Bounds = new Bounds();
+    for (const renderable of this.gltfScene.renderables ) {
+      Bounds.transform( b, renderable.bounds, renderable.node._wmatrix )
+      Bounds.union( this.bounds, this.bounds, b );
+    }
+  }
+
+  initCamera(){
+    const bs = new BoundingSphere();
+    BoundingSphere.fromBounds( bs, this.bounds );
+
+    vec3.add( this.devCamera.position,  <vec3>bs.center, vec3.fromValues(0, 0, -bs.radius[0] * 5 ) );
+    this.devCamera.lookAt( <vec3>bs.center );
+    this.devCamera.invalidate();
+    this.maxcam.orbitRadius = -bs.radius[0] * 5;
+    this.devCamera.lens.far = bs.radius[0] * 10
+    this.devCamera.lens.near = bs.radius[0] / 10
+    this.camCtrl.setControler(this.maxcam)
+  }
+
+
  
   render(dt) {
 
     this.dt = dt;
     this.time += dt;
 
-    if( this.gltfScene )
+    
+    if( this.gltfScene ) {
+
+      this.animationTime += dt
+      if( this.animationTime > this.animationDuration ) this.animationTime = 0;
+      for( const anim of this.gltfScene.animations ){
+        anim.evaluate( this.animationTime)
+      }
+
       this.drawScene( this.camera );
+    }
 
   }
 
 
 
-  drawScene( camera, fbo = null, force = false ){
+  drawScene( camera : Camera, fbo = null, force = false ){
 
 
     const gl = this.gl;
@@ -207,6 +254,7 @@ export default class Scene {
     for (const renderable of this.gltfScene.renderables ) {
       renderable.render( this, camera, mask, passId, cfg )
     }
+    // this.gltfScene.renderables[5].render( this, camera, mask, passId, cfg )
   }
 
 

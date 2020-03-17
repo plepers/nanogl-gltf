@@ -33,6 +33,7 @@ export interface IExtensionInstance {
 
   loadElement<P extends Gltf2.Property>( data : P ) : null | Promise<ElementOfType<PropertyType<P>>>;
 
+  acceptElement<P extends Gltf2.Property>( data : P, element : ElementOfType<PropertyType<P>> ) : Promise<ElementOfType<PropertyType<P>>>;
 }
 
 
