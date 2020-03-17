@@ -128,34 +128,18 @@ void main( void ){
 
   #pragma SLOT f
 
-  // -----------
-  vec3 worldNormal = COMPUTE_NORMAL();
-
-
-
-  // SH Irradiance diffuse coeff
-  // -------------
-
-  vec3 diffuseCoef = ComputeIBLDiffuse( worldNormal );
-
-
-  // IBL reflexion
-  // --------------
-
-  vec3 viewDir = normalize( uCameraPosition - vWorldPosition );
-  vec3 worldReflect = reflect( -viewDir, worldNormal );
-  vec3 specularColor = SpecularIBL( tEnv, worldReflect, roughness() );
-
-
-  #pragma SLOT lightsf
-
-
   vec3 _baseColor = vec3(1.0);
   #if HAS_baseColor
     _baseColor *= baseColor();
   #endif
   #if HAS_baseColorFactor
     _baseColor *= baseColorFactor();
+  #endif
+  
+  #ifdef HAS_vertexColor
+  #if HAS_vertexColor
+    _baseColor *= vertexColor();
+  #endif
   #endif
 
 
@@ -178,10 +162,33 @@ void main( void ){
 
 
 
+  // -----------
+  vec3 worldNormal = COMPUTE_NORMAL();
+
+
+
+  // SH Irradiance diffuse coeff
+  // -------------
+
+  vec3 diffuseCoef = ComputeIBLDiffuse( worldNormal );
+
+
+  // IBL reflexion
+  // --------------
+
+  vec3 viewDir = normalize( uCameraPosition - vWorldPosition );
+  vec3 worldReflect = reflect( -viewDir, worldNormal );
+  vec3 specularColor = SpecularIBL( tEnv, worldReflect, _roughness );
+
+
+  #pragma SLOT lightsf
+
+
+
 
   float NoV = sdot( viewDir, worldNormal );
-  vec3 specularF0 = mix( vec3(0.04), _baseColor, metalness() );
-  specularColor *= F_Schlick( NoV, specularF0, 1.0-roughness() );
+  vec3 specularF0 = mix( vec3(0.04), _baseColor, _metalness );
+  specularColor *= F_Schlick( NoV, specularF0, 1.0-_roughness );
 
 
   
@@ -197,13 +204,13 @@ void main( void ){
   #if HAS_occlusion
     float _occlusion = occlusion();
     #if HAS_occlusionStrength
-      _occlusion = 1 - occlusionStrength() + _occlusion*occlusionStrength()
+      // _occlusion = 1 - occlusionStrength() + _occlusion*occlusionStrength()
     #endif
     diffuseCoef *= _occlusion;
   #endif
 
 
-  vec3 alb = mix( _baseColor * vec3(1.0-0.04), vec3(0.0), metalness() );
+  vec3 alb = mix( _baseColor * vec3(1.0-0.04), vec3(0.0), _metalness );
   vec3 albedoSq = alb*alb;
 
   FragColor.xyz = diffuseCoef*albedoSq + specularColor;
@@ -266,6 +273,10 @@ void main( void ){
 
   #if HAS_normal
   // FragColor.rgb = FragColor.rgb*0.0001 + normal();
+  #endif
+
+  #if HAS_occlusion
+    // FragColor.rgb = FragColor.rgb*0.0001 + occlusion();
   #endif
 
 

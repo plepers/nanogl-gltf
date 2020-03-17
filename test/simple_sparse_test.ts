@@ -1,6 +1,7 @@
 import Gltf from '../src'
 import expect from 'expect.js'
 import WebGltfIO from '../src/io/web';
+import GltfTypes from '../src/types/GltfTypes';
 
 
 describe("Triangle", function () {
@@ -18,7 +19,7 @@ describe("Triangle", function () {
 
 
     it("sparse positions ok", function () {
-      const accessor = gltf.accessors[1]
+      const accessor = gltf.getElement( GltfTypes.ACCESSOR, 1 )
       const holder = accessor.createElementHolder();
 
       accessor.getValue(holder, 8)
@@ -35,7 +36,7 @@ describe("Triangle", function () {
     });
 
     it("not sparse positions ok", function () {
-      const accessor = gltf.accessors[1]
+      const accessor = gltf.getElement( GltfTypes.ACCESSOR, 1 )
       const holder = accessor.createElementHolder();
 
       accessor.getValue(holder, 9)
@@ -48,7 +49,7 @@ describe("Triangle", function () {
 
 
     // it("positions getValues ok", function () {
-    //   const accessor = gltf.accessors[1]
+    //   const accessor = gltf.getElement( GltfTypes.ACCESSOR, 1 )
     //   const holder = accessor.createElementHolder();
     //   accessor.getValue( holder, 0 )
     //   expect(holder[0]).to.equal(0);

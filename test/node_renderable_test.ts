@@ -36,8 +36,6 @@ describe("Node renderable", function () {
     });
 
     it("renderables are set on gltf object", function () {
-      const m = gltf.getElement( GltfTypes.NODE, 0 );
-      expect( gltf.renderables[0] ).to.be.equal( m.renderable )
       expect( gltf.renderables.length ).to.be.equal( 2 )
     });
 

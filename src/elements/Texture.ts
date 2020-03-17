@@ -27,6 +27,14 @@ export function isPowerOf2(n : number ) : boolean {
   return (n != 0 && (n & (n-1)) === 0);
 }
 
+function nearestPowerOf2(n:number) : number {
+    if( isPowerOf2(n) ) return n;
+    if (n % 2 === 1) n++;
+    return Math.pow(2.0, Math.round(Math.log(n) / Math.log(2.0)));
+}
+
+
+
 export default class Texture implements IElement {
 
   readonly gltftype : GltfTypes.TEXTURE = GltfTypes.TEXTURE;
@@ -55,11 +63,10 @@ export default class Texture implements IElement {
       this.source = await gltfLoader.getElement( GltfTypes.IMAGE, data.source );
     }
 
-    
   }
   
   
-  allocateGl( gl : GLContext ) : void {
+  async allocateGl( gl : GLContext ) : Promise<any> {
     
     let glFormat = gl.RGBA;
     if( this.source.mimeType === Gltf2.ImageMimeType.JPEG )
@@ -89,12 +96,12 @@ export default class Texture implements IElement {
     let texImageSource = this.source.texImageSource;
     if( wrapRequirePot(wrapS) || wrapRequirePot( wrapT ) || filterHasMipmap(minFilter) ){
       if( !isPowerOf2(texImageSource.width) || !isPowerOf2(texImageSource.height) )
-        texImageSource = this.resizeToPOT( texImageSource );
+        texImageSource = await this.resizeToPOT( texImageSource, gl );
     }
 
 
     this.glTexture = new Texture2D( gl, glFormat, gl.UNSIGNED_BYTE );
-    this.glTexture.fromImage( this.source.texImageSource );
+    this.glTexture.fromImage( texImageSource );
 
     
     if( filterHasMipmap(minFilter) ){
@@ -110,9 +117,24 @@ export default class Texture implements IElement {
 
   }
 
-  resizeToPOT( source: TexImageSource ) : TexImageSource {
-    throw new Error( "Not implemented - Texture source need to be resized to power of 2" );
-    return source;
+  async resizeToPOT( source: TexImageSource, gl : GLContext ) : Promise<TexImageSource> {
+    // throw new Error( "Not implemented - Texture source need to be resized to power of 2" );
+    // return source;
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.width  = nearestPowerOf2( source.width );
+    canvas.height = nearestPowerOf2( source.height );
+    
+    if( source instanceof ImageData ){
+      const imageBitmap = await  createImageBitmap( source, 0, 0, canvas.width, canvas.height );
+      context.drawImage(imageBitmap, 0, 0, canvas.width, canvas.height);
+    } else {
+      context.drawImage(source, 0, 0, canvas.width, canvas.height);
+    }
+
+    return canvas;
+    // return context.createImageData( canvas.width, canvas.height );
+
   }
   
 

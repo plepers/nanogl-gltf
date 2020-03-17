@@ -13,6 +13,7 @@ import GltfTypes from '../types/GltfTypes';
 import BufferView from './BufferView';
 import Gltf from '..';
 import { IElement } from '../types/Elements';
+import Bounds from 'nanogl-pbr/Bounds';
 
 
 class Attribute {
@@ -122,6 +123,17 @@ export default class Primitive implements IElement {
   indexBuffer : GLIndexBuffer;
 
 
+  readonly bounds : Bounds = new Bounds();
+
+
+  _calculaterBounds() : void {
+    const pos = this.attributes.getSemantic( 'POSITION' );
+    if( pos != null && pos.accessor.min && pos.accessor.max ){
+      this.bounds.fromMinMax( pos.accessor.min, pos.accessor.max );
+    }
+  }
+
+
   async parse( gltfLoader:GltfLoader, data:Gltf2.IMeshPrimitive ) : Promise<any> {
 
     this.attributes = new AttributesSet();
@@ -151,6 +163,8 @@ export default class Primitive implements IElement {
         this.targets.push( aset );
       }
     }
+
+    this._calculaterBounds();
   }
 
 
@@ -239,8 +253,9 @@ export default class Primitive implements IElement {
 
 
   render(){
-    if( this.indexBuffer )
-      this.indexBuffer.draw( this.mode, this.indices.count, this.indices.byteOffset / this.indices.bytesPerElem );
+    if( this.indexBuffer ){
+      this.indexBuffer.draw( this.mode, this.indices.count, this.indices.byteOffset );
+    }
     else 
       this.buffers[0].draw( this.mode );    
   }

@@ -4,6 +4,7 @@ import Gltf from '../src'
 import expect from 'expect.js'
 import { expectEqualArray } from './test-utils';
 import WebGltfIO from '../src/io/web';
+import GltfTypes from '../src/types/GltfTypes';
 
 
 describe("Animation Sampler modes ", function () {
@@ -48,7 +49,7 @@ describe("Animation Sampler modes ", function () {
     it("test set", function () {
 
       //CubicSpline Scale
-      const sampler = gltf.animations[2].channels[0].sampler;
+      const sampler = gltf.getElement( GltfTypes.ANIMATION, 2 ).channels[0].sampler;
       const out = sampler.createElementHolder();
 
       var arr = []
@@ -101,7 +102,7 @@ describe("Animation Sampler modes ", function () {
     let out;
 
     before( function(){
-      sampler = gltf.animations[0].channels[0].sampler;
+      sampler = gltf.getElement( GltfTypes.ANIMATION, 0 ).channels[0].sampler;
       out = sampler.createElementHolder();
     })
 

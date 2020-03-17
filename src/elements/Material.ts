@@ -12,7 +12,7 @@ import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
 import StandardPass from '../glsl/StandardPass';
-import { Sampler } from 'nanogl-pbr/Input';
+import Input, { Sampler } from 'nanogl-pbr/Input';
 import BaseMaterial from 'nanogl-pbr/BaseMaterial';
 import Primitive from './Primitive';
 import Node from './Node';
@@ -80,6 +80,14 @@ export default class Material implements IMaterial {
 
     const material = new BaseMaterial( gl, this._materialPass.name );
     material.addPass( this._materialPass, 'color' )
+
+    if( primitive.attributes.getSemantic( 'COLOR_0') !== null ){
+      // vertex color
+      const vcInput = new Input( 'vertexColor', 3 );
+      vcInput.attachAttribute( Gltf.getSemantics().getAttributeName('COLOR_0') );
+      material.inputs.add( vcInput );
+    }
+
 
     if( node.skin ){
       // add skin deformer

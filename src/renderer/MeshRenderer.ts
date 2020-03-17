@@ -8,19 +8,23 @@ import { GLContext } from "nanogl/types"
 import Assert from "../lib/assert"
 import Program from "nanogl/program"
 import IRenderable, { IRenderingContext } from "./IRenderable"
+import Bounds from "nanogl-pbr/Bounds"
 
 
 
 
 
 export default class MeshRenderer implements IRenderable {
+
   
-  node: Node;
-  mesh: Mesh;
+  readonly node: Node;
+  readonly mesh: Mesh;
   
   materials : BaseMaterial[] = []
   
   glconfig? : GLConfig;
+
+  readonly bounds : Bounds = new Bounds();
   
   constructor( gl : GLContext, node: Node) {
     Assert.isDefined( node.mesh );
@@ -28,6 +32,7 @@ export default class MeshRenderer implements IRenderable {
     this.mesh = node.mesh;
     
     this.setupMaterials( gl );
+    this.computeBounds();
   }
   
   /**
@@ -42,6 +47,13 @@ export default class MeshRenderer implements IRenderable {
       this.materials.push( material );
     }
 
+  }
+
+  computeBounds() {
+    this.bounds.copyFrom( this.mesh.primitives[0].bounds )
+    for (const primitive of this.mesh.primitives ) {
+      Bounds.union( this.bounds, this.bounds, primitive.bounds );
+    }
   }
 
 

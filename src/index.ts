@@ -25,7 +25,17 @@ import Assert from './lib/assert';
 import IRenderConfig, { DefaultRenderConfig } from './IRenderConfig';
 
 
-
+class ElementCollection<T extends AnyElement = AnyElement>{
+  
+  // private _byNames : Map<string, T> = new Map()
+  indexed : T[] = []
+  list :  T[] = []
+  
+  addElement(element: T, index : number = -1 ){
+    if(index>-1) this.indexed[index] = element  ;
+    this.list.push( element);
+  }
+}
 
 /** Gltf file representation */
 export default class Gltf {
@@ -55,40 +65,39 @@ export default class Gltf {
   
   
   private _elements: AnyElement[];
-  private _byType: Map<GltfTypes, AnyElement[]>;
-  renderables: IRenderable[];
-
+  private _collections: Map<GltfTypes, ElementCollection>;
+  
+  
   readonly root : NanoglNode = new NanoglNode();
-
-
+  renderables: IRenderable[];
 
   constructor( ) {
 
-    this._byType = new Map<GltfTypes, AnyElement[]>([
+    this._collections = new Map<GltfTypes, ElementCollection>([
 
-      [GltfTypes.ACCESSOR               , []],
-      [GltfTypes.ACCESSOR_SPARSE        , []],
-      [GltfTypes.ACCESSOR_SPARSE_INDICES, []],
-      [GltfTypes.ACCESSOR_SPARSE_VALUES , []],
-      [GltfTypes.ANIMATION              , []],
-      [GltfTypes.ANIMATION_SAMPLER      , []],
-      [GltfTypes.ANIMATION_CHANNEL      , []],
-      [GltfTypes.ASSET                  , []],
-      [GltfTypes.BUFFER                 , []],
-      [GltfTypes.BUFFERVIEW             , []],
-      [GltfTypes.CAMERA                 , []],
-      [GltfTypes.IMAGE                  , []],
-      [GltfTypes.MATERIAL               , []],
-      [GltfTypes.MESH                   , []],
-      [GltfTypes.NODE                   , []],
-      [GltfTypes.NORMAL_TEXTURE_INFO    , []],
-      [GltfTypes.OCCLUSION_TEXTURE_INFO , []],
-      [GltfTypes.PRIMITIVE              , []],
-      [GltfTypes.SAMPLER                , []],
-      [GltfTypes.SCENE                  , []],
-      [GltfTypes.SKIN                   , []],
-      [GltfTypes.TEXTURE                , []],
-      [GltfTypes.TEXTURE_INFO           , []],
+      [GltfTypes.ACCESSOR               , new ElementCollection()],
+      [GltfTypes.ACCESSOR_SPARSE        , new ElementCollection()],
+      [GltfTypes.ACCESSOR_SPARSE_INDICES, new ElementCollection()],
+      [GltfTypes.ACCESSOR_SPARSE_VALUES , new ElementCollection()],
+      [GltfTypes.ANIMATION              , new ElementCollection()],
+      [GltfTypes.ANIMATION_SAMPLER      , new ElementCollection()],
+      [GltfTypes.ANIMATION_CHANNEL      , new ElementCollection()],
+      [GltfTypes.ASSET                  , new ElementCollection()],
+      [GltfTypes.BUFFER                 , new ElementCollection()],
+      [GltfTypes.BUFFERVIEW             , new ElementCollection()],
+      [GltfTypes.CAMERA                 , new ElementCollection()],
+      [GltfTypes.IMAGE                  , new ElementCollection()],
+      [GltfTypes.MATERIAL               , new ElementCollection()],
+      [GltfTypes.MESH                   , new ElementCollection()],
+      [GltfTypes.NODE                   , new ElementCollection()],
+      [GltfTypes.NORMAL_TEXTURE_INFO    , new ElementCollection()],
+      [GltfTypes.OCCLUSION_TEXTURE_INFO , new ElementCollection()],
+      [GltfTypes.PRIMITIVE              , new ElementCollection()],
+      [GltfTypes.SAMPLER                , new ElementCollection()],
+      [GltfTypes.SCENE                  , new ElementCollection()],
+      [GltfTypes.SKIN                   , new ElementCollection()],
+      [GltfTypes.TEXTURE                , new ElementCollection()],
+      [GltfTypes.TEXTURE_INFO           , new ElementCollection()],
 
     ])
 
@@ -122,39 +131,39 @@ export default class Gltf {
 
 
   get buffers(): Buffer[] {
-    return this._getTypeHolder(GltfTypes.BUFFER);
+    return this._getCollection(GltfTypes.BUFFER).list;
   }
 
   get bufferViews(): BufferView[] {
-    return this._getTypeHolder(GltfTypes.BUFFERVIEW);
+    return this._getCollection(GltfTypes.BUFFERVIEW).list;
   }
 
   get accessors(): Accessor[] {
-    return this._getTypeHolder(GltfTypes.ACCESSOR);
+    return this._getCollection(GltfTypes.ACCESSOR).list;
   }
 
   get animations(): Animation[] {
-    return this._getTypeHolder(GltfTypes.ANIMATION);
+    return this._getCollection(GltfTypes.ANIMATION).list;
   }
 
   get meshes(): Mesh[] {
-    return this._getTypeHolder(GltfTypes.MESH);
+    return this._getCollection(GltfTypes.MESH).list;
   }
 
   get nodes(): Node[] {
-    return this._getTypeHolder(GltfTypes.NODE);
+    return this._getCollection(GltfTypes.NODE).list;
   }
 
   get materials(): IMaterial[] {
-    return this._getTypeHolder(GltfTypes.MATERIAL);
+    return this._getCollection(GltfTypes.MATERIAL).list;
   }
 
   get cameras(): Camera[] {
-    return this._getTypeHolder(GltfTypes.CAMERA);
+    return this._getCollection(GltfTypes.CAMERA).list;
   }
 
   get skins(): Skin[] {
-    return this._getTypeHolder(GltfTypes.SKIN);
+    return this._getCollection(GltfTypes.SKIN).list;
   }
 
   
@@ -166,12 +175,12 @@ export default class Gltf {
   
   
   getElement<T extends GltfTypes>(type: T, index: number): ElementOfType<T> {
-    return this._getTypeHolder(type)[index];
+    return this._getCollection(type).indexed[index];
   }
   
   
   getElementByName<T extends GltfTypes>(type: T, name: string): ElementOfType<T> {
-    const list = this._getTypeHolder(type);
+    const list = this._getCollection(type).list;
     for (var el of list) {
       if (el.name === name) return el;
     }
@@ -179,24 +188,14 @@ export default class Gltf {
   }
 
   
-  private _getTypeHolder<T extends GltfTypes>(type: T): ElementOfType<T>[] {
-    return this._byType.get(type) as ElementOfType<T>[];
+  private _getCollection<T extends GltfTypes>(type: T): ElementCollection<ElementOfType<T>> {
+    return this._collections.get(type) as ElementCollection<ElementOfType<T>>;
   }
   
   addElement(element: AnyElement, index : number = -1 ) {
-    if( index>-1 ){
-      const a: AnyElement[] = this._getTypeHolder(element.gltftype);
-      a[index] = element;
-    }
+    const collection = this._getCollection( element.gltftype );
+    collection.addElement( element, index );
     this._elements.push(element);
-  }
-
-
-
-  addElements(elements: AnyElement[]) {
-    for (var e of elements) {
-      this.addElement(e);
-    }
   }
 
 

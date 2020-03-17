@@ -20,13 +20,19 @@ export default class Animation implements IElement {
   extras      : any   ;
 
   samplers : AnimationSampler[];
-  channels : AnimationChannel[]
+  channels : AnimationChannel[];
+
+  duration : number = 0
 
   
   async parse(gltfLoader:GltfLoader, data : Gltf2.IAnimation) : Promise<any> {
 
     const samplerPromises = data.samplers.map( (data)=>gltfLoader._loadElement(data) );
     this.samplers = await Promise.all( samplerPromises );
+
+    for (const sampler of this.samplers) {
+      this.duration = Math.max( sampler.maxTime );
+    }
 
     const channelPromises = data.channels.map( (data)=>gltfLoader._loadElement(data) );
     this.channels = await Promise.all( channelPromises );

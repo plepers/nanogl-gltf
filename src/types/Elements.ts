@@ -32,15 +32,10 @@ import { GLContext } from "nanogl/types";
 export interface IElement {
   
   readonly gltftype : GltfTypes;
-  // uuid         : string;
-  // elementIndex : number;
-  
   name        : undefined | string;
   extras      : any   ;
-  // extensions? : Record<string,any>;
   
   parse( gltfLoader : GltfLoader, data : Gltf2.IProperty ) : Promise<any>;
-  
   allocateGl?( gl : GLContext ) : void | Promise<any>;
   
 }
@@ -87,4 +82,6 @@ export type PropertyType<T extends Gltf2.Property> = T extends { gltftype : infe
 export type ElementType<T extends AnyElement> = T extends { gltftype : infer E } ? E : never;
 
 
+export type ElementForProperty        <T extends Gltf2.Property> = ElementOfType<PropertyType<T>>
+export type PromiseElementForProperty <T extends Gltf2.Property> = Promise<ElementOfType<PropertyType<T>>>
 

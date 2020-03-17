@@ -1,6 +1,7 @@
 import Gltf from '../src'
 import expect from 'expect.js'
 import WebGltfIO from '../src/io/web';
+import GltfTypes from '../src/types/GltfTypes';
 
 
 describe("Interleaved", function () {
@@ -19,7 +20,7 @@ describe("Interleaved", function () {
 
     it("positions ok", function () {
 
-      const accessor = gltf.accessors[0]
+      const accessor = gltf.getElement( GltfTypes.ACCESSOR, 0 )
       const holder = accessor.createElementHolder();
 
 
@@ -47,7 +48,7 @@ describe("Interleaved", function () {
 
     it("colors ok", function () {
 
-      const accessor = gltf.accessors[1]
+      const accessor = gltf.getElement( GltfTypes.ACCESSOR, 1 )
       const holder = accessor.createElementHolder();
 
       accessor.getValue(holder, 1)
@@ -66,7 +67,7 @@ describe("Interleaved", function () {
 
     it("uvs ok", function () {
 
-      const accessor = gltf.accessors[2]
+      const accessor = gltf.getElement( GltfTypes.ACCESSOR, 2 )
       const holder = accessor.createElementHolder();
 
       accessor.getValue(holder, 1)
@@ -83,7 +84,7 @@ describe("Interleaved", function () {
 
 
     // it("positions getValues ok", function () {
-    //   const accessor = gltf.accessors[1]
+    //   const accessor = gltf.getElement( GltfTypes.ACCESSOR, 1 )
     //   const holder = accessor.createElementHolder();
     //   accessor.getValue( holder, 0 )
     //   expect(holder[0]).to.equal(0);
@@ -108,7 +109,7 @@ describe("Interleaved", function () {
 
 
     it("positions ok", function () {
-      const accessor = gltf.accessors[0]
+      const accessor = gltf.getElement( GltfTypes.ACCESSOR, 0 )
       let s;
       
       s = accessor.getScalar(1)
@@ -121,7 +122,7 @@ describe("Interleaved", function () {
     });
 
     it("colors ok", function () {
-      const accessor = gltf.accessors[1]
+      const accessor = gltf.getElement( GltfTypes.ACCESSOR, 1 )
       let s;
       
       s = accessor.getScalar(1)
@@ -135,7 +136,7 @@ describe("Interleaved", function () {
     });
 
     it("uvs ok", function () {
-      const accessor = gltf.accessors[2]
+      const accessor = gltf.getElement( GltfTypes.ACCESSOR, 2 )
       let s;
       
       s = accessor.getScalar(1)

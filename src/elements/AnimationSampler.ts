@@ -84,6 +84,9 @@ class Interpolator {
 
 
   resolveInterval(t:number) {
+    // TODO: optimize 
+    // test time bounds
+    // binary search but test few frame around interval cache first
 
     const interval = this.interval;
     const input = this.sampler.input;
@@ -311,6 +314,8 @@ export default class AnimationSampler implements IElement {
   output        :Accessor          ;
   interpolator  :Interpolator      ;
 
+  minTime : number = 0;
+  maxTime : number = 0;
 
   async parse( gltfLoader:GltfLoader, data:Gltf2.IAnimationSampler ) : Promise<any> {
 
@@ -319,6 +324,9 @@ export default class AnimationSampler implements IElement {
 
     this.interpolation = data.interpolation || Gltf2.AnimationSamplerInterpolation.LINEAR;
     this.interpolator  = InterpolatorFactory( this );
+
+    this.minTime = this.input.getRawScalar(0);
+    this.maxTime = this.input.getRawScalar(this.input.count-1);
   }
 
 

@@ -4,6 +4,7 @@ import Gltf from '../src'
 import expect from 'expect.js'
 import { expectEqualArray } from './test-utils';
 import WebGltfIO from '../src/io/web';
+import GltfTypes from '../src/types/GltfTypes';
 
 
 describe("Animation Sampler", function () {
@@ -19,18 +20,18 @@ describe("Animation Sampler", function () {
   describe("parsing OK", function () {
 
     it("sampler OK", function () {
-      expect( gltf.animations[0] ).to.be.ok()
-      expect( gltf.animations[0].channels[0] ).to.be.ok()
-      expect( gltf.animations[0].channels[0].sampler ).to.be.ok()
+      expect( gltf.getElement( GltfTypes.ANIMATION, 0 ) ).to.be.ok()
+      expect( gltf.getElement( GltfTypes.ANIMATION, 0 ).channels[0] ).to.be.ok()
+      expect( gltf.getElement( GltfTypes.ANIMATION, 0 ).channels[0].sampler ).to.be.ok()
     })
 
     it("sampler input OK", function () {
-      const sampler = gltf.animations[0].channels[0].sampler;
+      const sampler = gltf.getElement( GltfTypes.ANIMATION, 0 ).channels[0].sampler;
       expect( sampler.input ).to.be.ok()
     })
 
     it("sampler output OK", function () {
-      const sampler = gltf.animations[0].channels[0].sampler;
+      const sampler = gltf.getElement( GltfTypes.ANIMATION, 0 ).channels[0].sampler;
       expect( sampler.output ).to.be.ok()
     })
 
@@ -40,7 +41,7 @@ describe("Animation Sampler", function () {
 
 
     it("t < 0", function () {
-      const sampler = gltf.animations[0].channels[0].sampler;
+      const sampler = gltf.getElement( GltfTypes.ANIMATION, 0 ).channels[0].sampler;
       const out = sampler.createElementHolder();
       sampler.evaluate( out, -1 )
 
@@ -49,7 +50,7 @@ describe("Animation Sampler", function () {
     });
 
     it("t > max", function () {
-      const sampler = gltf.animations[0].channels[0].sampler;
+      const sampler = gltf.getElement( GltfTypes.ANIMATION, 0 ).channels[0].sampler;
       const out = sampler.createElementHolder();
       sampler.evaluate( out, 1000 )
 
@@ -58,7 +59,7 @@ describe("Animation Sampler", function () {
     });
 
     it("t = 0", function () {
-      const sampler = gltf.animations[0].channels[0].sampler;
+      const sampler = gltf.getElement( GltfTypes.ANIMATION, 0 ).channels[0].sampler;
       const out = sampler.createElementHolder();
       sampler.evaluate( out, 0 )
 
@@ -68,7 +69,7 @@ describe("Animation Sampler", function () {
 
     it("t = 1", function () {
 
-      const sampler = gltf.animations[0].channels[0].sampler;
+      const sampler = gltf.getElement( GltfTypes.ANIMATION, 0 ).channels[0].sampler;
       const out = sampler.createElementHolder();
       sampler.evaluate( out, 1 )
 
@@ -77,7 +78,7 @@ describe("Animation Sampler", function () {
     });
 
     it("t = .25", function () {
-      const sampler = gltf.animations[0].channels[0].sampler;
+      const sampler = gltf.getElement( GltfTypes.ANIMATION, 0 ).channels[0].sampler;
       const out = sampler.createElementHolder();
       sampler.evaluate( out, .25 )
 

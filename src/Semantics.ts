@@ -1,12 +1,12 @@
 
 const Semantics = {
-  POSITION :{indexed:false, attrib:'aPosition'  },
-  NORMAL   :{indexed:false, attrib:'aNormal'    },
-  TANGENT  :{indexed:false, attrib:'aTangent'   },
-  TEXCOORD :{indexed:true , attrib:'aTexCoord'  },
-  COLOR    :{indexed:true , attrib:'aColor'     },
-  JOINT    :{indexed:false, attrib:'aSkinJoint' },
-  WEIGHT   :{indexed:false, attrib:'aSkinWeight'},
+  POSITION :{indexed:false, attrib:'aPosition'   },
+  NORMAL   :{indexed:false, attrib:'aNormal'     },
+  TANGENT  :{indexed:false, attrib:'aTangent'    },
+  TEXCOORD :{indexed:true , attrib:'aTexCoord'   },
+  COLOR    :{indexed:true , attrib:'aColor'      },
+  JOINTS   :{indexed:true , attrib:'aSkinJoints' },
+  WEIGHTS  :{indexed:true , attrib:'aSkinWeights'},
 }
 
 

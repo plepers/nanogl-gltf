@@ -4,6 +4,7 @@ import { expectEqualArray, describeMulti } from './test-utils';
 import WebGltfIO from '../src/io/web';
 import Mesh from '../src/elements/Mesh';
 import Accessor from '../src/elements/Accessor';
+import GltfTypes from '../src/types/GltfTypes';
 
 
 describe("Skins", function () {
@@ -46,13 +47,13 @@ describe("Skins", function () {
     });    
 
     it(" has correct name", function () {
-      var skin = gltf.skins[0]
+      var skin = gltf.getElement( GltfTypes.SKIN, 0 )
       expect( skin.name ).to.be( "Armature" )
     });    
 
     
     it(" has correct joints", function () {
-      var joints = gltf.skins[0].joints
+      var joints = gltf.getElement( GltfTypes.SKIN, 0 ).joints
       expect( joints.length ).to.be( 2 )
       expect( joints[0].position[2] ).to.be( -4.1803297996521 )
       expect( joints[1].position[1] ).to.be( 4.18717098236084 )
@@ -60,14 +61,14 @@ describe("Skins", function () {
     
 
     it(" has correct inverseBindMatrices", function () {
-      var ibms = gltf.skins[0].inverseBindMatrices
+      var ibms = gltf.getElement( GltfTypes.SKIN, 0 ).inverseBindMatrices
       expect( ibms[0][14] ).to.be( 0.027931740507483482 );
       expect( ibms[1][13] ).to.be( -0.006818830035626888 );
     }); 
 
     
     it(" has correct skeleton", function () {
-      var root = gltf.skins[0].skeletonRoot
+      var root = gltf.getElement( GltfTypes.SKIN, 0 ).skeletonRoot
       expect( root.position[2] ).to.be( -4.1803297996521 )
     }); 
 
