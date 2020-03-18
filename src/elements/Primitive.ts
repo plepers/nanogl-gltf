@@ -18,12 +18,25 @@ import Bounds from 'nanogl-pbr/Bounds';
 
 class Attribute {
 
+  /**
+   * the standard Semantic for this attribute (POSITION, NORMAL, WEIGHTS_0 etc)
+   */
   semantic : string;
+
+  /**
+   * the accessor providing data for this attribute
+   */
   accessor : Accessor;
+
+  /**
+   * the glsl attribute name
+   */
+  glslname : string
   
   constructor( semantic:string , accessor:Accessor ){
     this.semantic = semantic;
     this.accessor = accessor;
+    this.glslname = Gltf.getSemantics().getAttributeName( semantic );
   }
   
 }
@@ -55,14 +68,18 @@ class AttributesSet {
     this._attributes = [];
   }
 
-
   get length() :number {
     return this._attributes.length;
+  }
+
+  get attributes(): Attribute[]{
+    return this._attributes;
   }
 
   add( attribute : Attribute ){
     this._attributes.push( attribute );
   }
+
 
 
   getSemantic( semantic : string ) : Attribute {
@@ -157,9 +174,10 @@ export default class Primitive implements IElement {
     if( data.targets !== undefined ){
       this.targets = [];
 
-      for (var tgt of data.targets ) {
+      for (let i = 0; i < data.targets.length; i++) {
+        const tgt = data.targets[i];
         const aset = new AttributesSet();
-        await this.parseAttributeSet( gltfLoader, aset, tgt );
+        await this.parseMorphAttributeSet( gltfLoader, aset, tgt, i );
         this.targets.push( aset );
       }
     }
@@ -173,6 +191,18 @@ export default class Primitive implements IElement {
     for (const attrib in data ) { 
       const accessor:Accessor = await gltfLoader.getElement( GltfTypes.ACCESSOR, data[attrib] );
       aset.add( new Attribute( attrib, accessor ) );
+    }
+
+  }
+  
+
+  async parseMorphAttributeSet( gltfLoader:GltfLoader, aset : AttributesSet, data : any, morphIndex : number ) {
+    
+    for (const attrib in data ) { 
+      const accessor:Accessor = await gltfLoader.getElement( GltfTypes.ACCESSOR, data[attrib] );
+      const attribute = new Attribute( attrib, accessor )
+      attribute.glslname = Gltf.getSemantics().getMorphedAttributeName( attribute.semantic, morphIndex );
+      aset.add( attribute );
     }
 
   }
@@ -194,7 +224,16 @@ export default class Primitive implements IElement {
       const glBuffer = this.indices.bufferView.getWebGLBuffer( gl, ELEMENT_ARRAY_BUFFER )
       this.indexBuffer = new GLIndexBuffer( gl, this.indices.componentType, undefined, gl.STATIC_DRAW, glBuffer )
       this.indexBuffer.byteLength = this.indices.bufferView.byteLength;
-      
+    }
+
+    if( this.targets !== null ){
+      for (let i = 0; i < this.targets.length; i++) {
+        const target = this.targets[i];
+        const buffersSet = target.getBuffersViewSets();
+        for( const set of buffersSet ){
+          this.buffers.push( this.createArrayBuffer( gl, set ) );
+        }
+      }
     }
 
   }
@@ -207,7 +246,8 @@ export default class Primitive implements IElement {
 
     const glArraybuffer = new GLArrayBuffer(gl, undefined, gl.STATIC_DRAW, glBuffer );
     glArraybuffer.byteLength = bufferView.byteLength;
-    glArraybuffer.stride = 0;
+    glArraybuffer.stride = set.accessor._stride;
+    glArraybuffer._computeLength();
 
 
     for (const attribute of set.attributes ) {
@@ -223,7 +263,7 @@ export default class Primitive implements IElement {
   createAttributeDefinition( attribute : Attribute ){
     const accessor = attribute.accessor;
     return {
-      name      : Gltf.getSemantics().getAttributeName(attribute.semantic),
+      name      : attribute.glslname     ,
       type      : accessor .componentType,
       size      : accessor .numComps     ,
       normalize : accessor .normalized   ,

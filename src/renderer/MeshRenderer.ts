@@ -11,6 +11,9 @@ import IRenderable, { IRenderingContext } from "./IRenderable"
 import Bounds from "nanogl-pbr/Bounds"
 import SkinDeformer, { SkinAttributeSet } from "../glsl/SkinDeformer"
 import Gltf from ".."
+import MorphDeformer from "../glsl/MorphDeformer"
+import { MorphAttribInfos, MorphAttributeType } from "../glsl/MorphCode"
+import { AccessorGlslType } from "../elements/Accessor"
 
 
 
@@ -18,6 +21,8 @@ import Gltf from ".."
 function assertIsNumComps( n : number ) : asserts n is 1|2|3|4 {
   if( n<1 || n>4 ) throw new Error('number is not Component size')
 }
+
+
 
 
 export default class MeshRenderer implements IRenderable {
@@ -60,6 +65,47 @@ export default class MeshRenderer implements IRenderable {
   }
 
   configureDeformers(material: BaseMaterial, primitive: Primitive) {
+    this.configureSkin ( material, primitive );
+    this.configureMorph( material, primitive );
+  }
+
+  configureMorph(material: BaseMaterial, primitive: Primitive) {
+
+    if( primitive.targets !== null ){
+
+      const morphedAttribs = primitive.targets[0].attributes;
+      const morphInfos : MorphAttribInfos[] = [];
+      
+      for (const morphedattrib of morphedAttribs) {
+        
+        const miAttributes = primitive.targets.map( (target)=>{
+          return target.getSemantic( morphedattrib.semantic ).glslname
+        });
+        
+        const morphInfo :MorphAttribInfos = {
+          name : morphedattrib.semantic.toLowerCase(),
+          type : morphedattrib.accessor.glslType as MorphAttributeType,
+          attributes : miAttributes,
+        }
+        
+        morphInfos.push( morphInfo );
+      }
+      
+      const morphDeformer = new MorphDeformer();
+      morphDeformer.morphInfos = morphInfos;
+      
+      if( this.node.weights )
+        morphDeformer.weights = this.node.weights 
+        else if( this.mesh.weights )
+        morphDeformer.weights = this.mesh.weights 
+
+      material.inputs.add( morphDeformer );
+
+    }
+    
+  }
+
+  configureSkin(material: BaseMaterial, primitive: Primitive) {
     
     if( this.node.skin ){
       
@@ -90,8 +136,8 @@ export default class MeshRenderer implements IRenderable {
         assertIsNumComps( numComponents );
 
         attributeSet.push({
-          weightsAttrib : Gltf.getSemantics().getAttributeName( wsem ),
-          jointsAttrib  : Gltf.getSemantics().getAttributeName( jsem ),
+          weightsAttrib : weights.glslname,
+          jointsAttrib  : joints .glslname,
           numComponents
         })
         setIndex++;

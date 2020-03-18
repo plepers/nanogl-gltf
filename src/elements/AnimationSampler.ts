@@ -76,10 +76,17 @@ class Interpolator {
   sampler : AnimationSampler;
   interval: SampleInterval  ;
 
+  /**
+   * number of element to fetch in output accessor
+   * primarily used to fetch morph weights
+   */
+  numElements: number;
 
-  constructor(sampler:AnimationSampler) {
+
+  constructor(sampler:AnimationSampler, numElements : number ) {
     this.sampler = sampler;
     this.interval = new SampleInterval(sampler.input);
+    this.numElements = numElements;
   }
 
 
@@ -155,7 +162,7 @@ class StepInterpolator extends Interpolator {
 
   evaluate(out:TypedArray, t:number) {
     this.resolveInterval(t);
-    this.sampler.output.getValue(out, this.interval.normalizedFrame());
+    this.sampler.output.getValues(out, this.interval.normalizedFrame()*this.numElements, this.numElements);
   }
 
 }
@@ -175,15 +182,20 @@ function LERP1( out:TypedArray, a:TypedArray, b:TypedArray, p:number ){
   out[0] = a[0] * (1.0 - p) + b[0] * p;
 }
 
-function getLerpFunction( numComps : number ) : LerpFunc {
-  switch (numComps) {
-    case 1:
-      return LERP1
-    case 4:
+function getLerpFunction( path : Gltf2.AnimationChannelTargetPath, numComps : number ) : LerpFunc {
+
+  switch (path) {
+    case Gltf2.AnimationChannelTargetPath.WEIGHTS:
+      return (numComps===1) ? LERP1 : LERP_N;
+    case Gltf2.AnimationChannelTargetPath.ROTATION:
       return quat.slerp;
+        
+    case Gltf2.AnimationChannelTargetPath.SCALE:
+    case Gltf2.AnimationChannelTargetPath.TRANSLATION:
     default:
-      return LERP_N;
+        return LERP_N;
   }
+
 }
 
 
@@ -195,28 +207,28 @@ class LinearInterpolator extends Interpolator {
   val1 : TypedArray;
   lerpFunc : LerpFunc;
 
-  constructor(sampler : AnimationSampler) {
-    super(sampler);
-    this.val0 = sampler.output.createElementHolder();
-    this.val1 = sampler.output.createElementHolder();
-    this.lerpFunc = getLerpFunction(this.val0.length);
+  constructor(sampler : AnimationSampler, path : Gltf2.AnimationChannelTargetPath, numElements : number) {
+    super(sampler, numElements);
+    this.val0 = sampler.output.createElementHolderArray(numElements);
+    this.val1 = sampler.output.createElementHolderArray(numElements);
+    this.lerpFunc = getLerpFunction( path, this.val0.length);
   }
 
   evaluate(out:TypedArray, t:number) {
     this.resolveInterval(t);
 
     const output = this.sampler.output;
-
+    const ne = this.numElements
     if (this.interval.inBound) {
       const { t0, t1, frame } = this.interval;
       const p = (t - t0) / (t1 - t0);
 
-      output.getValue(this.val0, frame + 0);
-      output.getValue(this.val1, frame + 1);
+      output.getValues(this.val0, ne*frame + 0,  ne);
+      output.getValues(this.val1, ne*frame + ne, ne);
       this.lerpFunc(out, this.val0, this.val1, p);
 
     } else {
-      output.getValue(out, this.interval.normalizedFrame());
+      output.getValues(out, this.interval.normalizedFrame()*ne, ne);
     }
   }
 
@@ -236,31 +248,30 @@ class CubicSplineInterpolator extends Interpolator {
 
   assumeQuat : boolean;
 
-  constructor(sampler : AnimationSampler) {
-    super(sampler);
-    this.val0 = sampler.output.createElementHolder();
-    this.val1 = sampler.output.createElementHolder();
-    this.val2 = sampler.output.createElementHolder();
-    this.val3 = sampler.output.createElementHolder();
-
-    this.assumeQuat = (this.val0.length === 4);
+  constructor(sampler : AnimationSampler, path : Gltf2.AnimationChannelTargetPath, numElements : number) {
+    super(sampler, numElements);
+    this.val0 = sampler.output.createElementHolderArray(numElements);
+    this.val1 = sampler.output.createElementHolderArray(numElements);
+    this.val2 = sampler.output.createElementHolderArray(numElements);
+    this.val3 = sampler.output.createElementHolderArray(numElements);
+    this.assumeQuat = path === Gltf2.AnimationChannelTargetPath.ROTATION
   }
 
   evaluate(out:TypedArray, t:number) {
     this.resolveInterval(t);
 
     const output = this.sampler.output;
-
+    const ne = this.numElements
     if (this.interval.inBound) {
 
       const { t0, t1, frame } = this.interval;
       const dt = t1 - t0
       const p = (t - t0) / dt;
 
-      output.getValue(this.val0, frame * 3 + 1);
-      output.getValue(this.val1, frame * 3 + 2);
-      output.getValue(this.val2, frame * 3 + 3);
-      output.getValue(this.val3, frame * 3 + 4);
+      output.getValues(this.val0, ne*(frame * 3 + 1), ne);
+      output.getValues(this.val1, ne*(frame * 3 + 2), ne);
+      output.getValues(this.val2, ne*(frame * 3 + 3), ne);
+      output.getValues(this.val3, ne*(frame * 3 + 4), ne);
 
 
       cubicSplineInterpolation(out, p, dt, this.val0, this.val1, this.val2, this.val3);
@@ -271,7 +282,7 @@ class CubicSplineInterpolator extends Interpolator {
 
 
     } else {
-      output.getValue(out, this.interval.normalizedFrame() * 3 + 1);
+      output.getValues(out, ne*(this.interval.normalizedFrame() * 3 + 1), ne);
     }
   }
 
@@ -281,14 +292,14 @@ class CubicSplineInterpolator extends Interpolator {
 
 
 
-function InterpolatorFactory(sampler:AnimationSampler) : Interpolator {
+function InterpolatorFactory(sampler:AnimationSampler, path : Gltf2.AnimationChannelTargetPath, numElements : number ) : Interpolator {
   switch (sampler.interpolation) {
     case Gltf2.AnimationSamplerInterpolation.STEP:
-      return new StepInterpolator(sampler);
+      return new StepInterpolator(sampler, numElements);
     case Gltf2.AnimationSamplerInterpolation.LINEAR:
-      return new LinearInterpolator(sampler);
+      return new LinearInterpolator(sampler, path, numElements);
     case Gltf2.AnimationSamplerInterpolation.CUBICSPLINE:
-      return new CubicSplineInterpolator(sampler);
+      return new CubicSplineInterpolator(sampler, path, numElements);
 
     default:
       throw new Error('GLTF : Unsupported sampler interpolation ' + sampler.interpolation);
@@ -298,6 +309,30 @@ function InterpolatorFactory(sampler:AnimationSampler) : Interpolator {
 
 
 
+
+
+
+export class SamplerEvaluator {
+
+  sampler: AnimationSampler;
+  numElements: number;
+  interpolator: Interpolator;
+
+  constructor( sampler : AnimationSampler, path : Gltf2.AnimationChannelTargetPath, numElements : number ){
+    this.sampler = sampler;
+    this.numElements = numElements;
+    this.interpolator  = InterpolatorFactory( sampler, path, numElements );
+  }
+
+  evaluate(out:TypedArray, t:number) {
+    this.interpolator.evaluate( out, t );
+  }
+
+  createElementHolder():TypedArray {
+    return this.sampler.output.createElementHolderArray( this.numElements );
+  }
+
+}
 
 
 
@@ -312,7 +347,6 @@ export default class AnimationSampler implements IElement {
   interpolation :Gltf2.AnimationSamplerInterpolation ;
   input         :Accessor          ;
   output        :Accessor          ;
-  interpolator  :Interpolator      ;
 
   minTime : number = 0;
   maxTime : number = 0;
@@ -323,20 +357,14 @@ export default class AnimationSampler implements IElement {
     this.output = await gltfLoader.getElement( GltfTypes.ACCESSOR, data.output );
 
     this.interpolation = data.interpolation || Gltf2.AnimationSamplerInterpolation.LINEAR;
-    this.interpolator  = InterpolatorFactory( this );
 
     this.minTime = this.input.getRawScalar(0);
     this.maxTime = this.input.getRawScalar(this.input.count-1);
   }
 
 
-  createElementHolder():TypedArray {
-    return this.output.createElementHolder();
-  }
-
-
-  evaluate(out:TypedArray, t:number) {
-    this.interpolator.evaluate( out, t );
+  createEvaluator( path: Gltf2.AnimationChannelTargetPath, numElements : number ):SamplerEvaluator {
+    return new SamplerEvaluator( this, path, numElements );
   }
 
 }

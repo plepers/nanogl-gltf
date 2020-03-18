@@ -11,11 +11,16 @@ const Semantics = {
 
 
 export interface ISemantics {
+  getMorphedAttributeName(semantic: string, index : number);
   getAttributeName( semantic:string):string;
 }
 
 
 export class DefaultSemantics implements ISemantics {
+
+  getMorphedAttributeName(semantic: string, index : number){
+    return this.getAttributeName( semantic )+'_mt'+index;
+  }
   
   getAttributeName(semantic: string): string {
     const [basename, set_index=0] = semantic.split( '_' );

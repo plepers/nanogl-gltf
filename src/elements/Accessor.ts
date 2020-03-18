@@ -14,52 +14,51 @@ import { TypedArrayConstructor, TypedArray } from '../types/TypedArray';
 type normalizeFunc = (n:number)=>number;
 
 
-
-
-const TYPE_SIZE_MAP = {
-  'SCALAR': 1,
-  'VEC2':   2,
-  'VEC3':   3,
-  'VEC4':   4,
-  'MAT2':   4,
-  'MAT3':   9,
-  'MAT4':   16
+export enum AccessorGlslType {
+  float = "float",
+  vec2  = "vec2",
+  vec3  = "vec3",
+  vec4  = "vec4",
+  mat2  = "mat2",
+  mat3  = "mat3",
+  mat4  = "mat4",
 }
 
-const ARRAY_TYPES = new Map<Gltf2.AccessorComponentType, TypedArrayConstructor >([
-  [Gltf2.AccessorComponentType.BYTE           , Int8Array    ], // force unsigned???
-  [Gltf2.AccessorComponentType.UNSIGNED_BYTE  , Uint8Array   ],
-  [Gltf2.AccessorComponentType.SHORT          , Int16Array   ],
-  [Gltf2.AccessorComponentType.UNSIGNED_SHORT , Uint16Array  ],
-  [Gltf2.AccessorComponentType.UNSIGNED_INT   , Uint32Array  ],
-  [Gltf2.AccessorComponentType.FLOAT          , Float32Array ],
-]);
+
 
 
 //https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md_animations
-const NORMALIZE_FUNCS = new Map<Gltf2.AccessorComponentType, normalizeFunc>([
-  [Gltf2.AccessorComponentType.BYTE           , c => Math.max(c / 127.0, -1.0)	 ],
-  [Gltf2.AccessorComponentType.UNSIGNED_BYTE  , c => c / 255.0	 ],
-  [Gltf2.AccessorComponentType.SHORT          , c => Math.max(c / 32767.0, -1.0)	 ],
-  [Gltf2.AccessorComponentType.UNSIGNED_SHORT , c => c / 65535.0	 ],
-  [Gltf2.AccessorComponentType.UNSIGNED_INT   , c => c ],
-  [Gltf2.AccessorComponentType.FLOAT          , c => c ],
-]);
+const NORMALIZE_BYTE           = (c:number) => Math.max(c / 127.0, -1.0);
+const NORMALIZE_UNSIGNED_BYTE  = (c:number) => c / 255.0;
+const NORMALIZE_SHORT          = (c:number) => Math.max(c / 32767.0, -1.0);
+const NORMALIZE_UNSIGNED_SHORT = (c:number) => c / 65535.0	;
+const NORMALIZE_UNSIGNED_INT   = (c:number) => c;
+const NORMALIZE_FLOAT          = (c:number) => c;
 
 
 function getNormalizeFunction( t:Gltf2.AccessorComponentType ) : normalizeFunc 
 {
-  const a : normalizeFunc = NORMALIZE_FUNCS.get(t);
-  Assert.isDefined(a);
-  return a;
+  switch (t) {
+    case Gltf2.AccessorComponentType.BYTE          : return NORMALIZE_BYTE          ;
+    case Gltf2.AccessorComponentType.UNSIGNED_BYTE : return NORMALIZE_UNSIGNED_BYTE ;
+    case Gltf2.AccessorComponentType.SHORT         : return NORMALIZE_SHORT         ;
+    case Gltf2.AccessorComponentType.UNSIGNED_SHORT: return NORMALIZE_UNSIGNED_SHORT;
+    case Gltf2.AccessorComponentType.UNSIGNED_INT  : return NORMALIZE_UNSIGNED_INT  ;
+    case Gltf2.AccessorComponentType.FLOAT         : return NORMALIZE_FLOAT         ;
+  }
 }
 
 
 export function getArrayForDataType( t:Gltf2.AccessorComponentType ) : TypedArrayConstructor
 {
-  const a : TypedArrayConstructor = ARRAY_TYPES.get(t);
-  Assert.isDefined(a);
-  return a;
+  switch (t) {
+    case Gltf2.AccessorComponentType.BYTE          : return Int8Array   ;
+    case Gltf2.AccessorComponentType.UNSIGNED_BYTE : return Uint8Array  ;
+    case Gltf2.AccessorComponentType.SHORT         : return Int16Array  ;
+    case Gltf2.AccessorComponentType.UNSIGNED_SHORT: return Uint16Array ;
+    case Gltf2.AccessorComponentType.UNSIGNED_INT  : return Uint32Array ;
+    case Gltf2.AccessorComponentType.FLOAT         : return Float32Array;
+  }
 }  
 
 
@@ -71,9 +70,29 @@ function getBytesLengthForDataType( t:Gltf2.AccessorComponentType ):number
 
 function getSizeForComponentType( t:Gltf2.AccessorType )
 {
-  const a = TYPE_SIZE_MAP[t];
-  Assert.isDefined(a);
-  return a;
+  switch (t) {
+    case Gltf2.AccessorType.SCALAR: return 1;
+    case Gltf2.AccessorType.VEC2  : return 2;
+    case Gltf2.AccessorType.VEC3  : return 3;
+    case Gltf2.AccessorType.VEC4  : return 4;
+    case Gltf2.AccessorType.MAT2  : return 4;
+    case Gltf2.AccessorType.MAT3  : return 9;
+    case Gltf2.AccessorType.MAT4  : return 16;
+  }
+}  
+
+
+function getGlslTypeForComponentType( t:Gltf2.AccessorType )
+{
+  switch (t) {
+    case Gltf2.AccessorType.SCALAR: return AccessorGlslType.float;
+    case Gltf2.AccessorType.VEC2  : return AccessorGlslType.vec2 ;
+    case Gltf2.AccessorType.VEC3  : return AccessorGlslType.vec3 ;
+    case Gltf2.AccessorType.VEC4  : return AccessorGlslType.vec4 ;
+    case Gltf2.AccessorType.MAT2  : return AccessorGlslType.mat2 ;
+    case Gltf2.AccessorType.MAT3  : return AccessorGlslType.mat3 ;
+    case Gltf2.AccessorType.MAT4  : return AccessorGlslType.mat4 ;
+  }
 }  
 
 
@@ -83,8 +102,15 @@ export type BaseAccessorData = Gltf2.IAccessor | Gltf2.IAccessorSparseIndices | 
 export class BaseAccessor {
 
   normalized     : boolean      = false;
+  /**
+   * bytes offset in the BufferView
+   */
   byteOffset     : number       = 0;
+  /**
+   * number of elements 
+   */
   count          : number       = 0;
+
   _stride        : number       = 0;
   _strideElem    : number       = 0;
   componentType  : Gltf2.AccessorComponentType        ;
@@ -98,12 +124,18 @@ export class BaseAccessor {
   sparse         : AccessorSparse|null  ;
 
 
+
+
   get numComps(){
     return getSizeForComponentType(this.type);
   }
 
   get bytesPerElem(){
     return getBytesLengthForDataType(this.componentType);
+  }
+
+  get glslType() : AccessorGlslType {
+    return getGlslTypeForComponentType( this.type );
   }
  
 
@@ -119,13 +151,24 @@ export class BaseAccessor {
 
   
   /**
-   * @return {TypedArray} 
+   * 
    */
   createElementHolder(normalized : boolean = this.normalized) : TypedArray{
     if( normalized ) 
       return new Float32Array( this.numComps );
     else
       return new (getArrayForDataType(this.componentType))(this.numComps);
+  }
+
+  
+  /**
+   * @return {TypedArray} 
+   */
+  createElementHolderArray( size : number, normalized : boolean = this.normalized) : TypedArray{
+    if( normalized ) 
+      return new Float32Array( this.numComps*size );
+    else
+      return new (getArrayForDataType(this.componentType))(this.numComps*size);
   }
 
 
@@ -187,11 +230,38 @@ export class BaseAccessor {
 
   }
 
+  getValues( out:TypedArray, index:number, size : number ){
+
+    if( this.sparse !== null ){
+      // TODO: try this one
+      throw new Error('Cant call getValues in sparsed accessor' )
+      // this.sparse.getRawValues( out, index, size );
+    } else {
+      this.getRawValues( out, index, size );
+    }
+
+    if( this.normalized ){
+      this._normalize( out, out );
+    }
+
+  }
+
   getRawValue( out:TypedArray, index:number ){
     const offset = this._strideElem * index;
     const ncomps = this.numComps;
     for (var i = 0; i < ncomps; i++) {
       out[i] = this._array[i+offset];
+    }
+  }
+
+  getRawValues( out:TypedArray, index:number, size : number ){
+    const ncomps = this.numComps;
+    for (let k = 0; k < size; k++) {
+      const j = k*ncomps;
+      const offset = this._strideElem * (index+k);
+      for (var i = 0; i < ncomps; i++) {
+        out[j+i] = this._array[i+offset];
+      }
     }
   }
 

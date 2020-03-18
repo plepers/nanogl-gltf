@@ -27,12 +27,10 @@
 uniform vec3 uCameraPosition;
 
 IN vec3 vWorldPosition;
-
 IN mediump vec3 vWorldNormal;
-
+IN mediump vec3 vWorldTangent;
 
 #if HAS_normal && useDerivatives == 0
-  IN mediump vec3 vWorldTangent;
   IN mediump vec3 vWorldBitangent;
 #endif
 

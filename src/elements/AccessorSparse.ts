@@ -6,6 +6,7 @@ import AccessorSparseIndices from "./AccessorSparseIndices";
 import AccessorSparseValues from "./AccessorSparseValues";
 import { IElement } from "../types/Elements";
 import { GLContext } from "nanogl/types";
+import { TypedArray } from "../types/TypedArray";
 
 export default class AccessorSparse implements IElement {
 
@@ -73,7 +74,7 @@ export default class AccessorSparse implements IElement {
 
 
 
-  getRawValue( out, index ){
+  getRawValue( out:TypedArray, index: number ){
     const isSparse = this.indicesSet.has( index );
     if( isSparse ){
       this.values.getRawValue( out, this.indicesMap.get(index) );
@@ -81,8 +82,24 @@ export default class AccessorSparse implements IElement {
       this.accessor.getRawValue( out, index );
     }
   }
+
+  // getRawValues( out:TypedArray, index: number, size : number ){
+
+  //   for (let i = 0; i < size; i++) {
+  //     const findex = index+i
+  //     const isSparse = this.indicesSet.has( findex );
+      
+  //     if( isSparse ){
+  //       this.values.getRawValue( out, this.indicesMap.get(findex) );
+  //     }else {
+  //       this.accessor.getRawValue( out, findex );
+  //     }
+
+  //   }
+  // }
+
   
-  getRawScalar(index) {
+  getRawScalar(index:number) : number {
     const isSparse = this.indicesSet.has( index );
     if( isSparse ){
       return this.values.getRawScalar( this.indicesMap.get(index) )

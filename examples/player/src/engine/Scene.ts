@@ -48,7 +48,6 @@ export default class Scene {
   maxcam      : MaxControler
   gltfScene   : Gltf;
   bounds      : Bounds
-  animation   : Animation
   animationTime :number;
   animationDuration :number;
 
@@ -103,6 +102,9 @@ export default class Scene {
     this.root.add( this.mainCamera )
     this.root.add( this.devCamera )
     this.sroot.add( this.root )
+
+    this.root.rotation.set([0, 0, 0, 1])
+    this.root.rotateY(this.envRotation)
     // this.root .add( this.tree      .node );
 
     // this.camCtrl.setControler(this.maxcam);
@@ -121,6 +123,9 @@ export default class Scene {
   async loadGltf( url : string ){
     if( this.gltfScene ){
       this.root.remove( this.gltfScene.root )
+      this.gltfScene = null;
+
+      this.gl.clear( this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT );
     }
 
     this.gltfScene = await GltfIO.loadGltf( url );
@@ -145,10 +150,10 @@ export default class Scene {
 
   computeBounds() {
 
-    this.gltfScene.root.updateWorldMatrix();
+    this.root.updateWorldMatrix();
     this.bounds = new Bounds();
-    this.bounds.copyFrom( this.gltfScene.renderables[0].bounds )
     const b : Bounds = new Bounds();
+    Bounds.transform( this.bounds, this.gltfScene.renderables[0].bounds, this.gltfScene.renderables[0].node._wmatrix )
     for (const renderable of this.gltfScene.renderables ) {
       Bounds.transform( b, renderable.bounds, renderable.node._wmatrix )
       Bounds.union( this.bounds, this.bounds, b );
@@ -158,14 +163,20 @@ export default class Scene {
   initCamera(){
     const bs = new BoundingSphere();
     BoundingSphere.fromBounds( bs, this.bounds );
-
-    vec3.add( this.devCamera.position,  <vec3>bs.center, vec3.fromValues(0, 0, bs.radius[0] * 5 ) );
-    this.devCamera.lookAt( <vec3>bs.center );
+    const maxRadius = Math.max( ...bs.radius )
+    vec3.add( this.devCamera.position,  <vec3>bs.center, vec3.fromValues(0, maxRadius * 1, maxRadius * 5 ) );
+    this.maxcam.stop();
+    
+    const m4 = mat4.create()
+    mat4.invert( m4, this.devCamera._parent._wmatrix )
+    vec3.transformMat4( bs.center, bs.center, m4 )
+    
+    this.devCamera.lookAt( bs.center );
     this.devCamera.invalidate();
-    this.maxcam.orbitRadius = -bs.radius[0] * 5;
-    this.maxcam.panSensitivity = bs.radius[0] * 5
-    this.devCamera.lens.far = bs.radius[0] * 10
-    this.devCamera.lens.near = bs.radius[0] / 10
+    this.maxcam.orbitRadius = -maxRadius * 5;
+    this.maxcam.panSensitivity = maxRadius * 5
+    this.devCamera.lens.far = maxRadius * 10
+    this.devCamera.lens.near = maxRadius / 10
     this.camCtrl.setControler(this.maxcam)
   }
 
@@ -295,10 +306,6 @@ export default class Scene {
   //   }
   //   glstate.apply();
   // }
-
-
-
-
 
 
   makeCamera() {

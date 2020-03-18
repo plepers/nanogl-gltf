@@ -1,5 +1,5 @@
 
-import AnimationSampler from './AnimationSampler'
+import AnimationSampler, { SamplerEvaluator } from './AnimationSampler'
 import Node from './Node'
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
@@ -11,12 +11,7 @@ type applyFunc = (node:Node, value:TypedArray)=>void
 
 
 
-enum Path {
-  TRANSLATION = 'translation',
-  ROTATION    = 'rotation'   ,
-  SCALE       = 'scale'      ,
-  WEIGHTS     = 'weights'    ,
-}
+
 
 type PathType = 'translation' | 'rotation' | 'scale' | 'weights' | string;
 
@@ -43,13 +38,13 @@ function applyWeights(node:Node, value:TypedArray) {
 
 function getApplyFunctionFromPath(path:PathType):applyFunc {
   switch (path) {
-    case Path.TRANSLATION:
+    case Gltf2.AnimationChannelTargetPath.TRANSLATION:
       return applyTranslation;
-    case Path.ROTATION:
+    case Gltf2.AnimationChannelTargetPath.ROTATION:
       return applyRotation;
-    case Path.SCALE:
+    case Gltf2.AnimationChannelTargetPath.SCALE:
       return applyScale;
-    case Path.WEIGHTS:
+    case Gltf2.AnimationChannelTargetPath.WEIGHTS:
       return applyWeights;
     default:
       throw new Error('unsupported path ' + path);
@@ -66,10 +61,11 @@ export default class AnimationChannel implements IElement {
 
   _active       : boolean         ;
   sampler       : AnimationSampler;
-  path          : PathType        ;
+  path          : Gltf2.AnimationChannelTargetPath        ;
   applyFunction : applyFunc       ;
   node          : Node            ;
   valueHolder   : TypedArray      ;
+  evaluator     : SamplerEvaluator;
 
 
   async parse(gltfLoader:GltfLoader, data:Gltf2.IAnimationChannel) : Promise<any> {
@@ -82,19 +78,27 @@ export default class AnimationChannel implements IElement {
     if( data.target.node !== undefined ){
       this._active = true;
       this.node = await gltfLoader.getElement( GltfTypes.NODE, data.target.node);
+      
+      
+      let numElems = 1;
+      if( this.path === Gltf2.AnimationChannelTargetPath.WEIGHTS ){
+        numElems = this.node.mesh.primitives[0].targets.length
+      }
+      
+      gltfLoader._loadElement( data.elementParent ).then( animation=>{
+        this.sampler = animation.getSampler(data.sampler);
+        this.evaluator = this.sampler.createEvaluator( this.path, numElems )
+        this.valueHolder = this.evaluator.createElementHolder();
+      } );
+
     }
 
-    gltfLoader._loadElement( data.elementParent ).then( animation=>{
-      this.sampler = animation.getSampler(data.sampler);
-      this.valueHolder = this.sampler.createElementHolder();
-    } );
-    
   }
 
 
   evaluate(t:number) {
     if (this._active) {
-      this.sampler.evaluate(this.valueHolder, t);
+      this.evaluator.evaluate(this.valueHolder, t);
       this.applyFunction( this.node, this.valueHolder );
     }
   }

@@ -82,10 +82,11 @@ export default class Material implements IMaterial {
     const material = new BaseMaterial( gl, this._materialPass.name );
     material.addPass( this._materialPass, 'color' )
 
-    if( primitive.attributes.getSemantic( 'COLOR_0') !== null ){
+    const vcColorAttrib = primitive.attributes.getSemantic( 'COLOR_0')
+    if( vcColorAttrib !== null ){
       // vertex color
       const vcInput = new Input( 'vertexColor', 3 );
-      vcInput.attachAttribute( Gltf.getSemantics().getAttributeName('COLOR_0') );
+      vcInput.attachAttribute( vcColorAttrib.glslname );
       material.inputs.add( vcInput );
     }
 

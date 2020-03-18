@@ -5,6 +5,8 @@ import expect from 'expect.js'
 import { expectEqualArray } from './test-utils';
 import WebGltfIO from '../src/io/web';
 import GltfTypes from '../src/types/GltfTypes';
+import AnimationSampler, { SamplerEvaluator } from '../src/elements/AnimationSampler';
+import { TypedArray } from '../src/types/TypedArray';
 
 
 describe("Animation Sampler modes ", function () {
@@ -49,8 +51,10 @@ describe("Animation Sampler modes ", function () {
     it("test set", function () {
 
       //CubicSpline Scale
-      const sampler = gltf.getElement( GltfTypes.ANIMATION, 2 ).channels[0].sampler;
-      const out = sampler.createElementHolder();
+      const channel = gltf.getElement( GltfTypes.ANIMATION, 2 ).channels[0]
+      const sampler = channel.sampler;
+      const evaluator = sampler.createEvaluator(channel.path, 1)
+      const out = evaluator.createElementHolder();
 
       var arr = []
 
@@ -78,7 +82,7 @@ describe("Animation Sampler modes ", function () {
       // console.log( lll )
 
       for (const tset of CUBIC_SCALE_TEST_SET) {
-        sampler.evaluate(out, tset[0]);
+        evaluator.evaluate(out, tset[0]);
         expect( out[0]).to.be.equal( tset[1] );
       }
 
@@ -98,57 +102,61 @@ describe("Animation Sampler modes ", function () {
     const EPSILON = 0.00001;
 
 
-    let sampler;
-    let out;
+    let evaluator : SamplerEvaluator
+    let out : TypedArray;
 
     before( function(){
-      sampler = gltf.getElement( GltfTypes.ANIMATION, 0 ).channels[0].sampler;
-      out = sampler.createElementHolder();
+
+      const channel = gltf.getElement( GltfTypes.ANIMATION, 0 ).channels[0]
+      const sampler = channel.sampler;
+      evaluator = sampler.createEvaluator(channel.path, 1)
+
+      out = evaluator.createElementHolder();
     })
 
         
     it("t < min", function () {
-      sampler.evaluate(out, 0)
+      evaluator.evaluate(out, 0)
       expectEqualArray( out, new Float32Array([1,1,1]))
     });
       
     it("t = 0", function () {
-      sampler.evaluate(out, F0)
+      evaluator.evaluate(out, F0)
       expectEqualArray( out, new Float32Array([1,1,1]))
     });
 
     it("t = EPSILON", function () {
-      sampler.evaluate(out, F0 + EPSILON)
+      evaluator.evaluate(out, F0 + EPSILON)
       expectEqualArray( out, new Float32Array([1,1,1]))
     });
 
     it("t = F1-EPSILON", function () {
-      sampler.evaluate(out, F1-EPSILON)
+      evaluator.evaluate(out, F1-EPSILON)
       expectEqualArray( out, new Float32Array([1,1,1]))
     });
 
     it("t = F1", function () {
-      sampler.evaluate(out, F1)
+      evaluator.evaluate(out, F1)
       expectEqualArray( out, new Float32Array([.5, .5, .5]))
     });
 
     it("t = F1+EPSILON", function () {
-      sampler.evaluate(out, F1+EPSILON)
+      evaluator.evaluate(out, F1+EPSILON)
       expectEqualArray( out, new Float32Array([.5, .5, .5]))
     });
 
     it("t = FE-EPSILON", function () {
-      sampler.evaluate(out, FE-EPSILON)
+      evaluator.evaluate(out, FE-EPSILON)
       expectEqualArray( out, new Float32Array([.5, .5, .5]))
     });
     
     it("t = FE", function () {
-      sampler.evaluate(out, FE)
+      evaluator.evaluate(out, FE)
       expectEqualArray( out, new Float32Array([1,1,1]))
     });
     
     it("t = FE+EPSILON", function () {
-      sampler.evaluate(out, FE+EPSILON)
+      evaluator.evaluate(out, FE+EPSILON)
       expectEqualArray( out, new Float32Array([1,1,1]))
     });
 

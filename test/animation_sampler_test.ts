@@ -5,6 +5,8 @@ import expect from 'expect.js'
 import { expectEqualArray } from './test-utils';
 import WebGltfIO from '../src/io/web';
 import GltfTypes from '../src/types/GltfTypes';
+import { TypedArray } from '../src/types/TypedArray';
+import { SamplerEvaluator } from '../src/elements/AnimationSampler';
 
 
 describe("Animation Sampler", function () {
@@ -39,51 +41,41 @@ describe("Animation Sampler", function () {
   
   describe("getValue", function () {
 
+    let out : TypedArray;
+    let evaluator : SamplerEvaluator
+
+    before( function(){
+
+      const channel = gltf.getElement( GltfTypes.ANIMATION, 0 ).channels[0]
+      const sampler = channel.sampler;
+      evaluator = sampler.createEvaluator(channel.path, 1)
+      out = evaluator.createElementHolder();
+    })
+
 
     it("t < 0", function () {
-      const sampler = gltf.getElement( GltfTypes.ANIMATION, 0 ).channels[0].sampler;
-      const out = sampler.createElementHolder();
-      sampler.evaluate( out, -1 )
-
+      evaluator.evaluate( out, -1 )
       expectEqualArray( out, new Float32Array([0, 0, 0, 1]))
-
     });
 
     it("t > max", function () {
-      const sampler = gltf.getElement( GltfTypes.ANIMATION, 0 ).channels[0].sampler;
-      const out = sampler.createElementHolder();
-      sampler.evaluate( out, 1000 )
-
+      evaluator.evaluate( out, 1000 )
       expectEqualArray( out, new Float32Array([0, 0, 0, 1]))
-
     });
 
     it("t = 0", function () {
-      const sampler = gltf.getElement( GltfTypes.ANIMATION, 0 ).channels[0].sampler;
-      const out = sampler.createElementHolder();
-      sampler.evaluate( out, 0 )
-
+      evaluator.evaluate( out, 0 )
       expectEqualArray( out, new Float32Array([0, 0, 0, 1]))
-
     });
 
     it("t = 1", function () {
-
-      const sampler = gltf.getElement( GltfTypes.ANIMATION, 0 ).channels[0].sampler;
-      const out = sampler.createElementHolder();
-      sampler.evaluate( out, 1 )
-
+      evaluator.evaluate( out, 1 )
       expectEqualArray( out, new Float32Array([0, 0, 0, 1]))
-
     });
 
     it("t = .25", function () {
-      const sampler = gltf.getElement( GltfTypes.ANIMATION, 0 ).channels[0].sampler;
-      const out = sampler.createElementHolder();
-      sampler.evaluate( out, .25 )
-
+      evaluator.evaluate( out, .25 )
       expectEqualArray( out, new Float32Array([ 0, 0, 0.7070, .7070 ]))
-
     });
 
 

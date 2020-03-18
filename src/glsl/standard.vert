@@ -17,6 +17,7 @@
 
 IN vec3 aPosition;
 IN vec3 aNormal;
+IN vec4 aTangent;
 
 
 uniform mat4 uMVP;
@@ -26,12 +27,11 @@ uniform mat4 uVP;
 
 OUT vec3 vWorldPosition;
 OUT mediump vec3 vWorldNormal;
+OUT mediump vec3 vWorldTangent;
 
 
 #if HAS_normal
   #if useDerivatives == 0
-  IN vec4 aTangent;
-  OUT mediump vec3 vWorldTangent;
   OUT mediump vec3 vWorldBitangent;
   #endif
 #endif
@@ -58,14 +58,15 @@ void main( void ){
   #pragma SLOT v
 
   // warp acces
-  highp vec3 pos = aPosition;
-  vec3 nrm = aNormal;
+  highp vec3 position = aPosition;
+  vec3 normal = aNormal;
+  vec3 tangent = aTangent.xyz;
   mat4 worldMatrix = uWorldMatrix;
   mat4 mvp         = uMVP;
 
   #pragma SLOT vertex_warp
 
-  vec4 worldPos = worldMatrix * vec4( pos, 1.0 );
+  vec4 worldPos = worldMatrix * vec4( position, 1.0 );
   worldPos.xyz /= worldPos.w;
   worldPos.w = 1.0;
 
@@ -74,11 +75,11 @@ void main( void ){
   gl_Position     = uVP         * worldPos;
 
   vWorldPosition  = worldPos.xyz;
-  vWorldNormal    = normalize( rotate( worldMatrix, nrm ) );
+  vWorldNormal    = normalize( rotate( worldMatrix, normal ) );
+  vWorldTangent   = normalize( rotate( worldMatrix, tangent.xyz ) );
 
   #if HAS_normal
     #if useDerivatives == 0
-    vWorldTangent   = normalize( rotate( worldMatrix, aTangent.xyz ) );
     vWorldBitangent = normalize( cross( vWorldNormal, vWorldTangent ) * aTangent.w );
     #endif
   #endif
@@ -89,5 +90,5 @@ void main( void ){
 
 
   
-  // vDebugColor = vec4( -pos, 1.0 );
+  // vDebugColor = vec4( -position, 1.0 );
 }
