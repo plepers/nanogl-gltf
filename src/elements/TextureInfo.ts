@@ -2,7 +2,6 @@
 
 
 import Texture from './Texture';
-import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
 import { IElement } from '../types/Elements';

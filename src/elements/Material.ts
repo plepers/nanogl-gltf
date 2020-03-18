@@ -89,17 +89,6 @@ export default class Material implements IMaterial {
       material.inputs.add( vcInput );
     }
 
-
-    if( node.skin ){
-      // add skin deformer
-      //material.setSkin ...
-    }
-    
-    if( node.weights ){
-      // add morph target deformer
-      //primitive.targets[0]
-    }
-
     return material;
   }
 

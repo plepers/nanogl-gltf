@@ -4,11 +4,8 @@
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
-import Texture from './Texture';
 import { IElement } from '../types/Elements';
 import { ITextureInfo, BaseTextureInfo } from './TextureInfo';
-import UVTransform from '../glsl/UVTransform';
-import Gltf from '..';
 
 
 export default class OcclusionTextureInfo extends BaseTextureInfo implements IElement, ITextureInfo {

@@ -2,7 +2,6 @@
   "name": "nanogl-gltf",
   "version": "0.1.0",
   "description": "gltf loader",
-  "main": "lib/index.js",
   "scripts": {
     "test": "karma start",
     "build": "tsc && ./build/make-glsl",
@@ -59,7 +58,7 @@
     "nanogl-node": "^1.2.0",
     "nanogl-state": "^1.1.1",
     "nanogl-vao": "^1.1.0",
-    "nanogl-pbr": "^2.3.1",
+    "nanogl-pbr": "^2.3.2",
     "save": "^2.4.0",
     "when": "^3.7.8"
   }

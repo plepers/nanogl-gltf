@@ -9,9 +9,15 @@ import Assert from "../lib/assert"
 import Program from "nanogl/program"
 import IRenderable, { IRenderingContext } from "./IRenderable"
 import Bounds from "nanogl-pbr/Bounds"
+import SkinDeformer, { SkinAttributeSet } from "../glsl/SkinDeformer"
+import Gltf from ".."
 
 
 
+
+function assertIsNumComps( n : number ) : asserts n is 1|2|3|4 {
+  if( n<1 || n>4 ) throw new Error('number is not Component size')
+}
 
 
 export default class MeshRenderer implements IRenderable {
@@ -25,6 +31,9 @@ export default class MeshRenderer implements IRenderable {
   glconfig? : GLConfig;
 
   readonly bounds : Bounds = new Bounds();
+
+
+  private _skins : SkinDeformer[] = []
   
   constructor( gl : GLContext, node: Node) {
     Assert.isDefined( node.mesh );
@@ -44,7 +53,60 @@ export default class MeshRenderer implements IRenderable {
     
     for (const primitive of this.mesh.primitives ) {
       const material = primitive.material.createMaterialForPrimitive( gl, this.node, primitive );
+      this.configureDeformers( material, primitive );
       this.materials.push( material );
+    }
+
+  }
+
+  configureDeformers(material: BaseMaterial, primitive: Primitive) {
+    
+    if( this.node.skin ){
+      
+      const skinDeformer = new SkinDeformer()
+      skinDeformer.numJoints = this.node.skin.joints.length
+
+      const attributeSet : SkinAttributeSet[] = [];
+      
+      let setIndex = 0
+      while( true ){
+
+        const wsem = 'WEIGHTS_'+setIndex;
+        const jsem = 'JOINTS_' +setIndex;
+        const weights = primitive.attributes.getSemantic( wsem );
+        const joints  = primitive.attributes.getSemantic( jsem );
+        
+        if( (weights === null) !== (joints === null) ){
+          throw new Error('Skin attributes inconsistency')
+        }
+
+        if( weights === null ) break;
+        
+        if( weights.accessor.numComps !== joints.accessor.numComps){
+          throw new Error('weight and joints attribute dont have the same size')
+        }
+
+        const numComponents = weights.accessor.numComps;
+        assertIsNumComps( numComponents );
+
+        attributeSet.push({
+          weightsAttrib : Gltf.getSemantics().getAttributeName( wsem ),
+          jointsAttrib  : Gltf.getSemantics().getAttributeName( jsem ),
+          numComponents
+        })
+        setIndex++;
+      }
+
+      skinDeformer.setAttributeSet( attributeSet );
+      // add skin deformer
+      //material.setSkin ...
+      material.inputs.add( skinDeformer );
+      this._skins.push( skinDeformer );
+    }
+    
+    if( this.node.weights ){
+      // add morph target deformer
+      //primitive.targets[0]
     }
 
   }
@@ -56,6 +118,7 @@ export default class MeshRenderer implements IRenderable {
     }
   }
 
+  
 
   render( context:IRenderingContext, camera:Camera, mask:number, passId : string,  glconfig?:GLConfig ) : void {
 
@@ -63,6 +126,11 @@ export default class MeshRenderer implements IRenderable {
 
     const primitives = this.mesh.primitives;
     
+    // TODO: move this in pre render? 
+    for (const skin of this._skins) {
+      this.node.skin.computeJoints( this.node, skin.jointMatrices );
+    }
+
 
     for (let i = 0; i < primitives.length; i++) {
 
