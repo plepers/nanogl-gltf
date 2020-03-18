@@ -89,7 +89,7 @@ export default class Scene {
     this.inputs      = new Inputs (this.glview.canvas );
     this.iblMngr     = new IBLManager ( this );
     
-    this.envRotation = Math.PI
+    this.envRotation = Math.PI/2
 
     // CONTROLERS
     // ======
@@ -119,8 +119,13 @@ export default class Scene {
   }
 
   async loadGltf( url : string ){
+    if( this.gltfScene ){
+      this.root.remove( this.gltfScene.root )
+    }
+
     this.gltfScene = await GltfIO.loadGltf( url );
     await this.gltfScene.allocateGl( this.gl )
+    this.root.add( this.gltfScene.root );
     this.setupMaterials()
     this.computeBounds()
     this.initCamera()
@@ -154,7 +159,7 @@ export default class Scene {
     const bs = new BoundingSphere();
     BoundingSphere.fromBounds( bs, this.bounds );
 
-    vec3.add( this.devCamera.position,  <vec3>bs.center, vec3.fromValues(0, 0, -bs.radius[0] * 5 ) );
+    vec3.add( this.devCamera.position,  <vec3>bs.center, vec3.fromValues(0, 0, bs.radius[0] * 5 ) );
     this.devCamera.lookAt( <vec3>bs.center );
     this.devCamera.invalidate();
     this.maxcam.orbitRadius = -bs.radius[0] * 5;
@@ -206,7 +211,6 @@ export default class Scene {
 
     // upadate graph
     // =================
-
     this.root.rotation.set([0, 0, 0, 1])
     this.root.rotateY(this.envRotation)
     this.sroot.updateWorldMatrix()

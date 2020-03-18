@@ -3,6 +3,7 @@ import Scene from "./engine/Scene";
 import Models from './Models'
 
 const selector = document.getElementById('model-selector') as HTMLSelectElement
+const statusEl = document.getElementById('status')
 
 const modelPaths = [];
 for (const name in Models) {
@@ -44,8 +45,13 @@ scene.load().then(() => {
 
 function loadModel(path) {
   selector.selectedIndex = modelPaths.indexOf(path)
+  statusEl.innerText = "loading"
   scene.loadGltf(path).then(()=>{
     localStorage.setItem('selectedmodel', path)
+    statusEl.innerText = "loaded"
+  }).catch((e)=>{
+    console.log(e)
+    statusEl.innerText = e.message
   });
 }
 

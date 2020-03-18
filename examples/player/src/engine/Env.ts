@@ -24,7 +24,7 @@ const ENVS = [
 
 
 
-const EXPO = 1.4
+const EXPO = 5
 const GAMMA = 2.2
 
 class Env{
@@ -73,16 +73,6 @@ class Env{
 
   }
 
-
-  setupForReflect(){
-    this.expoUniform.set( 1 );
-    this.gammaUniform.set( 1 );
-  }
-  
-  restoreFromReflect(){
-    this.expoUniform.set( EXPO );
-    this.gammaUniform.set( 1/GAMMA );
-  }
 
 
   setupMat( m : StandardPass ){

@@ -118,7 +118,6 @@ export default class StandardPass extends MaterialPass {
     inputs.add( this.iGamma                = new Input( 'gamma'               , 1 ) );
     inputs.add( this.iExposure             = new Input( 'exposure'            , 1 ) );
 
-
     inputs.add( this.alphaMode      = new Enum( 'alphaMode', [
       "OPAQUE",
       "MASK",
