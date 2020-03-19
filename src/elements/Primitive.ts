@@ -16,7 +16,7 @@ import { IElement } from '../types/Elements';
 import Bounds from 'nanogl-pbr/Bounds';
 
 
-class Attribute {
+export class Attribute {
 
   /**
    * the standard Semantic for this attribute (POSITION, NORMAL, WEIGHTS_0 etc)
@@ -59,7 +59,7 @@ class BufferInfos {
 }
 
 
-class AttributesSet {
+export class AttributesSet {
 
   
   _attributes: Attribute[];

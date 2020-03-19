@@ -225,6 +225,7 @@ export default class GltfLoader {
 
 
 
+
   parseAll = async () => {
 
 

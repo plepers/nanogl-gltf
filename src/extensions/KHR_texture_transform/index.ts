@@ -72,11 +72,6 @@ class Instance implements IExtensionInstance {
     this.loader = gltfLoader;
   }
 
-
-  setupUVTransform( ){
-
-  }
-
   wrapElement( element : ITextureInfo, extData : TransformData ){
     element.createMaterialTexCoords = (texCoords : TexCoordCollection)=>{
 

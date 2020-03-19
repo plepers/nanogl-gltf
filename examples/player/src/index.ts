@@ -1,17 +1,23 @@
 import GLView from "./engine/GLView";
 import Scene from "./engine/Scene";
-import Models from './Models'
+import _Models from './Models'
+
+type Mentry = {
+  name : string,
+  url:string
+}
+const Models : Mentry[] = _Models
 
 const selector = document.getElementById('model-selector') as HTMLSelectElement
 const statusEl = document.getElementById('status')
 
 const modelPaths = [];
-for (const name in Models) {
-  const path = Models[name];
-  modelPaths.push(path)
+for (const model of Models) {
+  const {name, url} = model
+  modelPaths.push(url)
   const option = document.createElement('option')
   option.textContent = name
-  option.value = path
+  option.value = url
   selector.appendChild(option);
 }
 
@@ -35,7 +41,7 @@ scene.load().then(() => {
   if (storedSelected) {
     loadModel(storedSelected)
   } else {
-    loadModel(Models['TextureTransformTest.gltf'])
+    loadModel(Models[0])
   }
 })
 

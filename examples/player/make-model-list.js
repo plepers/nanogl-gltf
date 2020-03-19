@@ -18,12 +18,13 @@ for (const patt of globPatterns) {
 
 
 
-const json = {}
+const json = []
 for (let i = 0; i < files.length; i++) {
   const file = files[i];
   name = path.basename( file )
+  if( file.toLowerCase().indexOf( 'draco' ) > -1 ) name += ' (draco)'
   url = path.relative( './test/samples/', file )
-  json[name] = url
+  json.push({name, url})
   
 }
 
