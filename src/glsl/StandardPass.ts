@@ -13,7 +13,6 @@ import  Enum           from 'nanogl-pbr/Enum'
 import {GammaModeEnum} from 'nanogl-pbr/GammaModeEnum'
 import  Precision      from 'nanogl-pbr/ShaderPrecision'
 import  Version        from 'nanogl-pbr/ShaderVersion'
-import  TexCoordCollection   from 'nanogl-pbr/TexCoordCollection'
 import  MaterialPass   from 'nanogl-pbr/MaterialPass'
 import  Program        from 'nanogl/program'
 import  Node           from 'nanogl-node'
@@ -32,7 +31,6 @@ const MAT_ID = 'std';
 export default class StandardPass extends MaterialPass {
 
 
-  texCoords            : TexCoordCollection
   ibl                  : IBL
   version              : Version
   precision            : Precision
@@ -82,7 +80,6 @@ export default class StandardPass extends MaterialPass {
 
     const inputs = this.inputs;
 
-    this.texCoords = new TexCoordCollection( inputs );
 
     inputs.add( this.version         = new Version( '100' ) );
     inputs.add( this.precision       = new Precision( 'highp' ) );
@@ -132,7 +129,7 @@ export default class StandardPass extends MaterialPass {
     inputs.add( this.glossNearest    = new Flag ( 'glossNearest',    false ) );
     inputs.add( this.noFresnel       = new Flag ( 'noFresnel'   ,    false ) );
     inputs.add( this.horizonFading   = new Flag ( 'horizonFading' ,  false ) );
-    inputs.add( this.useDerivatives  = new Flag ( 'useDerivatives',  false ) );
+    // inputs.add( this.useDerivatives  = new Flag ( 'useDerivatives',  false ) );
 
     inputs.add( this.gammaMode       = new Enum( 'gammaMode',[
       'GAMMA_NONE',

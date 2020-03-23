@@ -6,6 +6,7 @@ import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
 import { IElement } from '../types/Elements';
+import Assert from '../lib/assert';
 
 
 const _HAS_CIB : boolean = ( window.createImageBitmap !== undefined );
@@ -79,13 +80,13 @@ export default class Image implements IElement {
       const img = new window.Image();
       const src = URL.createObjectURL(blob);
 
-      new Promise( (resolve, reject)=>{
+      const loadPromise = new Promise( (resolve, reject)=>{
         img.onload  = resolve;
         img.onerror = reject;
         img.src = src;
-      })
-      .finally( ()=>URL.revokeObjectURL(src) )
-      .then( ()=>img );
+      }).finally( ()=>URL.revokeObjectURL(src) )
+
+      return loadPromise.then( ()=>img );
 
     }
   }

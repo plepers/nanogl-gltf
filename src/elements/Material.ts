@@ -6,19 +6,20 @@ import NormalTextureInfo from './NormalTextureInfo';
 import OcclusionTextureInfo from './OcclusionTextureInfo';
 import TextureInfo from './TextureInfo';
 
-import { GLContext } from 'nanogl/types';
+import { GLContext, isWebgl2 } from 'nanogl/types';
 import MaterialPass from 'nanogl-pbr/MaterialPass';
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
 import StandardPass from '../glsl/StandardPass';
-import Input, { Sampler } from 'nanogl-pbr/Input';
+import Input, { Sampler, Uniform } from 'nanogl-pbr/Input';
 import BaseMaterial from 'nanogl-pbr/BaseMaterial';
 import Primitive from './Primitive';
 import Node from './Node';
 import { IElement } from '../types/Elements';
 import Gltf from '..';
 import Texture from './Texture';
+import Flag from 'nanogl-pbr/Flag';
 
 
 function _isAllOnes( a : ArrayLike<number> ) : boolean {
@@ -71,16 +72,23 @@ export default class Material implements IMaterial {
 
 
   
-  protected _materialPass   : MaterialPass
+  protected _materialPass   : StandardPass
 
   get materialPass() : MaterialPass {
     return this._materialPass;
   }
 
   createMaterialForPrimitive( gl : GLContext, node : Node, primitive : Primitive ) : BaseMaterial {
+    
+    this._materialPass.version.set( isWebgl2(gl) ? '300 es' : '100' )
 
     const material = new BaseMaterial( gl, this._materialPass.name );
     material.addPass( this._materialPass, 'color' )
+
+    const tangent = primitive.attributes.getSemantic( 'TANGENT')
+    if( tangent === null ){
+      material.inputs.add( new Flag('useDerivatives', true ))
+    }
 
     const vcColorAttrib = primitive.attributes.getSemantic( 'COLOR_0')
     if( vcColorAttrib !== null ){
@@ -127,12 +135,6 @@ export default class Material implements IMaterial {
   }
 
 
-  assignSamplerTexture( sampler : Sampler, texture : Texture ){
-    texture.glTexturePromise.then((tex)=>{
-      sampler.set( tex );
-    })
-  }
-
 // TODO: don't really need to be in gl allocation step
   setupMaterials(): void {
     const pass = new StandardPass(this.name);
@@ -160,24 +162,25 @@ export default class Material implements IMaterial {
     if (pbr !== undefined) {
 
       if (pbr.baseColorTexture) {
-        const tc = pbr.baseColorTexture.createMaterialTexCoords(pass.texCoords);
-        const baseColorSampler = new Sampler('tBaseColor', tc );
-        this.assignSamplerTexture( baseColorSampler, pbr.baseColorTexture.texture )
+        const baseColorSampler = pbr.baseColorTexture.createSampler()
         pass.baseColor.attach(baseColorSampler, 'rgb')
-        pass.alpha.attach(baseColorSampler, 'a')
+        pass.alpha    .attach(baseColorSampler, 'a')
       }
 
+      if( ! _isAllOnes( pbr.baseColorFactor ) ){
+        const cFactor = new Uniform( 'uBasecolorFactor', 4 );
+        cFactor.set( ...pbr.baseColorFactor )
+        pass.baseColorFactor.attach(cFactor, 'rgb' )
+        pass.alphaFactor    .attach(cFactor, 'a')
+      }
+
+
       if (pbr.metallicRoughnessTexture) {
-        const tc = pbr.metallicRoughnessTexture.createMaterialTexCoords(pass.texCoords);
-        const mrSampler = new Sampler('tMetalicRoughness', tc );
-        this.assignSamplerTexture( mrSampler, pbr.metallicRoughnessTexture.texture )
+        const mrSampler = pbr.metallicRoughnessTexture.createSampler()
         pass.metalness.attach(mrSampler, 'b')
         pass.roughness.attach(mrSampler, 'g')
       }
 
-      if( ! _isAllOnes( pbr.baseColorFactor ) ){
-        pass.baseColorFactor.attachUniform('uBasecolorFactor').set(...pbr.baseColorFactor)
-      }
 
       if (pbr.metallicFactor !== 1) {
         pass.metalnessFactor.attachUniform('uMetalnessFactor').set(pbr.metallicFactor)
@@ -192,9 +195,8 @@ export default class Material implements IMaterial {
     
 
     if ( this.emissiveTexture ) {
-      const tc = this.emissiveTexture.createMaterialTexCoords(pass.texCoords);
-      const sampler = pass.emissive.attachSampler('tEmissive', tc);
-      this.assignSamplerTexture( sampler, this.emissiveTexture.texture )
+      const sampler = this.emissiveTexture.createSampler();
+      pass.emissive.attach( sampler );
     }
     
     if( !_isAllZeros( this.emissiveFactor) ){
@@ -204,9 +206,8 @@ export default class Material implements IMaterial {
     
     const nrm = this.normalTexture;
     if ( nrm ) {
-      const tc = nrm.createMaterialTexCoords(pass.texCoords);
-      const sampler = pass.normal.attachSampler('tNormal', tc);
-      this.assignSamplerTexture( sampler, nrm.texture )
+      const sampler = nrm.createSampler();
+      pass.normal.attach( sampler )
       
       if (nrm.scale !== 1) {
         pass.normalScale.attachUniform('uNormalScale').set(nrm.scale)
@@ -217,9 +218,8 @@ export default class Material implements IMaterial {
     const occlu = this.occlusionTexture;
     if (occlu) {
 
-      const tc = occlu.createMaterialTexCoords(pass.texCoords);
-      const sampler = pass.occlusion.attachSampler('tOcclusion', tc);
-      this.assignSamplerTexture( sampler, occlu.texture )
+      const sampler = occlu.createSampler()
+      pass.occlusion.attach(sampler);
 
       if (occlu.strength !== 1) {
         pass.occlusionStrength.attachUniform('uOccluStrength').set(occlu.strength)

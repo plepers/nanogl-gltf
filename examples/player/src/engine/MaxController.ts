@@ -4,6 +4,10 @@ import { ICameraController } from "./CameraController";
 import PerspectiveLens from "nanogl-camera/perspective-lens";
 
 
+function isTouchEvent(e:MouseEvent|TouchEvent ) : e is TouchEvent {
+  return ((e as any).touches !== undefined );
+}
+
 const NULL_QUAT = quat.create()
 const Q1        = quat.create()
 const Q2        = quat.create()
@@ -22,9 +26,17 @@ const enum Mode {
 
 
 
-function setMousePos( e:MouseEvent, el:HTMLCanvasElement, v3 ){
-  v3[0] =   2 * e.clientX / (el.width /window.devicePixelRatio)- 1
-  v3[1] = -(2 * e.clientY / (el.height/window.devicePixelRatio) - 1)
+function setMousePos( e:MouseEvent|TouchEvent, el:HTMLCanvasElement, v3 ){
+  let cx:number, cy:number;
+  if( isTouchEvent(e) ){
+    cx = e.touches[0].clientX
+    cy = e.touches[0].clientY
+  }else {
+    cx = e.clientX
+    cy = e.clientY
+  }
+  v3[0] =   2 * cx / (el.width /window.devicePixelRatio)- 1
+  v3[1] = -(2 * cy / (el.height/window.devicePixelRatio) - 1)
 }
 
 
@@ -58,6 +70,7 @@ export default class CameraControl implements ICameraController {
   start( cam : Camera ){
     this.cam = cam as Camera<PerspectiveLens>;
     this.el.addEventListener( 'mousemove', this.onMouseMove );
+    this.el.addEventListener( 'touchmove', this.onMouseMove );
     this.mode        = -1;
     this.setMode( Mode.IDLE )
   }
@@ -66,6 +79,7 @@ export default class CameraControl implements ICameraController {
   stop(){
     this.cam = null;
     this.el.removeEventListener( 'mousemove', this.onMouseMove );
+    this.el.removeEventListener( 'touchmove', this.onMouseMove );
   }
 
 
@@ -107,14 +121,18 @@ export default class CameraControl implements ICameraController {
 
 
 
-  onMouseMove = ( e:MouseEvent )=>{
+  onMouseMove = ( e:MouseEvent|TouchEvent )=>{
     var mode = this._getModeForEvt(e)
     this.setMode( mode );
     setMousePos( e, this.el, this.mouse );
     this.action.update( this.mouse );
   }
 
-  _getModeForEvt( e:MouseEvent ) : Mode {
+
+  _getModeForEvt( e:MouseEvent|TouchEvent ) : Mode {
+    if( isTouchEvent(e)){
+      return Mode.ORBIT
+    }
     if( e .which !==  2 ) return Mode.IDLE
     if( e.altKey ){
       return e.ctrlKey ? Mode.DOLLY : Mode.ORBIT

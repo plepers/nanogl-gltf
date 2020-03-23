@@ -6,6 +6,8 @@ import { ITextureInfo } from "../../elements/TextureInfo";
 import Gltf from "../..";
 import TexCoordCollection from "nanogl-pbr/TexCoordCollection";
 import { mat3 } from "gl-matrix";
+import TexCoord from "nanogl-pbr/TexCoord";
+import { Sampler } from "nanogl-pbr/Input";
 
 const M3 : mat3 = mat3.create()
 
@@ -58,6 +60,7 @@ class TransformData {
 
 }
 
+let _samplerUID = 0;
 
 class Instance implements IExtensionInstance {
 
@@ -73,13 +76,23 @@ class Instance implements IExtensionInstance {
   }
 
   wrapElement( element : ITextureInfo, extData : TransformData ){
-    element.createMaterialTexCoords = (texCoords : TexCoordCollection)=>{
 
-      extData.getMatrix(M3);
-      const index = extData.texCoord ?? element.texCoord;
-      const attrib = Gltf.getSemantics().getAttributeName( `TEXCOORD_${index}` )
-      const uv = texCoords.getTexCoord(attrib).addStaticTransform( M3 );
-      return uv.varying();
+
+    element.createSampler = ()=>{
+
+      const e : any = element as any;
+      if( e._sampler === null ){
+
+        extData.getMatrix(M3);
+        const index = extData.texCoord ?? element.texCoord;
+        const attrib = Gltf.getSemantics().getAttributeName( `TEXCOORD_${index}` )
+        const tc = TexCoord.createTransformed( attrib, M3 );
+      
+        const sampler = new Sampler( `tex${name??''}tt_${_samplerUID++}`, tc )
+        e._sampler = sampler;
+        element.texture.glTexturePromise.then( (t)=> sampler.set( t ) )
+      }
+      return e._sampler;
     }
   }
   

@@ -1,8 +1,10 @@
 #pragma SLOT version
 #pragma SLOT definitions
 
-#if useDerivatives && __VERSION__ != 300
+#if __VERSION__ != 300
+#ifdef useDerivatives
   #extension GL_OES_standard_derivatives : enable
+#endif 
 #endif 
 
 #pragma SLOT precision
@@ -30,8 +32,10 @@ IN vec3 vWorldPosition;
 IN mediump vec3 vWorldNormal;
 IN mediump vec3 vWorldTangent;
 
-#if HAS_normal && useDerivatives == 0
+#if HAS_normal
+#ifndef useDerivatives
   IN mediump vec3 vWorldBitangent;
+#endif
 #endif
 
 
@@ -91,10 +95,10 @@ vec3 F_Schlick( float VoH,vec3 spec,float glo )
   vec3 ComputeWorldNormal( vec3 nrmmap ){
     
     vec3 nrm = normalize( gl_FrontFacing ? vWorldNormal : -vWorldNormal );
-    #if useDerivatives
-      vec3 res = normalize( perturbWorldNormalDerivatives( nrm, nrmmap, vTexCoord0 ) );
-    #else
+    #ifndef useDerivatives
       vec3 res = normalize( perturbWorldNormal( nrm, nrmmap, vWorldTangent, vWorldBitangent ) );
+    #else
+      vec3 res = normalize( perturbWorldNormalDerivatives( nrm, nrmmap, normal_texCoord() ) );
     #endif
     // res = res * 0.0001 + vWorldNormal;
 
@@ -260,6 +264,9 @@ void main( void ){
   // FragColor.rgb = FragColor.rgb*0.0001 + albedoSq;
   // FragColor.rgb = FragColor.rgb*0.0001 + diffuseCoef;
   // FragColor.rgb = FragColor.rgb*0.0001 + worldNormal;
+  // FragColor.rgb = FragColor.rgb*0.0001 + vWorldNormal;
+  // FragColor.rgb = FragColor.rgb*0.0001 + vWorldBitangent;
+  // FragColor.rgb = FragColor.rgb*0.0001 + vWorldTangent;
   // FragColor.rgb = FragColor.rgb*0.0001 + vec3(1.0, 0.0, 0.0);
   // FragColor.rg = vec2(0.0);
 

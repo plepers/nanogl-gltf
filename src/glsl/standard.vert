@@ -31,7 +31,7 @@ OUT mediump vec3 vWorldTangent;
 
 
 #if HAS_normal
-  #if useDerivatives == 0
+  #ifndef useDerivatives
   OUT mediump vec3 vWorldBitangent;
   #endif
 #endif
@@ -79,7 +79,7 @@ void main( void ){
   vWorldTangent   = normalize( rotate( worldMatrix, tangent.xyz ) );
 
   #if HAS_normal
-    #if useDerivatives == 0
+    #ifndef useDerivatives
     vWorldBitangent = normalize( cross( vWorldNormal, vWorldTangent ) * aTangent.w );
     #endif
   #endif

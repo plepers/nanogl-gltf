@@ -3,6 +3,8 @@
   <head>
     <title>glTF player</title>
 
+    <meta name="viewport" content="maximum-width=1, minimum-width=1, width=device-width">
+
     <style>
       html, body {
         margin : 0;
@@ -31,6 +33,7 @@
   <body>
     <div class='model-selector-wrapper'>
       <select name="models" id="model-selector"></select>
+      <button id='next-model'>next</button>
       <p id="status"></p>
     </div>
     <canvas id="gl-canvas"></canvas>

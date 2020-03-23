@@ -1,6 +1,6 @@
 
 
-#if useDerivatives
+#ifdef useDerivatives
 
 
 vec3 perturbWorldNormalDerivatives( vec3 nrm, vec3 n, vec2 texcoord ){

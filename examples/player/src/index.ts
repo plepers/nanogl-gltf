@@ -9,6 +9,7 @@ type Mentry = {
 const Models : Mentry[] = _Models
 
 const selector = document.getElementById('model-selector') as HTMLSelectElement
+const nextbtn = document.getElementById('next-model')
 const statusEl = document.getElementById('status')
 
 const modelPaths = [];
@@ -41,7 +42,7 @@ scene.load().then(() => {
   if (storedSelected) {
     loadModel(storedSelected)
   } else {
-    loadModel(Models[0])
+    loadModel(Models[0].url)
   }
 })
 
@@ -61,6 +62,10 @@ function loadModel(path) {
   });
 }
 
+nextbtn.onclick = ()=>{
+  selector.selectedIndex++
+  loadModel(selector.selectedOptions[0].value)
+}
 
 window.addEventListener('keydown', (e) => {
   switch (e.key) {

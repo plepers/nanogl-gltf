@@ -22,26 +22,26 @@ export function whenAll( promises ){
 
 
 
-export function loadText( url ) {
+export function loadText( url:string ) {
   return _ajax( url, '' );
 }
 
 
 
-export function loadJson( url ) {
+export function loadJson( url:string ) {
   return loadText( url )
     .then( str => JSON.parse(str) );
   
 }
 
 
-export function loadBytes( url ) {
+export function loadBytes( url:string ) {
   return _ajax( url, 'arraybuffer' );
 }
 
 
 
-export function loadImage( url ){
+export function loadImage( url:string ){
 
   const defer = when.defer();
   const img = new Image();
@@ -54,7 +54,7 @@ export function loadImage( url ){
 }
 
 
-export function baseDir( p ) : string[]{
+export function baseDir( p:string ) : string[]{
   const sep = p.lastIndexOf("/");
   return [
     p.substr( 0, sep ),

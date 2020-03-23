@@ -1,7 +1,7 @@
 
 import base64 from 'base64-js'
 
-import { loadText, loadBytes, baseDir } from "../lib/net";
+import { baseDir } from "../lib/net";
 import IOInterface from "./IOInterface";
 
 import UTF8   from '../lib/utf8-decoder'
@@ -37,6 +37,7 @@ class WebImpl implements IOInterface {
   }
 
   decodeUTF8(buffer: ArrayBuffer, offset : number = 0, length : number = undefined ): string {
+    if( length === undefined ) length = buffer.byteLength - offset;
     return UTF8( new Uint8Array( buffer, offset, length ) );
   }
   

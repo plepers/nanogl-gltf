@@ -54,7 +54,6 @@ class GLView {
     this.gl = <GLContext>(
       cvs.getContext( 'webgl2', opts ) ||
       cvs.getContext( 'webgl', opts ) ||
-      cvs.getContext( 'experimental-webgl', opts ) ||
       cvs.getContext( 'webgl'));
 
     this.gl.clearColor( 1, 1, 1, 1 );

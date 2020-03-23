@@ -57,6 +57,7 @@ export default class Scene {
 
   enableDebugDraw: boolean
   envRotation    : number
+  extensions: any[]
 
 
   constructor() {
@@ -76,6 +77,12 @@ export default class Scene {
 
     this.glview = glview
     this.gl = this.glview.gl
+
+
+    this.extensions = [
+      this.gl.getExtension( 'OES_standard_derivatives' ),
+      this.gl.getExtension( 'OES_element_index_uint' )
+    ]
 
 
     // CAMERA
