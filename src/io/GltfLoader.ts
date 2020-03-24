@@ -369,7 +369,7 @@ export default class GltfLoader {
   }
 
 
-  prepareGltfProperty(element: Gltf2.Property, type: GltfTypes, index : number, parent : Gltf2.Property ) {
+  prepareGltfProperty( element: Gltf2.Property, type: GltfTypes, index : number, parent : Gltf2.Property ) {
     if( element === undefined ) return;
     (element as any).gltftype = type;
     element.uuid = getUUID();

@@ -4,11 +4,11 @@ const Models = [
     "url": "models/2.0/2CylinderEngine/glTF-Draco/2CylinderEngine.gltf"
   },
   {
-    "name": "2CylinderEngine.gltf",
+    "name": "2CylinderEngine.gltf (embedded)",
     "url": "models/2.0/2CylinderEngine/glTF-Embedded/2CylinderEngine.gltf"
   },
   {
-    "name": "2CylinderEngine.gltf",
+    "name": "2CylinderEngine.gltf (specular)",
     "url": "models/2.0/2CylinderEngine/glTF-pbrSpecularGlossiness/2CylinderEngine.gltf"
   },
   {
@@ -16,7 +16,7 @@ const Models = [
     "url": "models/2.0/2CylinderEngine/glTF/2CylinderEngine.gltf"
   },
   {
-    "name": "AlphaBlendModeTest.gltf",
+    "name": "AlphaBlendModeTest.gltf (embedded)",
     "url": "models/2.0/AlphaBlendModeTest/glTF-Embedded/AlphaBlendModeTest.gltf"
   },
   {
@@ -36,7 +36,7 @@ const Models = [
     "url": "models/2.0/AnimatedMorphSphere/glTF/AnimatedMorphSphere.gltf"
   },
   {
-    "name": "AnimatedTriangle.gltf",
+    "name": "AnimatedTriangle.gltf (embedded)",
     "url": "models/2.0/AnimatedTriangle/glTF-Embedded/AnimatedTriangle.gltf"
   },
   {
@@ -52,7 +52,7 @@ const Models = [
     "url": "models/2.0/Avocado/glTF-Draco/Avocado.gltf"
   },
   {
-    "name": "Avocado.gltf",
+    "name": "Avocado.gltf (specular)",
     "url": "models/2.0/Avocado/glTF-pbrSpecularGlossiness/Avocado.gltf"
   },
   {
@@ -64,7 +64,7 @@ const Models = [
     "url": "models/2.0/BarramundiFish/glTF-Draco/BarramundiFish.gltf"
   },
   {
-    "name": "BarramundiFish.gltf",
+    "name": "BarramundiFish.gltf (specular)",
     "url": "models/2.0/BarramundiFish/glTF-pbrSpecularGlossiness/BarramundiFish.gltf"
   },
   {
@@ -76,7 +76,7 @@ const Models = [
     "url": "models/2.0/BoomBox/glTF-Draco/BoomBox.gltf"
   },
   {
-    "name": "BoomBox.gltf",
+    "name": "BoomBox.gltf (specular)",
     "url": "models/2.0/BoomBox/glTF-pbrSpecularGlossiness/BoomBox.gltf"
   },
   {
@@ -92,11 +92,11 @@ const Models = [
     "url": "models/2.0/Box/glTF-Draco/Box.gltf"
   },
   {
-    "name": "Box.gltf",
+    "name": "Box.gltf (embedded)",
     "url": "models/2.0/Box/glTF-Embedded/Box.gltf"
   },
   {
-    "name": "Box.gltf",
+    "name": "Box.gltf (specular)",
     "url": "models/2.0/Box/glTF-pbrSpecularGlossiness/Box.gltf"
   },
   {
@@ -104,11 +104,11 @@ const Models = [
     "url": "models/2.0/Box/glTF/Box.gltf"
   },
   {
-    "name": "BoxAnimated.gltf",
+    "name": "BoxAnimated.gltf (embedded)",
     "url": "models/2.0/BoxAnimated/glTF-Embedded/BoxAnimated.gltf"
   },
   {
-    "name": "BoxAnimated.gltf",
+    "name": "BoxAnimated.gltf (specular)",
     "url": "models/2.0/BoxAnimated/glTF-pbrSpecularGlossiness/BoxAnimated.gltf"
   },
   {
@@ -116,11 +116,11 @@ const Models = [
     "url": "models/2.0/BoxAnimated/glTF/BoxAnimated.gltf"
   },
   {
-    "name": "BoxInterleaved.gltf",
+    "name": "BoxInterleaved.gltf (embedded)",
     "url": "models/2.0/BoxInterleaved/glTF-Embedded/BoxInterleaved.gltf"
   },
   {
-    "name": "BoxInterleaved.gltf",
+    "name": "BoxInterleaved.gltf (specular)",
     "url": "models/2.0/BoxInterleaved/glTF-pbrSpecularGlossiness/BoxInterleaved.gltf"
   },
   {
@@ -128,11 +128,11 @@ const Models = [
     "url": "models/2.0/BoxInterleaved/glTF/BoxInterleaved.gltf"
   },
   {
-    "name": "BoxTextured.gltf",
+    "name": "BoxTextured.gltf (embedded)",
     "url": "models/2.0/BoxTextured/glTF-Embedded/BoxTextured.gltf"
   },
   {
-    "name": "BoxTextured.gltf",
+    "name": "BoxTextured.gltf (specular)",
     "url": "models/2.0/BoxTextured/glTF-pbrSpecularGlossiness/BoxTextured.gltf"
   },
   {
@@ -140,11 +140,11 @@ const Models = [
     "url": "models/2.0/BoxTextured/glTF/BoxTextured.gltf"
   },
   {
-    "name": "BoxTexturedNonPowerOfTwo.gltf",
+    "name": "BoxTexturedNonPowerOfTwo.gltf (embedded)",
     "url": "models/2.0/BoxTexturedNonPowerOfTwo/glTF-Embedded/BoxTexturedNonPowerOfTwo.gltf"
   },
   {
-    "name": "BoxTexturedNonPowerOfTwo.gltf",
+    "name": "BoxTexturedNonPowerOfTwo.gltf (specular)",
     "url": "models/2.0/BoxTexturedNonPowerOfTwo/glTF-pbrSpecularGlossiness/BoxTexturedNonPowerOfTwo.gltf"
   },
   {
@@ -152,7 +152,7 @@ const Models = [
     "url": "models/2.0/BoxTexturedNonPowerOfTwo/glTF/BoxTexturedNonPowerOfTwo.gltf"
   },
   {
-    "name": "BoxVertexColors.gltf",
+    "name": "BoxVertexColors.gltf (embedded)",
     "url": "models/2.0/BoxVertexColors/glTF-Embedded/BoxVertexColors.gltf"
   },
   {
@@ -164,11 +164,11 @@ const Models = [
     "url": "models/2.0/BrainStem/glTF-Draco/BrainStem.gltf"
   },
   {
-    "name": "BrainStem.gltf",
+    "name": "BrainStem.gltf (embedded)",
     "url": "models/2.0/BrainStem/glTF-Embedded/BrainStem.gltf"
   },
   {
-    "name": "BrainStem.gltf",
+    "name": "BrainStem.gltf (specular)",
     "url": "models/2.0/BrainStem/glTF-pbrSpecularGlossiness/BrainStem.gltf"
   },
   {
@@ -180,11 +180,11 @@ const Models = [
     "url": "models/2.0/Buggy/glTF-Draco/Buggy.gltf"
   },
   {
-    "name": "Buggy.gltf",
+    "name": "Buggy.gltf (embedded)",
     "url": "models/2.0/Buggy/glTF-Embedded/Buggy.gltf"
   },
   {
-    "name": "Buggy.gltf",
+    "name": "Buggy.gltf (specular)",
     "url": "models/2.0/Buggy/glTF-pbrSpecularGlossiness/Buggy.gltf"
   },
   {
@@ -192,7 +192,7 @@ const Models = [
     "url": "models/2.0/Buggy/glTF/Buggy.gltf"
   },
   {
-    "name": "Cameras.gltf",
+    "name": "Cameras.gltf (embedded)",
     "url": "models/2.0/Cameras/glTF-Embedded/Cameras.gltf"
   },
   {
@@ -204,11 +204,11 @@ const Models = [
     "url": "models/2.0/CesiumMan/glTF-Draco/CesiumMan.gltf"
   },
   {
-    "name": "CesiumMan.gltf",
+    "name": "CesiumMan.gltf (embedded)",
     "url": "models/2.0/CesiumMan/glTF-Embedded/CesiumMan.gltf"
   },
   {
-    "name": "CesiumMan.gltf",
+    "name": "CesiumMan.gltf (specular)",
     "url": "models/2.0/CesiumMan/glTF-pbrSpecularGlossiness/CesiumMan.gltf"
   },
   {
@@ -220,11 +220,11 @@ const Models = [
     "url": "models/2.0/CesiumMilkTruck/glTF-Draco/CesiumMilkTruck.gltf"
   },
   {
-    "name": "CesiumMilkTruck.gltf",
+    "name": "CesiumMilkTruck.gltf (embedded)",
     "url": "models/2.0/CesiumMilkTruck/glTF-Embedded/CesiumMilkTruck.gltf"
   },
   {
-    "name": "CesiumMilkTruck.gltf",
+    "name": "CesiumMilkTruck.gltf (specular)",
     "url": "models/2.0/CesiumMilkTruck/glTF-pbrSpecularGlossiness/CesiumMilkTruck.gltf"
   },
   {
@@ -236,7 +236,7 @@ const Models = [
     "url": "models/2.0/Corset/glTF-Draco/Corset.gltf"
   },
   {
-    "name": "Corset.gltf",
+    "name": "Corset.gltf (specular)",
     "url": "models/2.0/Corset/glTF-pbrSpecularGlossiness/Corset.gltf"
   },
   {
@@ -248,7 +248,7 @@ const Models = [
     "url": "models/2.0/Cube/glTF/Cube.gltf"
   },
   {
-    "name": "DamagedHelmet.gltf",
+    "name": "DamagedHelmet.gltf (embedded)",
     "url": "models/2.0/DamagedHelmet/glTF-Embedded/DamagedHelmet.gltf"
   },
   {
@@ -260,11 +260,11 @@ const Models = [
     "url": "models/2.0/Duck/glTF-Draco/Duck.gltf"
   },
   {
-    "name": "Duck.gltf",
+    "name": "Duck.gltf (embedded)",
     "url": "models/2.0/Duck/glTF-Embedded/Duck.gltf"
   },
   {
-    "name": "Duck.gltf",
+    "name": "Duck.gltf (specular)",
     "url": "models/2.0/Duck/glTF-pbrSpecularGlossiness/Duck.gltf"
   },
   {
@@ -288,11 +288,11 @@ const Models = [
     "url": "models/2.0/GearboxAssy/glTF-Draco/GearboxAssy.gltf"
   },
   {
-    "name": "GearboxAssy.gltf",
+    "name": "GearboxAssy.gltf (embedded)",
     "url": "models/2.0/GearboxAssy/glTF-Embedded/GearboxAssy.gltf"
   },
   {
-    "name": "GearboxAssy.gltf",
+    "name": "GearboxAssy.gltf (specular)",
     "url": "models/2.0/GearboxAssy/glTF-pbrSpecularGlossiness/GearboxAssy.gltf"
   },
   {
@@ -308,7 +308,7 @@ const Models = [
     "url": "models/2.0/Lantern/glTF-Draco/Lantern.gltf"
   },
   {
-    "name": "Lantern.gltf",
+    "name": "Lantern.gltf (specular)",
     "url": "models/2.0/Lantern/glTF-pbrSpecularGlossiness/Lantern.gltf"
   },
   {
@@ -316,7 +316,7 @@ const Models = [
     "url": "models/2.0/Lantern/glTF/Lantern.gltf"
   },
   {
-    "name": "MetalRoughSpheres.gltf",
+    "name": "MetalRoughSpheres.gltf (embedded)",
     "url": "models/2.0/MetalRoughSpheres/glTF-Embedded/MetalRoughSpheres.gltf"
   },
   {
@@ -328,11 +328,11 @@ const Models = [
     "url": "models/2.0/Monster/glTF-Draco/Monster.gltf"
   },
   {
-    "name": "Monster.gltf",
+    "name": "Monster.gltf (embedded)",
     "url": "models/2.0/Monster/glTF-Embedded/Monster.gltf"
   },
   {
-    "name": "Monster.gltf",
+    "name": "Monster.gltf (specular)",
     "url": "models/2.0/Monster/glTF-pbrSpecularGlossiness/Monster.gltf"
   },
   {
@@ -344,7 +344,7 @@ const Models = [
     "url": "models/2.0/MorphPrimitivesTest/glTF/MorphPrimitivesTest.gltf"
   },
   {
-    "name": "MultiUVTest.gltf",
+    "name": "MultiUVTest.gltf (embedded)",
     "url": "models/2.0/MultiUVTest/glTF-Embedded/MultiUVTest.gltf"
   },
   {
@@ -352,7 +352,7 @@ const Models = [
     "url": "models/2.0/MultiUVTest/glTF/MultiUVTest.gltf"
   },
   {
-    "name": "NormalTangentMirrorTest.gltf",
+    "name": "NormalTangentMirrorTest.gltf (embedded)",
     "url": "models/2.0/NormalTangentMirrorTest/glTF-Embedded/NormalTangentMirrorTest.gltf"
   },
   {
@@ -360,7 +360,7 @@ const Models = [
     "url": "models/2.0/NormalTangentMirrorTest/glTF/NormalTangentMirrorTest.gltf"
   },
   {
-    "name": "NormalTangentTest.gltf",
+    "name": "NormalTangentTest.gltf (embedded)",
     "url": "models/2.0/NormalTangentTest/glTF-Embedded/NormalTangentTest.gltf"
   },
   {
@@ -368,7 +368,7 @@ const Models = [
     "url": "models/2.0/NormalTangentTest/glTF/NormalTangentTest.gltf"
   },
   {
-    "name": "OrientationTest.gltf",
+    "name": "OrientationTest.gltf (embedded)",
     "url": "models/2.0/OrientationTest/glTF-Embedded/OrientationTest.gltf"
   },
   {
@@ -380,11 +380,11 @@ const Models = [
     "url": "models/2.0/ReciprocatingSaw/glTF-Draco/ReciprocatingSaw.gltf"
   },
   {
-    "name": "ReciprocatingSaw.gltf",
+    "name": "ReciprocatingSaw.gltf (embedded)",
     "url": "models/2.0/ReciprocatingSaw/glTF-Embedded/ReciprocatingSaw.gltf"
   },
   {
-    "name": "ReciprocatingSaw.gltf",
+    "name": "ReciprocatingSaw.gltf (specular)",
     "url": "models/2.0/ReciprocatingSaw/glTF-pbrSpecularGlossiness/ReciprocatingSaw.gltf"
   },
   {
@@ -396,11 +396,11 @@ const Models = [
     "url": "models/2.0/RiggedFigure/glTF-Draco/RiggedFigure.gltf"
   },
   {
-    "name": "RiggedFigure.gltf",
+    "name": "RiggedFigure.gltf (embedded)",
     "url": "models/2.0/RiggedFigure/glTF-Embedded/RiggedFigure.gltf"
   },
   {
-    "name": "RiggedFigure.gltf",
+    "name": "RiggedFigure.gltf (specular)",
     "url": "models/2.0/RiggedFigure/glTF-pbrSpecularGlossiness/RiggedFigure.gltf"
   },
   {
@@ -412,11 +412,11 @@ const Models = [
     "url": "models/2.0/RiggedSimple/glTF-Draco/RiggedSimple.gltf"
   },
   {
-    "name": "RiggedSimple.gltf",
+    "name": "RiggedSimple.gltf (embedded)",
     "url": "models/2.0/RiggedSimple/glTF-Embedded/RiggedSimple.gltf"
   },
   {
-    "name": "RiggedSimple.gltf",
+    "name": "RiggedSimple.gltf (specular)",
     "url": "models/2.0/RiggedSimple/glTF-pbrSpecularGlossiness/RiggedSimple.gltf"
   },
   {
@@ -428,7 +428,7 @@ const Models = [
     "url": "models/2.0/SciFiHelmet/glTF/SciFiHelmet.gltf"
   },
   {
-    "name": "SimpleMeshes.gltf",
+    "name": "SimpleMeshes.gltf (embedded)",
     "url": "models/2.0/SimpleMeshes/glTF-Embedded/SimpleMeshes.gltf"
   },
   {
@@ -436,7 +436,7 @@ const Models = [
     "url": "models/2.0/SimpleMeshes/glTF/SimpleMeshes.gltf"
   },
   {
-    "name": "SimpleMorph.gltf",
+    "name": "SimpleMorph.gltf (embedded)",
     "url": "models/2.0/SimpleMorph/glTF-Embedded/SimpleMorph.gltf"
   },
   {
@@ -444,7 +444,7 @@ const Models = [
     "url": "models/2.0/SimpleMorph/glTF/SimpleMorph.gltf"
   },
   {
-    "name": "SimpleSparseAccessor.gltf",
+    "name": "SimpleSparseAccessor.gltf (embedded)",
     "url": "models/2.0/SimpleSparseAccessor/glTF-Embedded/SimpleSparseAccessor.gltf"
   },
   {
@@ -464,7 +464,7 @@ const Models = [
     "url": "models/2.0/Suzanne/glTF/Suzanne.gltf"
   },
   {
-    "name": "TextureCoordinateTest.gltf",
+    "name": "TextureCoordinateTest.gltf (embedded)",
     "url": "models/2.0/TextureCoordinateTest/glTF-Embedded/TextureCoordinateTest.gltf"
   },
   {
@@ -472,7 +472,7 @@ const Models = [
     "url": "models/2.0/TextureCoordinateTest/glTF/TextureCoordinateTest.gltf"
   },
   {
-    "name": "TextureSettingsTest.gltf",
+    "name": "TextureSettingsTest.gltf (embedded)",
     "url": "models/2.0/TextureSettingsTest/glTF-Embedded/TextureSettingsTest.gltf"
   },
   {
@@ -484,7 +484,7 @@ const Models = [
     "url": "models/2.0/TextureTransformTest/glTF/TextureTransformTest.gltf"
   },
   {
-    "name": "Triangle.gltf",
+    "name": "Triangle.gltf (embedded)",
     "url": "models/2.0/Triangle/glTF-Embedded/Triangle.gltf"
   },
   {
@@ -492,7 +492,7 @@ const Models = [
     "url": "models/2.0/Triangle/glTF/Triangle.gltf"
   },
   {
-    "name": "TriangleWithoutIndices.gltf",
+    "name": "TriangleWithoutIndices.gltf (embedded)",
     "url": "models/2.0/TriangleWithoutIndices/glTF-Embedded/TriangleWithoutIndices.gltf"
   },
   {
@@ -512,11 +512,11 @@ const Models = [
     "url": "models/2.0/VC/glTF-Draco/VC.gltf"
   },
   {
-    "name": "VC.gltf",
+    "name": "VC.gltf (embedded)",
     "url": "models/2.0/VC/glTF-Embedded/VC.gltf"
   },
   {
-    "name": "VC.gltf",
+    "name": "VC.gltf (specular)",
     "url": "models/2.0/VC/glTF-pbrSpecularGlossiness/VC.gltf"
   },
   {
@@ -524,7 +524,7 @@ const Models = [
     "url": "models/2.0/VC/glTF/VC.gltf"
   },
   {
-    "name": "VertexColorTest.gltf",
+    "name": "VertexColorTest.gltf (embedded)",
     "url": "models/2.0/VertexColorTest/glTF-Embedded/VertexColorTest.gltf"
   },
   {
@@ -536,7 +536,7 @@ const Models = [
     "url": "models/2.0/WaterBottle/glTF-Draco/WaterBottle.gltf"
   },
   {
-    "name": "WaterBottle.gltf",
+    "name": "WaterBottle.gltf (specular)",
     "url": "models/2.0/WaterBottle/glTF-pbrSpecularGlossiness/WaterBottle.gltf"
   },
   {
@@ -1012,59 +1012,59 @@ const Models = [
     "url": "generator/Output/Material_Mixed/Material_Mixed_02.gltf"
   },
   {
-    "name": "Material_SpecularGlossiness_00.gltf",
+    "name": "Material_SpecularGlossiness_00.gltf (specular)",
     "url": "generator/Output/Material_SpecularGlossiness/Material_SpecularGlossiness_00.gltf"
   },
   {
-    "name": "Material_SpecularGlossiness_01.gltf",
+    "name": "Material_SpecularGlossiness_01.gltf (specular)",
     "url": "generator/Output/Material_SpecularGlossiness/Material_SpecularGlossiness_01.gltf"
   },
   {
-    "name": "Material_SpecularGlossiness_02.gltf",
+    "name": "Material_SpecularGlossiness_02.gltf (specular)",
     "url": "generator/Output/Material_SpecularGlossiness/Material_SpecularGlossiness_02.gltf"
   },
   {
-    "name": "Material_SpecularGlossiness_03.gltf",
+    "name": "Material_SpecularGlossiness_03.gltf (specular)",
     "url": "generator/Output/Material_SpecularGlossiness/Material_SpecularGlossiness_03.gltf"
   },
   {
-    "name": "Material_SpecularGlossiness_04.gltf",
+    "name": "Material_SpecularGlossiness_04.gltf (specular)",
     "url": "generator/Output/Material_SpecularGlossiness/Material_SpecularGlossiness_04.gltf"
   },
   {
-    "name": "Material_SpecularGlossiness_05.gltf",
+    "name": "Material_SpecularGlossiness_05.gltf (specular)",
     "url": "generator/Output/Material_SpecularGlossiness/Material_SpecularGlossiness_05.gltf"
   },
   {
-    "name": "Material_SpecularGlossiness_06.gltf",
+    "name": "Material_SpecularGlossiness_06.gltf (specular)",
     "url": "generator/Output/Material_SpecularGlossiness/Material_SpecularGlossiness_06.gltf"
   },
   {
-    "name": "Material_SpecularGlossiness_07.gltf",
+    "name": "Material_SpecularGlossiness_07.gltf (specular)",
     "url": "generator/Output/Material_SpecularGlossiness/Material_SpecularGlossiness_07.gltf"
   },
   {
-    "name": "Material_SpecularGlossiness_08.gltf",
+    "name": "Material_SpecularGlossiness_08.gltf (specular)",
     "url": "generator/Output/Material_SpecularGlossiness/Material_SpecularGlossiness_08.gltf"
   },
   {
-    "name": "Material_SpecularGlossiness_09.gltf",
+    "name": "Material_SpecularGlossiness_09.gltf (specular)",
     "url": "generator/Output/Material_SpecularGlossiness/Material_SpecularGlossiness_09.gltf"
   },
   {
-    "name": "Material_SpecularGlossiness_10.gltf",
+    "name": "Material_SpecularGlossiness_10.gltf (specular)",
     "url": "generator/Output/Material_SpecularGlossiness/Material_SpecularGlossiness_10.gltf"
   },
   {
-    "name": "Material_SpecularGlossiness_11.gltf",
+    "name": "Material_SpecularGlossiness_11.gltf (specular)",
     "url": "generator/Output/Material_SpecularGlossiness/Material_SpecularGlossiness_11.gltf"
   },
   {
-    "name": "Material_SpecularGlossiness_12.gltf",
+    "name": "Material_SpecularGlossiness_12.gltf (specular)",
     "url": "generator/Output/Material_SpecularGlossiness/Material_SpecularGlossiness_12.gltf"
   },
   {
-    "name": "Material_SpecularGlossiness_13.gltf",
+    "name": "Material_SpecularGlossiness_13.gltf (specular)",
     "url": "generator/Output/Material_SpecularGlossiness/Material_SpecularGlossiness_13.gltf"
   },
   {

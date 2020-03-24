@@ -23,6 +23,7 @@ import Animation from 'nanogl-gltf/elements/Animation'
 
 import KHR_texture_transform from 'nanogl-gltf/extensions/KHR_texture_transform'
 import KHR_draco_mesh_compression from 'nanogl-gltf/extensions/KHR_draco_mesh_compression'
+import KHR_materials_pbrSpecularGlossiness from 'nanogl-gltf/extensions/KHR_materials_pbrSpecularGlossiness'
 
    
 
@@ -31,6 +32,7 @@ Program.debug = true;
 
 Gltf.addExtension( new KHR_texture_transform() );
 Gltf.addExtension( new KHR_draco_mesh_compression() );
+Gltf.addExtension( new KHR_materials_pbrSpecularGlossiness() );
 
 
 export default class Scene {

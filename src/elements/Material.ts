@@ -11,35 +11,28 @@ import MaterialPass from 'nanogl-pbr/MaterialPass';
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
-import StandardPass from '../glsl/StandardPass';
-import Input, { Sampler, Uniform } from 'nanogl-pbr/Input';
+import StandardPass from 'nanogl-pbr/StandardPass';
+import Input from 'nanogl-pbr/Input';
 import BaseMaterial from 'nanogl-pbr/BaseMaterial';
 import Primitive from './Primitive';
 import Node from './Node';
 import { IElement } from '../types/Elements';
 import Gltf from '..';
-import Texture from './Texture';
 import Flag from 'nanogl-pbr/Flag';
+import { MetalnessInputs } from 'nanogl-pbr/PbrInputs';
+import { isAllZeros } from '../lib/Utils';
 
 
-function _isAllOnes( a : ArrayLike<number> ) : boolean {
-  for (let i = 0; i < a.length; i++) {
-    if( a[i] !== 1 ) return false;
-  }
-  return true;
-}
 
-function _isAllZeros( a : ArrayLike<number> ) : boolean {
-  for (let i = 0; i < a.length; i++) {
-    if( a[i] !== 0 ) return false;
-  }
-  return true;
-}
 
 
 const SRC_ALPHA             = 0x0302;
 const ONE_MINUS_SRC_ALPHA   = 0x0303;
 
+
+export interface IPbrInputsData {
+  setupPass( pass : StandardPass ):void;
+}
 
 
 export interface IMaterial extends IElement {
@@ -69,6 +62,7 @@ export default class Material implements IMaterial {
   alphaCutoff: number;
   doubleSided: boolean;
 
+  pbrInputsData : IPbrInputsData;
 
 
   
@@ -85,11 +79,12 @@ export default class Material implements IMaterial {
     const material = new BaseMaterial( gl, this._materialPass.name );
     material.addPass( this._materialPass, 'color' )
 
+    const normal = primitive.attributes.getSemantic( 'NORMAL')
     const tangent = primitive.attributes.getSemantic( 'TANGENT')
-    if( tangent === null ){
-      material.inputs.add( new Flag('useDerivatives', true ))
-    }
+    material.inputs.add( new Flag('hasNormals', normal !== null ))
+    material.inputs.add( new Flag('hasTangents', tangent !== null ))
 
+    
     const vcColorAttrib = primitive.attributes.getSemantic( 'COLOR_0')
     if( vcColorAttrib !== null ){
       // vertex color
@@ -112,10 +107,7 @@ export default class Material implements IMaterial {
     this.alphaCutoff = data.alphaCutoff ?? 0.5;
     this.doubleSided = data.doubleSided ?? false;
 
-    if (data.pbrMetallicRoughness !== undefined) {
-      this.pbrMetallicRoughness = new PbrMetallicRoughness()
-      await this.pbrMetallicRoughness.parse(gltfLoader, data.pbrMetallicRoughness)
-    }
+    await this.parsePbrInputsData( gltfLoader, data );
 
     if (data.normalTexture !== undefined) {
       this.normalTexture = await gltfLoader._loadElement(data.normalTexture);
@@ -134,8 +126,24 @@ export default class Material implements IMaterial {
 
   }
 
+  async parsePbrInputsData( gltfLoader: GltfLoader, data: Gltf2.IMaterial ) : Promise<any>{
+    if (data.pbrMetallicRoughness !== undefined) {
+      this.pbrInputsData = this.pbrMetallicRoughness = new PbrMetallicRoughness()
+      await this.pbrMetallicRoughness.parse(gltfLoader, data.pbrMetallicRoughness)
+    }
+  }
 
-// TODO: don't really need to be in gl allocation step
+  setupPbrSurface( pass : StandardPass ){
+    if (this.pbrInputsData !== undefined) {
+      this.pbrInputsData.setupPass( pass );
+    } else {
+      const pbrInputs = new MetalnessInputs() 
+      pass.surface.setInputs( pbrInputs )
+    }
+  }
+
+
+//
   setupMaterials(): void {
     const pass = new StandardPass(this.name);
 
@@ -157,49 +165,15 @@ export default class Material implements IMaterial {
       pass.alphaCutoff.attachUniform('uAlphaCutoff').set( this.alphaCutoff );
     }
 
-    const pbr = this.pbrMetallicRoughness;
+    this.setupPbrSurface(pass);
 
-    if (pbr !== undefined) {
-
-      if (pbr.baseColorTexture) {
-        const baseColorSampler = pbr.baseColorTexture.createSampler()
-        pass.baseColor.attach(baseColorSampler, 'rgb')
-        pass.alpha    .attach(baseColorSampler, 'a')
-      }
-
-      if( ! _isAllOnes( pbr.baseColorFactor ) ){
-        const cFactor = new Uniform( 'uBasecolorFactor', 4 );
-        cFactor.set( ...pbr.baseColorFactor )
-        pass.baseColorFactor.attach(cFactor, 'rgb' )
-        pass.alphaFactor    .attach(cFactor, 'a')
-      }
-
-
-      if (pbr.metallicRoughnessTexture) {
-        const mrSampler = pbr.metallicRoughnessTexture.createSampler()
-        pass.metalness.attach(mrSampler, 'b')
-        pass.roughness.attach(mrSampler, 'g')
-      }
-
-
-      if (pbr.metallicFactor !== 1) {
-        pass.metalnessFactor.attachUniform('uMetalnessFactor').set(pbr.metallicFactor)
-      }
-      
-      if (pbr.roughnessFactor !== 1) {
-        pass.roughnessFactor.attachUniform('uRoughnessFactor').set(pbr.roughnessFactor)
-      }
-      
-      
-    }
-    
 
     if ( this.emissiveTexture ) {
       const sampler = this.emissiveTexture.createSampler();
       pass.emissive.attach( sampler );
     }
     
-    if( !_isAllZeros( this.emissiveFactor) ){
+    if( !isAllZeros( this.emissiveFactor) ){
       pass.emissiveFactor.attachUniform('uEmissFactor').set(...this.emissiveFactor);
     }
     

@@ -5,6 +5,10 @@ import { vec4 } from 'gl-matrix';
 import TextureInfo from './TextureInfo';
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
+import StandardPass from 'nanogl-pbr/StandardPass';
+import { MetalnessInputs } from 'nanogl-pbr/PbrInputs';
+import { isAllOnes } from '../lib/Utils';
+import { Uniform } from 'nanogl-pbr/Input';
 
 
 export default class PbrMetallicRoughness {
@@ -33,6 +37,42 @@ export default class PbrMetallicRoughness {
       this.metallicRoughnessTexture = await gltfLoader._loadElement( data.metallicRoughnessTexture );
     }
 
+  }
+
+  setupPass( pass : StandardPass ){
+
+    const inputs = new MetalnessInputs() 
+    pass.surface.setInputs( inputs )
+
+    if (this.baseColorTexture) {
+      const baseColorSampler = this.baseColorTexture.createSampler()
+      inputs.baseColor.attach(baseColorSampler, 'rgb')
+      pass.alpha    .attach(baseColorSampler, 'a')
+    }
+
+    if( ! isAllOnes( this.baseColorFactor ) ){
+      const cFactor = new Uniform( 'uBasecolorFactor', 4 );
+      cFactor.set( ...this.baseColorFactor )
+      inputs.baseColorFactor.attach(cFactor, 'rgb' )
+      pass.alphaFactor    .attach(cFactor, 'a')
+    }
+
+
+    if (this.metallicRoughnessTexture) {
+      const mrSampler = this.metallicRoughnessTexture.createSampler()
+      inputs.metalness.attach(mrSampler, 'b')
+      inputs.roughness.attach(mrSampler, 'g')
+    }
+
+
+    if (this.metallicFactor !== 1) {
+      inputs.metalnessFactor.attachUniform('uMetalnessFactor').set(this.metallicFactor)
+    }
+    
+    if (this.roughnessFactor !== 1) {
+      inputs.roughnessFactor.attachUniform('uRoughnessFactor').set(this.roughnessFactor)
+    }
+    
   }
 
 }

@@ -73,7 +73,11 @@ export default class Image implements IElement {
     
     if( _HAS_CIB )
     {
-      return createImageBitmap( blob );
+      //@ts-ignore
+      return createImageBitmap( blob, {
+        premultiplyAlpha:'none',
+        colorSpaceConversion : 'none'
+      });
     } 
     else {
       
