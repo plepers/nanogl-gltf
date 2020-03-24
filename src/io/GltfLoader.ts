@@ -251,8 +251,9 @@ export default class GltfLoader {
       }
     }
 
-    await this.resolveElements();
 
+
+    await this.resolveElements();
 
   }
 

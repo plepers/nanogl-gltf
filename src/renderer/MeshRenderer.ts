@@ -4,22 +4,24 @@ import Primitive from "../elements/Primitive"
 import GLConfig from 'nanogl-state/config'
 import Camera from 'nanogl-camera'
 import BaseMaterial from 'nanogl-pbr/BaseMaterial'
+import MorphDeformer from 'nanogl-pbr/MorphDeformer'
+import SkinDeformer, { SkinAttributeSet } from 'nanogl-pbr/SkinDeformer'
 import { GLContext } from "nanogl/types"
 import Assert from "../lib/assert"
 import Program from "nanogl/program"
 import IRenderable, { IRenderingContext } from "./IRenderable"
 import Bounds from "nanogl-pbr/Bounds"
-import SkinDeformer, { SkinAttributeSet } from "../glsl/SkinDeformer"
-import Gltf from ".."
-import MorphDeformer from "../glsl/MorphDeformer"
-import { MorphAttribInfos, MorphAttributeType } from "../glsl/MorphCode"
-import { AccessorGlslType } from "../elements/Accessor"
+import { MorphAttributeType, MorphAttribInfos, MorphAttributeName } from "nanogl-pbr/MorphCode"
 
 
 
 
 function assertIsNumComps( n : number ) : asserts n is 1|2|3|4 {
   if( n<1 || n>4 ) throw new Error('number is not Component size')
+}
+
+function assertSemanticCanBeMorphed( s : string ) : asserts s is MorphAttributeName {
+  if( s !== 'position' && s !== 'normal' && s !== 'tangent' ) throw new Error(`semantic ${s} can't be morphed`)
 }
 
 
@@ -82,8 +84,11 @@ export default class MeshRenderer implements IRenderable {
           return target.getSemantic( morphedattrib.semantic ).glslname
         });
         
+        const aname : string = morphedattrib.semantic.toLowerCase()
+        assertSemanticCanBeMorphed( aname );
+        
         const morphInfo :MorphAttribInfos = {
-          name : morphedattrib.semantic.toLowerCase(),
+          name : aname,
           type : morphedattrib.accessor.glslType as MorphAttributeType,
           attributes : miAttributes,
         }
@@ -91,8 +96,7 @@ export default class MeshRenderer implements IRenderable {
         morphInfos.push( morphInfo );
       }
       
-      const morphDeformer = new MorphDeformer();
-      morphDeformer.morphInfos = morphInfos;
+      const morphDeformer = new MorphDeformer( morphInfos );
       
       if( this.node.weights )
         morphDeformer.weights = this.node.weights 
@@ -109,8 +113,7 @@ export default class MeshRenderer implements IRenderable {
     
     if( this.node.skin ){
       
-      const skinDeformer = new SkinDeformer()
-      skinDeformer.numJoints = this.node.skin.joints.length
+      const numJoints = this.node.skin.joints.length;
 
       const attributeSet : SkinAttributeSet[] = [];
       
@@ -143,7 +146,7 @@ export default class MeshRenderer implements IRenderable {
         setIndex++;
       }
 
-      skinDeformer.setAttributeSet( attributeSet );
+      const skinDeformer = new SkinDeformer(numJoints, attributeSet)
       // add skin deformer
       //material.setSkin ...
       material.inputs.add( skinDeformer );

@@ -7,9 +7,8 @@ import Enum       from 'nanogl-pbr/Enum'
 import Texture2D    from 'nanogl/texture-2d'
 import Scene from './Scene'
 import { GLContext } from 'nanogl/types'
-import MaterialPass from 'nanogl-pbr/MaterialPass'
+import StandardPass from 'nanogl-pbr/StandardPass'
 import { GammaModes, GammaModeEnum } from 'nanogl-pbr/GammaModeEnum'
-import StandardPass from 'nanogl-gltf/glsl/StandardPass'
 
 
 
