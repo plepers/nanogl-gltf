@@ -24,6 +24,8 @@ import Animation from 'nanogl-gltf/elements/Animation'
 import KHR_texture_transform from 'nanogl-gltf/extensions/KHR_texture_transform'
 import KHR_draco_mesh_compression from 'nanogl-gltf/extensions/KHR_draco_mesh_compression'
 import KHR_materials_pbrSpecularGlossiness from 'nanogl-gltf/extensions/KHR_materials_pbrSpecularGlossiness'
+import KHR_lights_punctual from 'nanogl-gltf/extensions/KHR_lights_punctual'
+import LightSetup from 'nanogl-pbr/LightSetup'
 
    
 
@@ -33,6 +35,7 @@ Program.debug = true;
 Gltf.addExtension( new KHR_texture_transform() );
 Gltf.addExtension( new KHR_draco_mesh_compression() );
 Gltf.addExtension( new KHR_materials_pbrSpecularGlossiness() );
+Gltf.addExtension( new KHR_lights_punctual() );
 
 
 export default class Scene {
@@ -54,6 +57,7 @@ export default class Scene {
   maxcam      : MaxControler
   gltfScene   : Gltf;
   bounds      : Bounds
+  lightSetup  : LightSetup
   animationTime :number;
   animationDuration :number;
 
@@ -100,6 +104,8 @@ export default class Scene {
     this.glstate     = new GLState(this.gl    );
     this.inputs      = new Inputs (this.glview.canvas );
     this.iblMngr     = new IBLManager ( this );
+
+    this.lightSetup  = null
     
     this.envRotation = Math.PI/2
 
@@ -156,8 +162,18 @@ export default class Scene {
   }
 
   setupMaterials() {
+    this.lightSetup = new LightSetup()
+    // this.lightSetup.ibl = this.iblMngr.ibl
+    
+    const lights = this.gltfScene.extras.lights;
+    if( lights ){
+      for (const light of lights) {
+        this.lightSetup.add( light );
+      }
+    }
+
     for (const material of this.gltfScene.materials ) {
-      (material as any).materialPass.setIBL( this.iblMngr.ibl )
+      (material as any).materialPass.setLightSetup( this.lightSetup )
     }
   }
 
@@ -208,6 +224,8 @@ export default class Scene {
       for( const anim of this.gltfScene.animations ){
         anim.evaluate( this.animationTime)
       }
+
+      this.lightSetup.update()
 
       this.drawScene( this.camera );
     }

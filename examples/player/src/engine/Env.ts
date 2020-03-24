@@ -76,9 +76,6 @@ class Env{
 
   setupMat( m : StandardPass ){
 
-    m.setIBL( this.ibl );
-    // m.setLightSetup( this.lights.setup );
-
     m.iGamma   .proxy( this.gamma )
     m.iExposure.proxy( this.exposure )
     m.gammaMode.proxy( this.gammaMode )

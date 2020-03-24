@@ -42,7 +42,7 @@ export default class Gltf {
 
 
   private static _extensionsRegistry: ExtensionsRegistry = new ExtensionsRegistry();
-  private static _semantics : ISemantics = new DefaultSemantics();
+  private static _semantics    : ISemantics = new DefaultSemantics();
   private static _renderConfig : IRenderConfig = DefaultRenderConfig();
   
   static addExtension(ext: IExtensionFactory) {
@@ -74,6 +74,7 @@ export default class Gltf {
   
   readonly root : NanoglNode = new NanoglNode();
   renderables: IRenderable[];
+  extras : any = {}
 
   constructor( ) {
 

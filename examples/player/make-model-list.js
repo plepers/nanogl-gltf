@@ -3,6 +3,8 @@ const fs         = require( 'fs' );
 const path       = require( 'path' );
 
 const globPatterns = [
+  './test/samples/other/**/*.gltf',
+  './test/samples/other/**/*.glb',
   './test/samples/models/2.0/**/*.gltf',
   './test/samples/models/2.0/**/*.glb',
   './test/samples/generator/Output/**/*.gltf',
