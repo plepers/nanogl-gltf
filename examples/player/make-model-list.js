@@ -27,6 +27,7 @@ for (let i = 0; i < files.length; i++) {
   if( file.toLowerCase().indexOf( 'draco' ) > -1 ) name += ' (draco)'
   if( file.toLowerCase().indexOf( 'speculargloss' ) > -1 ) name += ' (specular)'
   if( file.toLowerCase().indexOf( 'embedded' ) > -1 ) name += ' (embedded)'
+  if( file.toLowerCase().indexOf( 'quantized' ) > -1 ) name += ' (quantized)'
   url = path.relative( './test/samples/', file )
   json.push({name, url})
   

@@ -1,5 +1,13 @@
 const Models = [
   {
+    "name": "CesiumBoxWebp.gltf",
+    "url": "other/Box-Textured-Webp/CesiumBoxWebp.gltf"
+  },
+  {
+    "name": "Duck.gltf (quantized)",
+    "url": "other/Duck-Quantized/Duck.gltf"
+  },
+  {
     "name": "lights.gltf",
     "url": "other/khronos/lights.gltf"
   },

@@ -4,7 +4,6 @@ import Gltf2 from "../../types/Gltf2";
 import { ElementOfType, PropertyType, AnyElement } from "../../types/Elements";
 import { ITextureInfo } from "../../elements/TextureInfo";
 import Gltf from "../..";
-import TexCoordCollection from "nanogl-pbr/TexCoordCollection";
 import { mat3 } from "gl-matrix";
 import TexCoord from "nanogl-pbr/TexCoord";
 import { Sampler } from "nanogl-pbr/Input";

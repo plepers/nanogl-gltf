@@ -21,11 +21,13 @@ import Program from 'nanogl/program'
 import Bounds, { BoundingSphere } from 'nanogl-pbr/Bounds'
 import Animation from 'nanogl-gltf/elements/Animation'
 
-import KHR_texture_transform from 'nanogl-gltf/extensions/KHR_texture_transform'
-import KHR_draco_mesh_compression from 'nanogl-gltf/extensions/KHR_draco_mesh_compression'
+import KHR_texture_transform               from 'nanogl-gltf/extensions/KHR_texture_transform'
+import KHR_draco_mesh_compression          from 'nanogl-gltf/extensions/KHR_draco_mesh_compression'
 import KHR_materials_pbrSpecularGlossiness from 'nanogl-gltf/extensions/KHR_materials_pbrSpecularGlossiness'
-import KHR_lights_punctual from 'nanogl-gltf/extensions/KHR_lights_punctual'
-import KHR_materials_unlit from 'nanogl-gltf/extensions/KHR_materials_unlit'
+import KHR_lights_punctual                 from 'nanogl-gltf/extensions/KHR_lights_punctual'
+import KHR_materials_unlit                 from 'nanogl-gltf/extensions/KHR_materials_unlit'
+import KHR_mesh_quantization               from 'nanogl-gltf/extensions/KHR_mesh_quantization'
+import EXT_texture_webp                    from 'nanogl-gltf/extensions/EXT_texture_webp'
 import LightSetup from 'nanogl-pbr/LightSetup'
 
    
@@ -33,11 +35,13 @@ import LightSetup from 'nanogl-pbr/LightSetup'
 
 Program.debug = true;
 
-Gltf.addExtension( new KHR_texture_transform() );
-Gltf.addExtension( new KHR_draco_mesh_compression() );
+Gltf.addExtension( new KHR_texture_transform              () );
+Gltf.addExtension( new KHR_draco_mesh_compression         () );
 Gltf.addExtension( new KHR_materials_pbrSpecularGlossiness() );
-Gltf.addExtension( new KHR_lights_punctual() );
-Gltf.addExtension( new KHR_materials_unlit() );
+Gltf.addExtension( new KHR_lights_punctual                () );
+Gltf.addExtension( new KHR_materials_unlit                () );
+Gltf.addExtension( new KHR_mesh_quantization              () );
+Gltf.addExtension( new EXT_texture_webp                   () );
 
 
 export default class Scene {

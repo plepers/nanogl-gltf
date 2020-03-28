@@ -59,7 +59,6 @@
     "nanogl-pbr": "next",
     "nanogl-state": "^1.1.1",
     "nanogl-vao": "^1.1.0",
-    "save": "^2.4.0",
-    "when": "^3.7.8"
+    "save": "^2.4.0"
   }
 }
