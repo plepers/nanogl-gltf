@@ -14,6 +14,8 @@ import type Mesh from './elements/Mesh';
 import type Skin from './elements/Skin';
 import type Camera from './elements/Camera';
 
+
+import NanoCamera from 'nanogl-camera';
 import { GLContext } from 'nanogl/types';
 import NanoglNode from 'nanogl-node';
 import { ISemantics, DefaultSemantics } from './Semantics';
@@ -74,6 +76,7 @@ export default class Gltf {
   
   readonly root : NanoglNode = new NanoglNode();
   renderables: IRenderable[];
+  cameraInstances: NanoCamera[]
   extras : any = {}
 
   constructor( ) {
@@ -132,6 +135,20 @@ export default class Gltf {
       }
     }
 
+    this.createCameras();
+
+  }
+
+  createCameras(){
+    
+    this.cameraInstances = this.nodes
+      .filter( n=>n.camera!==undefined )
+      .map( n=> {
+        const cam = new NanoCamera( n.camera.lens )
+        n.add( cam );
+        return cam
+       } )
+      
   }
 
 

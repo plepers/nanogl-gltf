@@ -6,6 +6,9 @@ import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
 import { IElement } from '../types/Elements';
+import { ICameraLens } from 'nanogl-camera/ICameraLens';
+import PerspectiveLens from 'nanogl-camera/perspective-lens';
+import OrthographicLens from 'nanogl-camera/ortho-lens';
 
 
 type ProjectionData = Gltf2.ICameraPerspective | Gltf2.ICameraOrthographic;
@@ -22,11 +25,11 @@ export default class Camera implements IElement {
   
   type : Gltf2.CameraType;
   projectionData : ProjectionData;
-  projection : mat4;
+
+  lens : ICameraLens;
 
   parse( gltfLoader:GltfLoader, data: Gltf2.ICamera ) : Promise<any>{
 
-    this.projection = mat4.create();
 
     this.type = data.type;
   
@@ -35,12 +38,12 @@ export default class Camera implements IElement {
       
       case Gltf2.CameraType.PERSPECTIVE:
         this.projectionData = data.perspective;
-        this.createPerpective( this.projectionData );
+        this.lens = this.createPerpective( this.projectionData );
         break;
       
       case Gltf2.CameraType.ORTHOGRAPHIC:
         this.projectionData = data.orthographic;
-        this.createOrtho( this.projectionData );
+        this.lens = this.createOrtho( this.projectionData );
         break;
 
       default:
@@ -53,28 +56,25 @@ export default class Camera implements IElement {
 
   }
 
-  createPerpective( data : Gltf2.ICameraPerspective ){
-
-    mat4.perspective( this.projection,
-      data.yfov,
-      data.aspectRatio,
-      data.znear,
-      data.zfar
-    );
-
+ 
+  createPerpective( data : Gltf2.ICameraPerspective ) : ICameraLens {
+    const lens = new PerspectiveLens();
+    lens.near = data.znear
+    lens.far  = data.zfar ?? 100 // todo: infinite projection
+    lens.setVerticalFov( data.yfov )
+    lens.aspect = data.aspectRatio ?? 1
+    return lens;
   }
 
   createOrtho( data : Gltf2.ICameraOrthographic ){
-
-    mat4.ortho( this.projection,
-      -data.xmag *.5,
-      data.xmag *.5,
-      -data.ymag * .5,
-      data.ymag * .5,
-      data.znear,
-      data.zfar
-    );
-
+    const lens = new OrthographicLens();
+    lens.near = data.znear
+    lens.far  = data.zfar
+    lens._xMin = -data.xmag *.5;
+    lens._xMax = data.xmag *.5;
+    lens._yMin = -data.ymag * .5;
+    lens._yMax = data.ymag * .5;
+    return lens;
   }
   
 

@@ -29,7 +29,7 @@ export default class CameraControler {
       this._current.stop()
     }
     this._current = ctrl;
-    ctrl.start( this.scene.camera );
+    ctrl.start( this.scene.freecamera );
   }
 
 

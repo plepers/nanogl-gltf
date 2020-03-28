@@ -25,6 +25,7 @@ import KHR_texture_transform from 'nanogl-gltf/extensions/KHR_texture_transform'
 import KHR_draco_mesh_compression from 'nanogl-gltf/extensions/KHR_draco_mesh_compression'
 import KHR_materials_pbrSpecularGlossiness from 'nanogl-gltf/extensions/KHR_materials_pbrSpecularGlossiness'
 import KHR_lights_punctual from 'nanogl-gltf/extensions/KHR_lights_punctual'
+import KHR_materials_unlit from 'nanogl-gltf/extensions/KHR_materials_unlit'
 import LightSetup from 'nanogl-pbr/LightSetup'
 
    
@@ -36,6 +37,7 @@ Gltf.addExtension( new KHR_texture_transform() );
 Gltf.addExtension( new KHR_draco_mesh_compression() );
 Gltf.addExtension( new KHR_materials_pbrSpecularGlossiness() );
 Gltf.addExtension( new KHR_lights_punctual() );
+Gltf.addExtension( new KHR_materials_unlit() );
 
 
 export default class Scene {
@@ -47,7 +49,7 @@ export default class Scene {
   gl          : GLContext
   mainCamera  : Camera<PerspectiveLens>
   devCamera   : Camera<PerspectiveLens>
-  camera      : Camera<PerspectiveLens>
+  freecamera      : Camera<PerspectiveLens>
   sroot       : Node
   root        : Node
   glstate     : GLState
@@ -95,7 +97,7 @@ export default class Scene {
     // ======
     this.mainCamera = this.makeCamera()
     this.devCamera  = this.makeCamera()
-    this.camera     = this.devCamera
+    this.freecamera     = this.devCamera
 
 
     this.sroot = new Node();
@@ -163,7 +165,7 @@ export default class Scene {
 
   setupMaterials() {
     this.lightSetup = new LightSetup()
-    // this.lightSetup.ibl = this.iblMngr.ibl
+    this.lightSetup.ibl = this.iblMngr.ibl
     
     const lights = this.gltfScene.extras.lights;
     if( lights ){
@@ -227,12 +229,18 @@ export default class Scene {
 
       this.lightSetup.update()
 
-      this.drawScene( this.camera );
+      
+      this.drawScene( this.getCurrentCamera() )
     }
 
   }
 
-
+  getCurrentCamera() : Camera {
+    if( this.gltfScene.cameraInstances.length > 0 ){
+      return this.gltfScene.cameraInstances[0]
+    }
+    return this.freecamera;
+  }
 
   drawScene( camera : Camera, fbo = null, force = false ){
 

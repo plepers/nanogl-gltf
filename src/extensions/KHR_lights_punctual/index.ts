@@ -60,7 +60,6 @@ interface IKHR_LP_Extension {
 
 interface IKHR_LP_LightInstance {
   light : number;
-
   extras?: any;
   extensions?: {
     [key: string]: any;
@@ -105,6 +104,7 @@ class Instance implements IExtensionInstance {
     l.radius = lightData.range ?? -1
     return l;
   }
+
   _createSpot( lightData: IKHR_LP_Light ) : SpotLight {
     const l = new SpotLight();
     l.radius = lightData.range ?? -1
@@ -116,8 +116,8 @@ class Instance implements IExtensionInstance {
   _createLightInstance( lightData: IKHR_LP_Light ) : Light {
     switch( lightData.type ){
       case IKHR_LP_LightType.Directional : return this._createDirectional( lightData );
-      case IKHR_LP_LightType.Point : return this._createPoint( lightData );
-      case IKHR_LP_LightType.Spot : return this._createSpot( lightData );
+      case IKHR_LP_LightType.Point       : return this._createPoint( lightData );
+      case IKHR_LP_LightType.Spot        : return this._createSpot( lightData );
     }
   }
 

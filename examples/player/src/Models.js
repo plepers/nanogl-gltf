@@ -1,11 +1,23 @@
 const Models = [
   {
+    "name": "lights.gltf",
+    "url": "other/khronos/lights.gltf"
+  },
+  {
+    "name": "Lights.gltf",
+    "url": "other/Lights/glTF/Lights.gltf"
+  },
+  {
     "name": "PointLightTest.gltf",
     "url": "other/LightTest/PointLightTest.gltf"
   },
   {
     "name": "SpotLightTest.gltf",
     "url": "other/LightTest/SpotLightTest.gltf"
+  },
+  {
+    "name": "Lights.glb",
+    "url": "other/Lights/glTF-Binary/Lights.glb"
   },
   {
     "name": "2CylinderEngine.gltf (draco)",

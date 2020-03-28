@@ -21,6 +21,8 @@ import Gltf from '..';
 import Flag from 'nanogl-pbr/Flag';
 import { MetalnessInputs } from 'nanogl-pbr/PbrInputs';
 import { isAllZeros } from '../lib/Utils';
+import UnlitPass from 'nanogl-pbr/UnlitPass';
+import ShaderVersion from 'nanogl-pbr/ShaderVersion';
 
 
 
@@ -36,14 +38,15 @@ export interface IPbrInputsData {
 
 
 export interface IMaterial extends IElement {
-
   readonly gltftype: GltfTypes.MATERIAL;
-  
   name : string|undefined;
-  
   createMaterialForPrimitive( gl : GLContext, node : Node, primitive : Primitive ) : BaseMaterial;
 }
 
+
+export type GltfMaterialPass = MaterialPass & {
+  version : ShaderVersion
+}
 
 
 export default class Material implements IMaterial {
@@ -66,9 +69,9 @@ export default class Material implements IMaterial {
 
 
   
-  protected _materialPass   : StandardPass
+  protected _materialPass   : GltfMaterialPass
 
-  get materialPass() : MaterialPass {
+  get materialPass() : GltfMaterialPass {
     return this._materialPass;
   }
 
@@ -133,7 +136,7 @@ export default class Material implements IMaterial {
     }
   }
 
-  setupPbrSurface( pass : StandardPass ){
+  configurePbrSurface( pass : StandardPass ){
     if (this.pbrInputsData !== undefined) {
       this.pbrInputsData.setupPass( pass );
     } else {
@@ -142,16 +145,7 @@ export default class Material implements IMaterial {
     }
   }
 
-
-//
-  setupMaterials(): void {
-    const pass = new StandardPass(this.name);
-
-    pass.glconfig.enableDepthTest();
-    pass.glconfig.enableCullface(!this.doubleSided);
-    pass.doubleSided.set( this.doubleSided );
-
-
+  configureAlpha( pass : StandardPass|UnlitPass ){
     if( this.alphaMode === Gltf2.MaterialAlphaMode.BLEND ){
       pass.glconfig.enableBlend()
       pass.glconfig.blendFunc( SRC_ALPHA, ONE_MINUS_SRC_ALPHA );
@@ -164,8 +158,19 @@ export default class Material implements IMaterial {
     if( this.alphaMode === Gltf2.MaterialAlphaMode.MASK ){
       pass.alphaCutoff.attachUniform('uAlphaCutoff').set( this.alphaCutoff );
     }
+  }
 
-    this.setupPbrSurface(pass);
+
+//
+  setupMaterials(): void {
+    const pass = new StandardPass(this.name);
+
+    pass.glconfig.enableDepthTest();
+    pass.glconfig.enableCullface(!this.doubleSided);
+    pass.doubleSided.set( this.doubleSided );
+
+    this.configureAlpha( pass );
+    this.configurePbrSurface( pass );
 
 
     if ( this.emissiveTexture ) {
