@@ -21,7 +21,7 @@ export default class UnlitMaterial extends Material {
 
       if( metalicRoughness.baseColorTexture )
       if (metalicRoughness.baseColorTexture) {
-        const baseColorSampler = metalicRoughness.baseColorTexture.createSampler()
+        const baseColorSampler = metalicRoughness.baseColorTexture.createSampler('basecolor')
         pass.baseColor.attach(baseColorSampler, 'rgb')
         pass.alpha    .attach(baseColorSampler, 'a')
       }

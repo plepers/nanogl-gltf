@@ -29,6 +29,7 @@ import KHR_materials_unlit                 from 'nanogl-gltf/extensions/KHR_mate
 import KHR_mesh_quantization               from 'nanogl-gltf/extensions/KHR_mesh_quantization'
 import EXT_texture_webp                    from 'nanogl-gltf/extensions/EXT_texture_webp'
 import LightSetup from 'nanogl-pbr/LightSetup'
+import { AbortController } from '@azure/abort-controller'
 
    
 
@@ -70,6 +71,7 @@ export default class Scene {
   enableDebugDraw: boolean
   envRotation    : number
   extensions: any[]
+  abortCtrl: AbortController
 
 
   constructor() {
@@ -146,14 +148,15 @@ export default class Scene {
   }
 
   async loadGltf( url : string ){
+    this.abortCtrl?.abort();
     if( this.gltfScene ){
       this.root.remove( this.gltfScene.root )
       this.gltfScene = null;
-
       this.gl.clear( this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT );
     }
 
-    this.gltfScene = await GltfIO.loadGltf( url );
+    this.abortCtrl = new AbortController();
+    this.gltfScene = await GltfIO.loadGltf( url, {abortSignal:this.abortCtrl.signal} );
     await this.gltfScene.allocateGl( this.gl )
     this.root.add( this.gltfScene.root );
     this.setupMaterials()

@@ -45,7 +45,7 @@ export default class PbrMetallicRoughness {
     pass.surface.setInputs( inputs )
 
     if (this.baseColorTexture) {
-      const baseColorSampler = this.baseColorTexture.createSampler()
+      const baseColorSampler = this.baseColorTexture.createSampler( 'basecolor' )
       inputs.baseColor.attach(baseColorSampler, 'rgb')
       pass.alpha    .attach(baseColorSampler, 'a')
     }
@@ -59,7 +59,7 @@ export default class PbrMetallicRoughness {
 
 
     if (this.metallicRoughnessTexture) {
-      const mrSampler = this.metallicRoughnessTexture.createSampler()
+      const mrSampler = this.metallicRoughnessTexture.createSampler( 'metalRough' )
       inputs.metalness.attach(mrSampler, 'b')
       inputs.roughness.attach(mrSampler, 'g')
     }

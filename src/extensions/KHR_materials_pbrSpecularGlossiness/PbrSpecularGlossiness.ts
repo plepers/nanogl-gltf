@@ -73,7 +73,7 @@ export default class PbrSpecularGlossiness {
     pass.surface.setInputs( inputs )
 
     if (this.diffuseTexture) {
-      const diffuseSampler = this.diffuseTexture.createSampler()
+      const diffuseSampler = this.diffuseTexture.createSampler('diffuse')
       inputs.baseColor.attach( diffuseSampler, 'rgb')
       pass.alpha      .attach( diffuseSampler, 'a')
     }
@@ -87,7 +87,7 @@ export default class PbrSpecularGlossiness {
 
 
     if (this.specularGlossinessTexture) {
-      const mrSampler = this.specularGlossinessTexture.createSampler()
+      const mrSampler = this.specularGlossinessTexture.createSampler('specgloss')
       inputs.specular  .attach(mrSampler, 'rgb')
       inputs.glossiness.attach(mrSampler, 'a')
     }

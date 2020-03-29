@@ -1,4 +1,5 @@
 import { IExtensionFactory } from "../extensions/IExtension"
+import { AbortSignal } from "@azure/abort-controller"
 
 
 
@@ -10,6 +11,8 @@ type Options = {
    * Extensions are merged with global extensions
    */
   extensions : IExtensionFactory[];
+
+  abortSignal : AbortSignal;
   
 }
 

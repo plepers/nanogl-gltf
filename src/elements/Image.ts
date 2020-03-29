@@ -6,7 +6,8 @@ import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
 import { IElement } from '../types/Elements';
-import Assert from '../lib/assert';
+import { AbortSignalLike } from '@azure/abort-controller';
+import { createNativeSignal } from '../lib/cancellation';
 
 
 const _HAS_CIB : boolean = ( window.createImageBitmap !== undefined );
@@ -45,55 +46,33 @@ export default class Image implements IElement {
       this.bufferView = await gltfLoader.getElement( GltfTypes.BUFFERVIEW, data.bufferView );
     }
     
-    this.texImageSource = await this.loadImage();
+
+    
+    const blob = await this.loadImageBlob(gltfLoader.abortSignal);
+    this.texImageSource = await gltfLoader.gltfIO.loadImageBlob( blob, gltfLoader.abortSignal );
 
   }
 
-  private async loadImage() : Promise<TexImageSource> {
-    
+  private async loadImageBlob( abortSignal : AbortSignalLike ) : Promise<Blob> {
+
     if( this.bufferView ){
       // mimeType is guaranted here
       const arrayView = new Uint8Array( 
         this.bufferView.buffer._bytes, 
         this.bufferView.getByteOffset(), 
         this.bufferView.byteLength 
-      );
-      
-      const blob = new Blob( [arrayView] , { type: this.mimeType });
-      return this.loadImageBuffer( blob );
-    } else {
-      // assume uri is defained as uri or data uri
-      const request = await fetch( this.resolvedUri )
+        );
+        return new Blob( [arrayView] , { type: this.mimeType });
+      } else {
+        // assume uri is defained as uri or data uri
+      const signal = createNativeSignal( abortSignal )
+      const request = await fetch( this.resolvedUri, {signal} )
       const blob = await request.blob();
-      return this.loadImageBuffer( blob );
+      return blob;
     }
   }
 
-  private async loadImageBuffer( blob : Blob ) : Promise<TexImageSource> {
-    
-    if( _HAS_CIB )
-    {
-      //@ts-ignore
-      return createImageBitmap( blob, {
-        premultiplyAlpha:'none',
-        colorSpaceConversion : 'none'
-      });
-    } 
-    else {
-      
-      const img = new window.Image();
-      const src = URL.createObjectURL(blob);
-
-      const loadPromise = new Promise( (resolve, reject)=>{
-        img.onload  = resolve;
-        img.onerror = reject;
-        img.src = src;
-      }).finally( ()=>URL.revokeObjectURL(src) )
-
-      return loadPromise.then( ()=>img );
-
-    }
-  }
+ 
 
 }
 

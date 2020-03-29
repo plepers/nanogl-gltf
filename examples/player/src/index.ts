@@ -53,7 +53,7 @@ scene.load().then(() => {
 function loadModel(path) {
   selector.selectedIndex = modelPaths.indexOf(path)
   statusEl.innerText = "loading"
-  scene.loadGltf(path).then(()=>{
+  return scene.loadGltf(path).then(()=>{
     localStorage.setItem('selectedmodel', path)
     statusEl.innerText = "loaded"
   }).catch((e)=>{
@@ -81,3 +81,26 @@ window.addEventListener('keydown', (e) => {
 
   
 })
+
+
+
+// stress test
+
+function stessTest(){
+  setInterval( ()=>{
+    loadModel(Models[Math.floor(Math.random()*Models.length)].url)
+  }, 200 )
+}
+
+let currentSeq = -1;
+function loadSeqentially(){
+  currentSeq++
+  if( currentSeq >= Models.length) currentSeq = 0;
+  loadModel( Models[currentSeq].url ).then(()=>{
+    return new Promise( (r)=>setTimeout(r, 200 ) )
+  }).then( loadSeqentially );
+}
+
+
+// stessTest()
+loadSeqentially()

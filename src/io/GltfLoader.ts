@@ -11,6 +11,7 @@ import "../extensions/DefaultExtension"
 import { GltfLoaderOptions } from "./GltfLoaderOptions";
 import { IMaterial } from "../elements/Material";
 import Assert from "../lib/assert";
+import { AbortSignal } from "@azure/abort-controller";
 
 
 let UID = 0;
@@ -72,12 +73,16 @@ export default class GltfLoader {
   _byType  : Map<GltfTypes, Promise<AnyElement>[]> = new Map();
   _propertyMaps  : Map<GltfTypes, Gltf2.Property[]> = new Map();
 
+  readonly abortSignal: AbortSignal;
+
 
   constructor(gltfIO: IOInterface, url: string, options : GltfLoaderOptions = {} ) {
     this.gltfIO = gltfIO;
 
     this._url = url;
     this._baseUrl = options.baseurl;
+
+    this.abortSignal = options.abortSignal ?? AbortSignal.none;
 
     if( this._baseUrl === undefined )
       [this._baseUrl, this._url] = gltfIO.resolveBaseDir( this._url );
@@ -92,7 +97,7 @@ export default class GltfLoader {
 
 
   load(): Promise<Gltf> {
-    return this.gltfIO.loadBinaryResource( this.gltfIO.resolvePath( this._url, this._baseUrl ) )
+    return this.gltfIO.loadBinaryResource( this.gltfIO.resolvePath( this._url, this._baseUrl ), this.abortSignal )
     .then( this.unpack )
     .then( this.parseAll )
     .then( this.yieldGltf);
@@ -147,7 +152,7 @@ export default class GltfLoader {
       return Promise.resolve(this._glbData);
 
       const resolvedUri = this.gltfIO.resolvePath(uri, this._baseUrl);
-    return this.gltfIO.loadBinaryResource(resolvedUri)
+    return this.gltfIO.loadBinaryResource(resolvedUri, this.abortSignal)
   }
 
 
@@ -228,33 +233,25 @@ export default class GltfLoader {
 
   parseAll = async () => {
 
-
-    // verify that required extensions are available
-    //, this._data.extensionsUsed, this._data.extensionsRequired
     this._extensions.validate(this._data.extensionsUsed, this._data.extensionsRequired);
 
+    const asset = await this._loadElement(this._data.asset);
+    if( asset.version != '2.0' ){
+      console.warn(`Gltf version should be "2.0" found "${asset.version}"` );
+    } 
 
-    this._loadElement(this._data.asset);
-
-    // TODO: validate asset version
-
-
-    if (this._data.nodes !== undefined) {
-      for (const nodeData of this._data.nodes) {
-        this._loadElement(nodeData)
-      }
-    }
-
-    if (this._data.animations !== undefined) {
-      for (const animData of this._data.animations) {
-        this._loadElement(animData)
-      }
-    }
-
-
-
+    await this._loadElements( this._data.nodes );
+    await this._loadElements( this._data.animations );
     await this.resolveElements();
 
+  }
+  
+
+  private _loadElements<T extends Gltf2.Property>( dataList? : T[] ) : Promise<any> {
+    if (dataList !== undefined) {
+      const promises = dataList.map( (data)=>this._loadElement(data))
+      return Promise.all( promises );
+    }
   }
 
   /**
@@ -303,13 +300,6 @@ export default class GltfLoader {
     this.prepareGltfRootProperties( gltfData.textures   , GltfTypes.TEXTURE   , null );
 
 
-    // ANIMATION_SAMPLER
-    // ANIMATION_CHANNEL
-
-    // NORMAL_TEXTURE_INFO
-    // OCCLUSION_TEXTURE_INFO
-    // PRIMITIVE
-    // TEXTURE_INFO
 
     if( gltfData.animations !== undefined ){
       for (const animation of gltfData.animations) {

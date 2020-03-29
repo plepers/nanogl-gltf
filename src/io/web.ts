@@ -1,11 +1,25 @@
 
 import base64 from 'base64-js'
 
-import { baseDir } from "../lib/net";
 import IOInterface from "./IOInterface";
 
 import UTF8   from '../lib/utf8-decoder'
 import GltfIO from ".";
+import {AbortSignal} from '@azure/abort-controller'
+import { cancellablePromise, createNativeSignal } from '../lib/cancellation';
+
+
+const _HAS_CIB : boolean = ( window.createImageBitmap !== undefined );
+
+function baseDir( p:string ) : string[]{
+  const sep = p.lastIndexOf("/");
+  return [
+    p.substr( 0, sep ),
+    p.substr( sep + 1 ),
+  ]
+}
+
+
 
 class WebImpl implements IOInterface {
 
@@ -41,23 +55,67 @@ class WebImpl implements IOInterface {
     return UTF8( new Uint8Array( buffer, offset, length ) );
   }
   
-
   
   
-  async loadResource(path: string): Promise<string> {
-    const response = await fetch( path );
+  async loadResource(path: string, abortSignal : AbortSignal = AbortSignal.none): Promise<string> {
+    const signal = createNativeSignal( abortSignal );
+    const response = await fetch( path, {signal} );
     return response.text();
   }
   
-  async loadBinaryResource(path: string): Promise<ArrayBuffer> {
+  async loadBinaryResource(path: string, abortSignal : AbortSignal = AbortSignal.none): Promise<ArrayBuffer> {
     if( this.isDataURI( path ) ){
       return this.decodeDataURI( path );
     }
-    const response = await fetch( path );
+    const signal = createNativeSignal( abortSignal );
+    const response = await fetch( path, {signal} );
     return response.arrayBuffer();
   }
   
   
+  async loadImageBuffer(arrayView:Uint8Array, mimetype : string, abortSignal : AbortSignal = AbortSignal.none ) : Promise<TexImageSource> {
+    const blob = new Blob( [arrayView] , { type: mimetype });
+    return this.loadImageBlob( blob, abortSignal );
+  }
+
+
+  async loadImage(uri:string, abortSignal : AbortSignal = AbortSignal.none) : Promise<TexImageSource> {
+    const signal = createNativeSignal( abortSignal );
+    const request = await fetch( uri,  {signal} )
+    const blob = await request.blob();
+    return this.loadImageBlob( blob, abortSignal );
+  
+  }
+
+  async loadImageBlob( blob : Blob, abortSignal : AbortSignal ) : Promise<TexImageSource> {
+    let promise : Promise<TexImageSource>;
+    if( _HAS_CIB )
+    {
+      //@ts-ignore
+      promise = createImageBitmap( blob, {
+        premultiplyAlpha:'none',
+        colorSpaceConversion : 'none'
+      });
+    } 
+    else {
+      
+      const img = new window.Image();
+      const src = URL.createObjectURL(blob);
+
+      const loadPromise = new Promise( (resolve, reject)=>{
+        img.onload  = resolve;
+        img.onerror = reject;
+        img.src = src;
+      }).finally( ()=>URL.revokeObjectURL(src) )
+
+      promise = loadPromise.then( ()=>img );
+
+    }
+
+    return cancellablePromise( promise, abortSignal );
+  }
+
+
 
   writeResource(path: string, data: string) : Promise<Boolean>{
     throw new Error("Method not implemented.");
@@ -71,6 +129,7 @@ class WebImpl implements IOInterface {
 }
 
 
-const _instance :  GltfIO = new  GltfIO( new WebImpl() );
+export const IO = new WebImpl();
+const _instance :  GltfIO = new  GltfIO( IO );
 
 export default _instance;

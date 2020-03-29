@@ -174,7 +174,7 @@ export default class Material implements IMaterial {
 
 
     if ( this.emissiveTexture ) {
-      const sampler = this.emissiveTexture.createSampler();
+      const sampler = this.emissiveTexture.createSampler('emissive');
       pass.emissive.attach( sampler );
     }
     
@@ -185,7 +185,7 @@ export default class Material implements IMaterial {
     
     const nrm = this.normalTexture;
     if ( nrm ) {
-      const sampler = nrm.createSampler();
+      const sampler = nrm.createSampler( 'nrmmap' );
       pass.normal.attach( sampler )
       
       if (nrm.scale !== 1) {
@@ -197,7 +197,7 @@ export default class Material implements IMaterial {
     const occlu = this.occlusionTexture;
     if (occlu) {
 
-      const sampler = occlu.createSampler()
+      const sampler = occlu.createSampler( 'occlu' )
       pass.occlusion.attach(sampler);
 
       if (occlu.strength !== 1) {

@@ -1,5 +1,4 @@
 import IBL        from './Ibl'
-import * as Net   from 'nanogl-gltf/lib/net'
 
 import NGL_IBL    from 'nanogl-pbr/Ibl'
 import Input      from 'nanogl-pbr/Input'
@@ -9,7 +8,7 @@ import Scene from './Scene'
 import { GLContext } from 'nanogl/types'
 import StandardPass from 'nanogl-pbr/StandardPass'
 import { GammaModes, GammaModeEnum } from 'nanogl-pbr/GammaModeEnum'
-
+import {IO} from "../../../../src/io/web";
 
 
 
@@ -107,10 +106,10 @@ class Env{
 
 
   load( dir:string ){
-
+    
     return Promise.all([
-      Net.loadImage( `envs/${dir}/env.png` ).then( (img)=>this.envTex.fromImage(img) ),
-      Net.loadBytes( `envs/${dir}/sh.bin`  ).then( this.convertSH )
+      IO.loadImage( `envs/${dir}/env.png` ).then( (img:TexImageSource)=>this.envTex.fromImage(img) ),
+      IO.loadBinaryResource( `envs/${dir}/sh.bin`  ).then( this.convertSH )
       // Net.loadImage( Config.asset_url( dir+'/bg.jpg' ) ).then( (img)=>this.envBg.fromImage(img) ),
       // Net.loadImage( Config.asset_url( dir+'/env_hi.png' ) ).then( (img)=>this.envHi.fromImage(img) ),
     ]);
@@ -119,7 +118,7 @@ class Env{
 
   convertSH = (buf) => {
     this.shBase = new Float32Array(buf, 0, 9*3);
-    this.ibl.sh = NGL_IBL.convert(this.shBase, this.shMul )
+    this.ibl.sh = NGL_IBL.convert(this.shBase, this.shMul );
   }
 
 
