@@ -24,6 +24,10 @@ const Models = [
     "url": "other/LightTest/SpotLightTest.gltf"
   },
   {
+    "name": "ExportTestScene.gltf",
+    "url": "other/UnityExporter/ExportTestScene.gltf"
+  },
+  {
     "name": "Lights.glb",
     "url": "other/Lights/glTF-Binary/Lights.glb"
   },
