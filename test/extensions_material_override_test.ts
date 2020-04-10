@@ -1,7 +1,6 @@
 import Gltf from '../src'
 import expect from 'expect.js'
 import WebGltfIO from '../src/io/web';
-import StandardPass from '../src/glsl/StandardPass';
 import MaterialOverrideExtension from '../src/extensions/MaterialOverrideExtension';
 import GltfTypes from '../src/types/GltfTypes';
 import BaseMaterial from 'nanogl-pbr/BaseMaterial';

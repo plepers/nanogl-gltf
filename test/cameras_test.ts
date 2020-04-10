@@ -54,17 +54,17 @@ describe("Cameras", function () {
     
     
     
-    it(" has proj matrix", function () {
+    it(" has lens", function () {
       let cam = gltf.getElement( GltfTypes.CAMERA, 0 );
-      expect( cam.projection ).to.be.ok()
+      expect( cam.lens ).to.be.ok()
     });
     
     
-    it(" has correct proj matrix", function () {
-      let cam = gltf.getElement( GltfTypes.CAMERA, 0 );
-      //TODO: need more
-      expect( cam.projection.length ).to.be( 16 )
-    });
+    // it(" has correct proj matrix", function () {
+    //   let cam = gltf.getElement( GltfTypes.CAMERA, 0 );
+    //   //TODO: need more
+    //   expect( cam.projection.length ).to.be( 16 )
+    // });
 
 
   });
@@ -100,17 +100,17 @@ describe("Cameras", function () {
     
     
     
-    it(" has proj matrix", function () {
+    it(" has lens", function () {
       let cam = gltf.getElement( GltfTypes.CAMERA, 1 );
-      expect( cam.projection ).to.be.ok()
+      expect( cam.lens ).to.be.ok()
     });
     
     
-    it(" has correct proj matrix", function () {
-      let cam = gltf.getElement( GltfTypes.CAMERA, 1 );
-      //TODO: need more
-      expect( cam.projection.length ).to.be( 16 )
-    });
+    // it(" has correct proj matrix", function () {
+    //   let cam = gltf.getElement( GltfTypes.CAMERA, 1 );
+    //   //TODO: need more
+    //   expect( cam.projection.length ).to.be( 16 )
+    // });
 
 
   });

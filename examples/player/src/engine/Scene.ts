@@ -19,7 +19,6 @@ import GltfIO from "nanogl-gltf/io/web";
 import GLConfig from 'nanogl-state/config'
 import Program from 'nanogl/program'
 import Bounds, { BoundingSphere } from 'nanogl-pbr/Bounds'
-import Animation from 'nanogl-gltf/elements/Animation'
 
 import KHR_texture_transform               from 'nanogl-gltf/extensions/KHR_texture_transform'
 import KHR_draco_mesh_compression          from 'nanogl-gltf/extensions/KHR_draco_mesh_compression'
@@ -28,7 +27,7 @@ import KHR_lights_punctual                 from 'nanogl-gltf/extensions/KHR_ligh
 import KHR_materials_unlit                 from 'nanogl-gltf/extensions/KHR_materials_unlit'
 import KHR_mesh_quantization               from 'nanogl-gltf/extensions/KHR_mesh_quantization'
 import EXT_texture_webp                    from 'nanogl-gltf/extensions/EXT_texture_webp'
-import LightSetup from 'nanogl-pbr/LightSetup'
+import LightSetup from 'nanogl-pbr/lighting/LightSetup'
 import { AbortController } from '@azure/abort-controller'
 
    
@@ -46,6 +45,7 @@ Gltf.addExtension( new EXT_texture_webp                   () );
 
 
 export default class Scene {
+
   
   dt    : number
   time  : number
@@ -72,7 +72,7 @@ export default class Scene {
   envRotation    : number
   extensions: any[]
   abortCtrl: AbortController
-
+  _selectedCamera : number;
 
   constructor() {
 
@@ -147,7 +147,7 @@ export default class Scene {
     // await this.loadGltf( 'models/Avocado.glb' )
   }
 
-  async loadGltf( url : string ){
+  async loadGltf( url : string ) : Promise<Gltf>{
     this.abortCtrl?.abort();
     if( this.gltfScene ){
       this.root.remove( this.gltfScene.root )
@@ -168,11 +168,13 @@ export default class Scene {
     for( const anim of this.gltfScene.animations ){
       this.animationDuration = Math.max( this.animationDuration, anim.duration );
     }
+    this._selectedCamera = -1;
+    return this.gltfScene;
   }
 
   setupMaterials() {
     this.lightSetup = new LightSetup()
-    this.lightSetup.ibl = this.iblMngr.ibl
+    this.lightSetup.add( this.iblMngr.ibl )
     
     const lights = this.gltfScene.extras.lights;
     if( lights ){
@@ -216,8 +218,22 @@ export default class Scene {
     this.devCamera.lens.far = maxRadius * 10
     this.devCamera.lens.near = maxRadius / 10
     this.camCtrl.setControler(this.maxcam)
+
+
+
   }
 
+  selectCam(index: number) {
+    console.log( index )
+    this._selectedCamera = index;
+  }
+
+  getCurrentCamera() : Camera {
+    if( this._selectedCamera > -1 ){
+      return this.gltfScene.cameraInstances[this._selectedCamera]
+    }
+    return this.freecamera;
+  }
 
  
   render(dt) {
@@ -242,12 +258,6 @@ export default class Scene {
 
   }
 
-  getCurrentCamera() : Camera {
-    if( this.gltfScene.cameraInstances.length > 0 ){
-      return this.gltfScene.cameraInstances[0]
-    }
-    return this.freecamera;
-  }
 
   drawScene( camera : Camera, fbo = null, force = false ){
 

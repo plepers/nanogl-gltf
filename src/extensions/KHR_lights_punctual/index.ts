@@ -3,12 +3,13 @@ import GltfLoader from "../../io/GltfLoader";
 import Gltf2 from "../../types/Gltf2";
 import { ElementOfType, PropertyType, AnyElement } from "../../types/Elements";
 import { mat3 } from "gl-matrix";
-import Light from "nanogl-pbr/Light";
-import DirectionalLight from "nanogl-pbr/DirectionalLight";
-import PointLight from "nanogl-pbr/PointLight";
-import SpotLight from "nanogl-pbr/SpotLight";
+import Light from "nanogl-pbr/lighting/Light";
+import DirectionalLight from "nanogl-pbr/lighting/DirectionalLight";
+import PointLight from "nanogl-pbr/lighting/PointLight";
+import SpotLight from "nanogl-pbr/lighting/SpotLight";
 import GltfTypes from "../../types/GltfTypes";
 import Node from "../../elements/Node";
+import PunctualLight from "nanogl-pbr/lighting/PunctualLight";
 
 const M3 : mat3 = mat3.create()
 
@@ -113,7 +114,7 @@ class Instance implements IExtensionInstance {
     return l;
   }
 
-  _createLightInstance( lightData: IKHR_LP_Light ) : Light {
+  _createLightInstance( lightData: IKHR_LP_Light ) : PunctualLight {
     switch( lightData.type ){
       case IKHR_LP_LightType.Directional : return this._createDirectional( lightData );
       case IKHR_LP_LightType.Point       : return this._createPoint( lightData );
@@ -125,7 +126,7 @@ class Instance implements IExtensionInstance {
     
     const lightData = this._getLightData( iData.light );
 
-    let light : Light = this._createLightInstance( lightData );
+    let light : PunctualLight = this._createLightInstance( lightData );
 
     const color = lightData.color ?? [1, 1, 1]
     const intensity =  lightData.intensity ?? 1

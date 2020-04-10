@@ -5,10 +5,10 @@ import { vec4 } from 'gl-matrix';
 import TextureInfo from './TextureInfo';
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
-import StandardPass from 'nanogl-pbr/StandardPass';
-import { MetalnessInputs } from 'nanogl-pbr/PbrInputs';
 import { isAllOnes } from '../lib/Utils';
 import { Uniform } from 'nanogl-pbr/Input';
+import { StandardPass } from 'nanogl-pbr/StandardPass';
+import { MetalnessSurface } from 'nanogl-pbr/PbrSurface';
 
 
 export default class PbrMetallicRoughness {
@@ -41,36 +41,36 @@ export default class PbrMetallicRoughness {
 
   setupPass( pass : StandardPass ){
 
-    const inputs = new MetalnessInputs() 
-    pass.surface.setInputs( inputs )
+    const surface = new MetalnessSurface() 
+    pass.setSurface( surface )
 
     if (this.baseColorTexture) {
       const baseColorSampler = this.baseColorTexture.createSampler( 'basecolor' )
-      inputs.baseColor.attach(baseColorSampler, 'rgb')
+      surface.baseColor.attach(baseColorSampler, 'rgb')
       pass.alpha    .attach(baseColorSampler, 'a')
     }
 
     if( ! isAllOnes( this.baseColorFactor ) ){
       const cFactor = new Uniform( 'uBasecolorFactor', 4 );
       cFactor.set( ...this.baseColorFactor )
-      inputs.baseColorFactor.attach(cFactor, 'rgb' )
+      surface.baseColorFactor.attach(cFactor, 'rgb' )
       pass.alphaFactor    .attach(cFactor, 'a')
     }
 
 
     if (this.metallicRoughnessTexture) {
       const mrSampler = this.metallicRoughnessTexture.createSampler( 'metalRough' )
-      inputs.metalness.attach(mrSampler, 'b')
-      inputs.roughness.attach(mrSampler, 'g')
+      surface.metalness.attach(mrSampler, 'b')
+      surface.roughness.attach(mrSampler, 'g')
     }
 
 
     if (this.metallicFactor !== 1) {
-      inputs.metalnessFactor.attachUniform('uMetalnessFactor').set(this.metallicFactor)
+      surface.metalnessFactor.attachUniform('uMetalnessFactor').set(this.metallicFactor)
     }
     
     if (this.roughnessFactor !== 1) {
-      inputs.roughnessFactor.attachUniform('uRoughnessFactor').set(this.roughnessFactor)
+      surface.roughnessFactor.attachUniform('uRoughnessFactor').set(this.roughnessFactor)
     }
     
   }

@@ -1,6 +1,7 @@
 import GLView from "./engine/GLView";
 import Scene from "./engine/Scene";
 import _Models from './Models'
+import Gltf from "nanogl-gltf";
 
 type Mentry = {
   name : string,
@@ -9,8 +10,11 @@ type Mentry = {
 const Models : Mentry[] = _Models
 
 const selector = document.getElementById('model-selector') as HTMLSelectElement
+const camSelector = document.querySelector("#camera-selector" ) as HTMLSelectElement;
 const nextbtn = document.getElementById('next-model')
 const statusEl = document.getElementById('status')
+
+
 
 const modelPaths = [];
 for (const model of Models) {
@@ -47,15 +51,49 @@ scene.load().then(() => {
 })
 
 
+function clearCamSelector(){
+  var child = camSelector.lastElementChild;  
+  while (child) { 
+    camSelector.removeChild(child); 
+    child = camSelector.lastElementChild; 
+  } 
+  camSelector.style.display = "none"
+}
+
+function updateCamSelector(gltf:Gltf){
+  var cams = gltf.cameraInstances;
+
+  const option = document.createElement('option')
+  option.textContent = "Free Camera"
+  option.value = "-1";
+  camSelector.appendChild(option);
+
+  for (let i = 0; i < cams.length; i++) {
+    const cam = cams[i];
+    const option = document.createElement('option')
+    option.textContent = "Camera "+ i
+    option.value = ""+i;
+    camSelector.appendChild(option);
+  }
 
 
+  camSelector.style.display = (cams.length>0) ? "inherit" : "none";
+}
 
-function loadModel(path) {
+
+camSelector.addEventListener('change', (e) => {
+  scene.selectCam( parseInt(camSelector.selectedOptions[0].value))
+})
+
+
+function loadModel(path : string) {
+  clearCamSelector();
   selector.selectedIndex = modelPaths.indexOf(path)
   statusEl.innerText = "loading"
-  return scene.loadGltf(path).then(()=>{
+  return scene.loadGltf(path).then((gltf:Gltf)=>{
     localStorage.setItem('selectedmodel', path)
     statusEl.innerText = "loaded"
+    updateCamSelector( gltf );
   }).catch((e)=>{
     console.log(e)
     statusEl.innerText = e.message
@@ -84,6 +122,8 @@ window.addEventListener('keydown', (e) => {
 
 
 
+
+
 // stress test
 
 function stessTest(){
@@ -103,4 +143,7 @@ function loadSeqentially(){
 
 
 // stessTest()
-loadSeqentially()
+// loadSeqentially()
+
+//@ts-ignore
+window.loadSeqentially = loadSeqentially;

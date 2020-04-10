@@ -3,15 +3,15 @@
 
 import { vec4, vec3 } from 'gl-matrix';
 
-import   StandardPass      from 'nanogl-pbr/StandardPass';
-import { MetalnessInputs, SpecularInputs } from 'nanogl-pbr/PbrInputs'   ;
-import { Uniform         } from 'nanogl-pbr/Input'       ;
+import { Uniform         } from 'nanogl-pbr/Input'        ;
+import { StandardPass    } from 'nanogl-pbr/StandardPass' ;
+import { SpecularSurface } from 'nanogl-pbr/PbrSurface'   ;
 
-import   TextureInfo, { ITextureInfo }   from '../../elements/TextureInfo';
-import   GltfLoader    from '../../io/GltfLoader'       ;
-import   Gltf2         from '../../types/Gltf2'         ;
-import { isAllOnes   } from '../../lib/Utils'           ;
-import GltfTypes from '../../types/GltfTypes';
+import   TextureInfo   from '../../elements/TextureInfo' ;
+import   GltfLoader    from '../../io/GltfLoader'        ;
+import   Gltf2         from '../../types/Gltf2'          ;
+import { isAllOnes   } from '../../lib/Utils'            ;
+import   GltfTypes     from '../../types/GltfTypes'      ;
 
 
 export interface IMaterialPbrSpecularGlossiness {
@@ -69,36 +69,36 @@ export default class PbrSpecularGlossiness {
 
   setupPass( pass : StandardPass ){
 
-    const inputs = new SpecularInputs() 
-    pass.surface.setInputs( inputs )
+    const surface = new SpecularSurface() 
+    pass.setSurface( surface )
 
     if (this.diffuseTexture) {
       const diffuseSampler = this.diffuseTexture.createSampler('diffuse')
-      inputs.baseColor.attach( diffuseSampler, 'rgb')
+      surface.baseColor.attach( diffuseSampler, 'rgb')
       pass.alpha      .attach( diffuseSampler, 'a')
     }
 
     if( ! isAllOnes( this.diffuseFactor ) ){
       const cFactor = new Uniform( 'uBasecolorFactor', 4 );
       cFactor.set( ...this.diffuseFactor )
-      inputs.baseColorFactor.attach(cFactor, 'rgb' )
+      surface.baseColorFactor.attach(cFactor, 'rgb' )
       pass.alphaFactor      .attach(cFactor, 'a')
     }
 
 
     if (this.specularGlossinessTexture) {
       const mrSampler = this.specularGlossinessTexture.createSampler('specgloss')
-      inputs.specular  .attach(mrSampler, 'rgb')
-      inputs.glossiness.attach(mrSampler, 'a')
+      surface.specular  .attach(mrSampler, 'rgb')
+      surface.glossiness.attach(mrSampler, 'a')
     }
 
 
     if (! isAllOnes( this.specularFactor )) {
-      inputs.specularFactor.attachUniform('uMetalnessFactor').set(...this.specularFactor)
+      surface.specularFactor.attachUniform('uMetalnessFactor').set(...this.specularFactor)
     }
     
     if (this.glossinessFactor !== 1) {
-      inputs.glossinessFactor.attachUniform('uRoughnessFactor').set(this.glossinessFactor)
+      surface.glossinessFactor.attachUniform('uRoughnessFactor').set(this.glossinessFactor)
     }
     
   }

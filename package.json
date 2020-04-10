@@ -4,7 +4,7 @@
   "description": "gltf loader",
   "scripts": {
     "test": "karma start",
-    "build": "tsc && ./build/make-glsl",
+    "build": "tsc && ./build/make-glsl && ./build/post-build",
     "player": "node examples/player/make-model-list.js && webpack-dev-server --config examples/player/webpack.config.js",
     "models": "node examples/player/make-model-list.js"
   },
@@ -57,7 +57,7 @@
     "nanogl": "^2.3.0",
     "nanogl-camera": "^1.1.2",
     "nanogl-node": "^1.2.0",
-    "nanogl-pbr": "next",
+    "nanogl-pbr": "^2.5.0",
     "nanogl-state": "^1.1.1",
     "nanogl-vao": "^1.1.0",
     "save": "^2.4.0"

@@ -1,14 +1,13 @@
-import IBL        from './Ibl'
 
-import NGL_IBL    from 'nanogl-pbr/Ibl'
+import IBL    from 'nanogl-pbr/lighting/Ibl'
 import Input      from 'nanogl-pbr/Input'
 import Enum       from 'nanogl-pbr/Enum'
 import Texture2D    from 'nanogl/texture-2d'
 import Scene from './Scene'
 import { GLContext } from 'nanogl/types'
-import StandardPass from 'nanogl-pbr/StandardPass'
 import { GammaModes, GammaModeEnum } from 'nanogl-pbr/GammaModeEnum'
 import {IO} from "../../../../src/io/web";
+import { StandardPass } from 'nanogl-pbr/StandardPass'
 
 
 
@@ -51,10 +50,8 @@ class Env{
     this.gl = gl;
     
     this.envTex = new Texture2D( this.gl, this.gl.RGBA );
-    this.envHi  = new Texture2D( this.gl, this.gl.RGBA );
-    this.envBg  = new Texture2D( this.gl, this.gl.RGB );
     
-    this.ibl    = new IBL( this.envTex, this.envHi, this.envBg );
+    this.ibl    = new IBL( this.envTex, null );
 
     this.envTex.setFilter( false );
 
@@ -118,7 +115,7 @@ class Env{
 
   convertSH = (buf) => {
     this.shBase = new Float32Array(buf, 0, 9*3);
-    this.ibl.sh = NGL_IBL.convert(this.shBase, this.shMul );
+    this.ibl.sh = IBL.convert(this.shBase, this.shMul );
   }
 
 

@@ -14,7 +14,7 @@ const EXT_ID : string = 'KHR_texture_transform';
 
 
 function isTextureInfo( element : any ) : asserts element is ITextureInfo {
-  if( element.createMaterialTexCoords === undefined ){
+  if( element.createSampler === undefined ){
     throw new Error("KHR_texture_transform used on element which doesn't implement ITextureInfo")
   }
   // const t = element.gltftype

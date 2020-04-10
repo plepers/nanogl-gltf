@@ -70,10 +70,10 @@ export default class Camera implements IElement {
     const lens = new OrthographicLens();
     lens.near = data.znear
     lens.far  = data.zfar
-    lens._xMin = -data.xmag *.5;
-    lens._xMax = data.xmag *.5;
-    lens._yMin = -data.ymag * .5;
-    lens._yMax = data.ymag * .5;
+    lens._xMin = -data.xmag;
+    lens._xMax = data.xmag ;
+    lens._yMin = -data.ymag;
+    lens._yMax = data.ymag ;
     return lens;
   }
   

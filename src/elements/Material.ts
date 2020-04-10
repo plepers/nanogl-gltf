@@ -11,7 +11,6 @@ import MaterialPass from 'nanogl-pbr/MaterialPass';
 import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
-import StandardPass from 'nanogl-pbr/StandardPass';
 import Input from 'nanogl-pbr/Input';
 import BaseMaterial from 'nanogl-pbr/BaseMaterial';
 import Primitive from './Primitive';
@@ -19,10 +18,11 @@ import Node from './Node';
 import { IElement } from '../types/Elements';
 import Gltf from '..';
 import Flag from 'nanogl-pbr/Flag';
-import { MetalnessInputs } from 'nanogl-pbr/PbrInputs';
 import { isAllZeros } from '../lib/Utils';
 import UnlitPass from 'nanogl-pbr/UnlitPass';
 import ShaderVersion from 'nanogl-pbr/ShaderVersion';
+import { StandardPass } from 'nanogl-pbr/StandardPass';
+import { MetalnessSurface } from 'nanogl-pbr/PbrSurface';
 
 
 
@@ -140,8 +140,7 @@ export default class Material implements IMaterial {
     if (this.pbrInputsData !== undefined) {
       this.pbrInputsData.setupPass( pass );
     } else {
-      const pbrInputs = new MetalnessInputs() 
-      pass.surface.setInputs( pbrInputs )
+      pass.setSurface( new MetalnessSurface() )
     }
   }
 

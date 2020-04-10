@@ -5,7 +5,6 @@ import Texture from './Texture';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
 import { IElement } from '../types/Elements';
-import TexCoordCollection from 'nanogl-pbr/TexCoordCollection';
 import Gltf from '..';
 import { Sampler } from 'nanogl-pbr/Input';
 import TexCoord from 'nanogl-pbr/TexCoord';
@@ -26,11 +25,6 @@ export abstract class BaseTextureInfo implements ITextureInfo {
   
   _sampler: Sampler = null;
   
-  createMaterialTexCoords(texCoords : TexCoordCollection ) : string {
-    const attrib = Gltf.getSemantics().getAttributeName( `TEXCOORD_${this.texCoord}` )
-    return texCoords.getTexCoord( attrib ).varying()
-  }
-  
 
   createSampler( id : string ) : Sampler {
     if( this._sampler === null ){
@@ -40,7 +34,6 @@ export abstract class BaseTextureInfo implements ITextureInfo {
     }
     return this._sampler;
   }
-
 
 
   async parse( gltfLoader:GltfLoader, data: any ) : Promise<any>{
