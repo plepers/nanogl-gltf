@@ -4,6 +4,7 @@ import Primitive from "../elements/Primitive"
 import GLConfig from 'nanogl-state/config'
 import Camera from 'nanogl-camera'
 import BaseMaterial from 'nanogl-pbr/BaseMaterial'
+import DepthPass from 'nanogl-pbr/DepthPass'
 import MorphDeformer from 'nanogl-pbr/MorphDeformer'
 import SkinDeformer, { SkinAttributeSet } from 'nanogl-pbr/SkinDeformer'
 import { GLContext } from "nanogl/types"
@@ -60,6 +61,7 @@ export default class MeshRenderer implements IRenderable {
     
     for (const primitive of this.mesh.primitives ) {
       const material = primitive.material.createMaterialForPrimitive( gl, this.node, primitive );
+      material.addPass( new DepthPass( gl ), 'depth' );
       this.configureDeformers( material, primitive );
       this.materials.push( material );
     }

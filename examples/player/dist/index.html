@@ -10,6 +10,7 @@
         margin : 0;
         width: 100%;
         height: 100%;
+        font-family: sans-serif;
       }
 
       #gl-canvas {
@@ -23,7 +24,6 @@
       }
 
       #status {
-        font-family: sans-serif;
         color: white;
         font-size: 12px;
       }
@@ -77,6 +77,8 @@
     <div class='model-selector-wrapper'>
       <select name="models" id="model-selector"></select>
       <select name="cameras" id="camera-selector"></select>
+      <input type="checkbox" id="playanims" name="animate" value="animate" checked>
+      <label for="playanims">Play animations</label>
       <button id='next-model'>next</button>
       <p id="status"></p>
       <!-- <div class="loader">Loading...</div> -->

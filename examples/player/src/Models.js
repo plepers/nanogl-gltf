@@ -24,8 +24,20 @@ const Models = [
     "url": "other/LightTest/SpotLightTest.gltf"
   },
   {
+    "name": "CompleteLighting.gltf",
+    "url": "other/UnityExporter/CompleteLighting.gltf"
+  },
+  {
     "name": "ExportTestScene.gltf",
     "url": "other/UnityExporter/ExportTestScene.gltf"
+  },
+  {
+    "name": "Lu_Scene_recorded.gltf",
+    "url": "other/UnityExporter/Lu_Scene_recorded.gltf"
+  },
+  {
+    "name": "Lu_Scene.gltf",
+    "url": "other/UnityExporter/Lu_Scene.gltf"
   },
   {
     "name": "Lights.glb",

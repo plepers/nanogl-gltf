@@ -11,6 +11,7 @@ const Models : Mentry[] = _Models
 
 const selector = document.getElementById('model-selector') as HTMLSelectElement
 const camSelector = document.querySelector("#camera-selector" ) as HTMLSelectElement;
+const playAnims = document.querySelector("#playanims" ) as HTMLInputElement;
 const nextbtn = document.getElementById('next-model')
 const statusEl = document.getElementById('status')
 
@@ -28,6 +29,10 @@ for (const model of Models) {
 
 selector.addEventListener('change', (e) => {
   loadModel(selector.selectedOptions[0].value)
+})
+
+playAnims.addEventListener('change', (e) => {
+  scene.playAnimations = playAnims.checked;
 })
 
 const canvas = document.getElementById('gl-canvas') as HTMLCanvasElement

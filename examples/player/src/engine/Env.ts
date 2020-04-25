@@ -17,11 +17,14 @@ const INITIAL_IDX = 0;
 
 const ENVS = [
   'Helipad',
+  'lu_env',
+  '3DTotal_free_sample_4',
+  'abandonned',
 ]
 
 
 
-const EXPO = 5
+const EXPO = 1.0
 const GAMMA = 2.2
 
 class Env{
@@ -72,9 +75,9 @@ class Env{
 
   setupMat( m : StandardPass ){
 
-    m.iGamma   .proxy( this.gamma )
-    m.iExposure.proxy( this.exposure )
-    m.gammaMode.proxy( this.gammaMode )
+    m.iGamma   ?.proxy( this.gamma )
+    m.iExposure?.proxy( this.exposure )
+    m.gammaMode?.proxy( this.gammaMode )
 
   }
 

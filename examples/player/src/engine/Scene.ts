@@ -29,6 +29,8 @@ import KHR_mesh_quantization               from 'nanogl-gltf/extensions/KHR_mesh
 import EXT_texture_webp                    from 'nanogl-gltf/extensions/EXT_texture_webp'
 import LightSetup from 'nanogl-pbr/lighting/LightSetup'
 import { AbortController } from '@azure/abort-controller'
+import PunctualLight from 'nanogl-pbr/lighting/PunctualLight'
+import DepthPass from 'nanogl-pbr/DepthPass'
 
    
 
@@ -74,6 +76,8 @@ export default class Scene {
   abortCtrl: AbortController
   _selectedCamera : number;
 
+  playAnimations :boolean = true;
+
   constructor() {
 
     this.dt     = 0   ;
@@ -115,7 +119,7 @@ export default class Scene {
 
     this.lightSetup  = null
     
-    this.envRotation = Math.PI/2
+    this.envRotation = 0;//Math.PI
 
     // CONTROLERS
     // ======
@@ -143,7 +147,8 @@ export default class Scene {
   
   
   async load( ){
-    await this.iblMngr.load( 'Helipad' );
+    await this.iblMngr.loadDefault();
+    // await this.iblMngr.load( 'Helipad' );
     // await this.loadGltf( 'models/Avocado.glb' )
   }
 
@@ -159,8 +164,8 @@ export default class Scene {
     this.gltfScene = await GltfIO.loadGltf( url, {abortSignal:this.abortCtrl.signal} );
     await this.gltfScene.allocateGl( this.gl )
     this.root.add( this.gltfScene.root );
-    this.setupMaterials()
     this.computeBounds()
+    this.setupMaterials()
     this.initCamera()
 
     this.animationTime = 0;
@@ -168,23 +173,27 @@ export default class Scene {
     for( const anim of this.gltfScene.animations ){
       this.animationDuration = Math.max( this.animationDuration, anim.duration );
     }
-    this._selectedCamera = -1;
+    this._selectedCamera = this.gltfScene.cameraInstances.length-1;
     return this.gltfScene;
   }
 
   setupMaterials() {
     this.lightSetup = new LightSetup()
     this.lightSetup.add( this.iblMngr.ibl )
+    this.lightSetup.bounds = this.bounds;
     
     const lights = this.gltfScene.extras.lights;
     if( lights ){
-      for (const light of lights) {
+      for (const light  of lights) {
+        (light as PunctualLight ).castShadows( true );
+        (light as PunctualLight )._shadowmapSize = 2048;
         this.lightSetup.add( light );
       }
     }
 
     for (const material of this.gltfScene.materials ) {
       (material as any).materialPass.setLightSetup( this.lightSetup )
+      this.iblMngr.setupMat( (material as any).materialPass );
     }
   }
 
@@ -213,10 +222,10 @@ export default class Scene {
     
     this.devCamera.lookAt( bs.center );
     this.devCamera.invalidate();
-    this.maxcam.orbitRadius = -maxRadius * 5;
+    this.maxcam.orbitRadius = -maxRadius * 5
     this.maxcam.panSensitivity = maxRadius * 5
     this.devCamera.lens.far = maxRadius * 10
-    this.devCamera.lens.near = maxRadius / 10
+    this.devCamera.lens.near = maxRadius / 1000
     this.camCtrl.setControler(this.maxcam)
 
 
@@ -244,13 +253,14 @@ export default class Scene {
     
     if( this.gltfScene ) {
 
-      this.animationTime += dt
+      if( this.playAnimations )
+        this.animationTime += dt
+
       if( this.animationTime > this.animationDuration ) this.animationTime = 0;
       for( const anim of this.gltfScene.animations ){
         anim.evaluate( this.animationTime)
       }
 
-      this.lightSetup.update()
 
       
       this.drawScene( this.getCurrentCamera() )
@@ -289,8 +299,8 @@ export default class Scene {
     // RTT
     // ==========
     
-    // this.iblMngr.lights.setup.update();
-    // this.renderShadowMaps()
+    this.lightSetup.prepare(gl);
+    this.renderShadowMaps()
     // this.glstate.apply()
     
     
@@ -334,34 +344,40 @@ export default class Scene {
 
 
 
-  // renderShadowMaps() {
-  //   const gl = this.gl;
-  //   const lights = this.iblMngr.lights;
-  //   const depthpass = lights.depthPass;
-  //   const glstate = this.glstate;
+  renderShadowMaps() {
+    const lights = this.gltfScene.extras.lights;
+    if( !lights ) return;
 
-  //   const isRgb = lights.setup.depthFormat._val === 'D_RGB';
-  //   lights.depthCfg.colorMask(isRgb, isRgb, isRgb, isRgb);
+    const gl = this.gl;
+    const glstate = this.glstate;
 
-  //   for (var l of lights.list) {
-  //     if (l._castShadows) {
-  //       l.prepareShadowmap()
-  //       // fbodebug.debug( l._fbo );
-  //       gl.clearColor(1, 1, 1, 1);
-  //       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-  //       glstate.push(lights.depthCfg);
-
-  //       // render
-  //       this.renderGltfScene( l._camera, Masks.SHADOW_CASTER, Passes.DEPTH )
+    const isRgb = this.lightSetup.depthFormat.value() === 'D_RGB';
+    var config = new GLConfig()
+      .enableCullface( true )
+      .enableDepthTest( true )
+      .depthMask( true )
+      .colorMask(isRgb, isRgb, isRgb, isRgb);
 
 
-  //       glstate.pop();
+    for (var l of lights) {
+      if (l._castShadows) {
+        l.bindShadowmap()
+        // fbodebug.debug( l._fbo );
+        gl.clearColor(1, 1, 1, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  //     }
-  //   }
-  //   glstate.apply();
-  // }
+        glstate.push(config);
+
+        // render
+        this.renderGltfScene( l._camera, Masks.OPAQUE, Passes.DEPTH, config )
+
+
+        glstate.pop();
+
+      }
+    }
+    glstate.apply();
+  }
 
 
   makeCamera() {
