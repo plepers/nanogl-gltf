@@ -27,14 +27,13 @@ export default class Node extends NGLNode implements IElement {
   mesh?       : Mesh;
   // weights?    : Float32Array;
 
-  renderable? : IRenderable;
+  renderable? : MeshRenderer;
 
   async parse( gltfLoader:GltfLoader, data: Gltf2.INode ){
     // super.parse();
     // this.uuid         = data.uuid;
     // this.elementIndex = data.elementIndex;
-    // this.gltf         = gltfLoader.gltf;
-    this.name         = data.name      
+    // this.gltf         = gltfLoader.gltf;    
     this.extras       = data.extras    
     // this.extensions   = data.extensions
 
@@ -72,12 +71,33 @@ export default class Node extends NGLNode implements IElement {
     if( data.mesh !== undefined ) {
       this.mesh = await gltfLoader.getElement( GltfTypes.MESH, data.mesh );
     }
-      
+    
+
+    this.name = data.name ?? (this.mesh?.name )
+
     this.invalidate();
     
   }
 
-
+  findChild( name : string ) : Node|undefined {
+    for (let i = 0; i < this._children.length; i++) {
+      const child = this._children[i] as Node;
+      if( child.name === name ) return child;
+    }
+    return undefined;
+  }
+  
+  findDescendant( name : string ) : Node|undefined {
+    let res = this.findChild( name );
+    if( res === undefined ){
+      for (let i = 0; i < this._children.length; i++) {
+        const child = this._children[i] as Node;
+        res = child.findDescendant?.( name );
+        if( res !== undefined ) return res;
+      }
+    }
+    return res;
+  }
   
   allocateGl( gl : GLContext ) : void {
     

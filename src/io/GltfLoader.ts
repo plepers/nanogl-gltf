@@ -156,10 +156,18 @@ export default class GltfLoader {
   }
 
 
-
+  parseCommonGltfProperty<P extends Gltf2.Property>(data: P, element:ElementOfType<PropertyType<P>>){
+    if( element.name === undefined ) {
+      element.name = (data as any).name;
+    }
+    if( element.extras === undefined ) {
+      element.extras = data.extras;
+    }
+  }
   
   async _createElement<P extends Gltf2.Property>(data: P): PromiseElementForProperty<P> {
     let element = await this._createElementInstance( data );
+    this.parseCommonGltfProperty( data, element );
     return this._extensionsAccept( data, element );
   }
 
@@ -266,10 +274,7 @@ export default class GltfLoader {
       const elements = await Promise.all( pelements.map( (pe)=>pe.promise ) );
       for (let i = 0; i < pelements.length; i++) {
         const element = elements[i];
-        const data    = pelements[i].data;
         Assert.isDefined( element.gltftype );
-        element.name = (data as any).name;
-        element.extras = data.extras;
         this.gltf.addElement( elements[i], pelements[i].data.elementIndex );
       }
     }

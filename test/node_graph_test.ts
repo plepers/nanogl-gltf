@@ -68,5 +68,39 @@ describe("Node graph", function () {
 
 
   });
+
+
+    
+  describe("find", function () {
+    
+    let gltf:Gltf;
+  
+    before(function () {
+      return WebGltfIO.loadGltf('samples/models/2.0/Buggy/glTF/Buggy.gltf').then( res=>gltf=res )
+    });
+
+
+    function logGraph( node : Node, tabs:string ){
+      console.log( tabs+node.name);
+      for (const c of node._children) {
+        logGraph( c as Node, tabs+'  ')
+      }
+    }
+
+    it("should find child when mesh has name", function () {
+      const m = gltf.getElement( GltfTypes.NODE, 0 );
+      expect( m.findChild("body_11") ).to.be.ok()
+    });
+    
+    it("should find descendant when mesh has name", function () {
+      const m = gltf.getElement( GltfTypes.NODE, 0 );
+      // logGraph(m, '');
+      expect( m.findDescendant("tech_light_p_SOLIDS_3") ).to.be.ok()
+    });
+
+
+
+
+  });
   
 });
