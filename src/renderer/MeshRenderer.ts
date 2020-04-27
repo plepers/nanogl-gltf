@@ -41,7 +41,8 @@ export default class MeshRenderer implements IRenderable {
   readonly bounds : Bounds = new Bounds();
 
 
-  private _skins : SkinDeformer[] = []
+  private _skin : SkinDeformer;
+  private _morph : MorphDeformer;
   
   constructor( gl : GLContext, node: Node) {
     Assert.isDefined( node.mesh );
@@ -100,15 +101,21 @@ export default class MeshRenderer implements IRenderable {
       
       const morphDeformer = new MorphDeformer( morphInfos );
       
-      if( this.node.weights )
-        morphDeformer.weights = this.node.weights 
-        else if( this.mesh.weights )
-        morphDeformer.weights = this.mesh.weights 
 
       material.inputs.add( morphDeformer );
+      this._morph = morphDeformer;
 
+      this.setupMorphWeights();
     }
     
+  
+  }
+  setupMorphWeights() {
+    if( this.node.weights ){
+      this._morph.weights = this.node.weights 
+    } else if( this.mesh.weights ){
+      this._morph.weights = this.mesh.weights 
+    }
   }
 
   configureSkin(material: BaseMaterial, primitive: Primitive) {
@@ -152,14 +159,9 @@ export default class MeshRenderer implements IRenderable {
       // add skin deformer
       //material.setSkin ...
       material.inputs.add( skinDeformer );
-      this._skins.push( skinDeformer );
+      this._skin = skinDeformer;
     }
     
-    if( this.node.weights ){
-      // add morph target deformer
-      //primitive.targets[0]
-    }
-
   }
 
   computeBounds() {
@@ -177,9 +179,12 @@ export default class MeshRenderer implements IRenderable {
 
     const primitives = this.mesh.primitives;
     
-    // TODO: move this in pre render? 
-    for (const skin of this._skins) {
-      this.node.skin.computeJoints( this.node, skin.jointMatrices );
+    if( this._skin ){
+      this.node.skin.computeJoints( this.node, this._skin.jointMatrices );
+    }
+
+    if (this._morph ){
+      this.setupMorphWeights();
     }
 
 

@@ -25,7 +25,7 @@ export default class Node extends NGLNode implements IElement {
   camera?     : Camera;
   skin?       : Skin;
   mesh?       : Mesh;
-  // weights?    : Float32Array;
+  weights?    : Float32Array = null;
 
   renderable? : MeshRenderer;
 
@@ -52,8 +52,6 @@ export default class Node extends NGLNode implements IElement {
     if( data.rotation !== undefined )
       this.rotation.set( data.rotation );
 
-    if( data.weights !== undefined )
-      this.weights = new Float32Array( data.weights );
 
       
     if( data.children !== undefined ){
@@ -68,8 +66,20 @@ export default class Node extends NGLNode implements IElement {
       this.skin = await gltfLoader.getElement( GltfTypes.SKIN, data.skin )
     }
 
+    
     if( data.mesh !== undefined ) {
       this.mesh = await gltfLoader.getElement( GltfTypes.MESH, data.mesh );
+      const targets = this.mesh.primitives[0].targets
+      if( targets ){
+        this.weights = new Float32Array(targets.length);    
+      }
+    }
+
+    if( data.weights !== undefined ){
+      if( this.weights === null || this.weights.length !== data.weights.length ){
+        throw new Error( "morph weights on node doesn't match mesh targets" );
+      }
+      this.weights.set( data.weights );
     }
     
 
@@ -105,14 +115,6 @@ export default class Node extends NGLNode implements IElement {
       this.renderable = new MeshRenderer( gl, this );
     }
     
-  }
-
-  set weights( weights : Float32Array ){
-    this.mesh.weights.set( weights );
-  }
-
-  get weights( ) : Float32Array {
-    return this.mesh.weights;
   }
 
  

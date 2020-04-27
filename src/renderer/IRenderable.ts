@@ -3,7 +3,7 @@ import { GLContext } from "nanogl/types";
 import Camera from "nanogl-camera";
 import GLConfig from "nanogl-state/config";
 import Bounds from "nanogl-pbr/Bounds";
-import Node from "nanogl-node";
+import Node from "../elements/Node";
 
 
 export interface IRenderingContext {
