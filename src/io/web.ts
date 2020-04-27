@@ -9,7 +9,31 @@ import {AbortSignal} from '@azure/abort-controller'
 import { cancellablePromise, createNativeSignal } from '../lib/cancellation';
 
 
-const _HAS_CIB : boolean = ( window.createImageBitmap !== undefined );
+/**
+ * we need a createImageBitmap implementation which support options
+ * make test with small data uri png
+ */
+async function checkCreateImageBitmapCapability() : Promise<boolean>{
+  if( window.createImageBitmap === undefined ){
+    return false
+  }
+  const uri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=";
+  const request = await fetch( uri )
+  const blob = await request.blob();
+  try{
+    //@ts-ignore
+    await window.createImageBitmap( blob, {
+      premultiplyAlpha:'none',
+      colorSpaceConversion : 'none'
+    });
+  } catch(e){
+    return false;
+  }
+    
+  return true;
+}
+
+const CreateImageBitmapAvailable : Promise<boolean> = checkCreateImageBitmapCapability();
 
 function baseDir( p:string ) : string[]{
   const sep = p.lastIndexOf("/");
@@ -89,7 +113,9 @@ class WebImpl implements IOInterface {
 
   async loadImageBlob( blob : Blob, abortSignal : AbortSignal ) : Promise<TexImageSource> {
     let promise : Promise<TexImageSource>;
-    if( _HAS_CIB )
+    const hasCIB : boolean = await CreateImageBitmapAvailable;
+
+    if( hasCIB )
     {
       //@ts-ignore
       promise = createImageBitmap( blob, {
