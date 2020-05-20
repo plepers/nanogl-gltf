@@ -23,7 +23,7 @@ export default class CompressedImage extends Image {
 
   }
 
-  public async setupTexture(texture: Texture2D, wrapS: GLenum, wrapT: GLenum, minFilter: GLenum, magFilter: GLenum) {
+  public async setupTexture(texture: Texture2D, requirePOT : boolean = false, genMipmaps : boolean = false) {
 
     const gl = texture.gl;
 
@@ -41,10 +41,6 @@ export default class CompressedImage extends Image {
       h = h >> 1;
     };
 
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapS);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapT);
 
   }
 
