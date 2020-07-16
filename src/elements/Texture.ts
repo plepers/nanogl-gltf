@@ -35,6 +35,7 @@ function nearestPowerOf2(n:number) : number {
 
 
 
+
 export default class Texture implements IElement {
 
   readonly gltftype : GltfTypes.TEXTURE = GltfTypes.TEXTURE;
@@ -75,6 +76,7 @@ export default class Texture implements IElement {
       glFormat = gl.RGBA;
 
 
+
     let minFilter : GLenum = gl.LINEAR
     let magFilter : GLenum = gl.LINEAR
 
@@ -87,28 +89,13 @@ export default class Texture implements IElement {
       wrapS = this.sampler.wrapS
       wrapT = this.sampler.wrapT
     }
-
     
-    /*
-      TODO: implement texture resize
-      Resize source to POT if needed : if the sampler the texture references
-      Has a wrapping mode (either wrapS or wrapT) equal to REPEAT or MIRRORED_REPEAT, or
-      Has a minification filter (minFilter) that uses mipmapping (NEAREST_MIPMAP_NEAREST, NEAREST_MIPMAP_LINEAR, LINEAR_MIPMAP_NEAREST, or LINEAR_MIPMAP_LINEAR).
-    */
-    let texImageSource = this.source.texImageSource;
-    if( wrapRequirePot(wrapS) || wrapRequirePot( wrapT ) || filterHasMipmap(minFilter) ){
-      if( !isPowerOf2(texImageSource.width) || !isPowerOf2(texImageSource.height) )
-        texImageSource = await this.resizeToPOT( texImageSource, gl );
-    }
-
-
     this.glTexture = new Texture2D( gl, glFormat, gl.UNSIGNED_BYTE );
-    this.glTexture.fromImage( texImageSource );
 
-    
-    if( filterHasMipmap(minFilter) ){
-      gl.generateMipmap( gl.TEXTURE_2D );
-    }
+    const requirePOT = wrapRequirePot(wrapS) || wrapRequirePot( wrapT ) || filterHasMipmap(minFilter);
+    await this.source.setupTexture(this.glTexture, requirePOT, filterHasMipmap(minFilter) );
+
+    this.glTexture.bind();
 
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
@@ -116,26 +103,6 @@ export default class Texture implements IElement {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapT);
 
     this._glTextureDeferred.resolve( this.glTexture );
-
-  }
-
-  async resizeToPOT( source: TexImageSource, gl : GLContext ) : Promise<TexImageSource> {
-    // throw new Error( "Not implemented - Texture source need to be resized to power of 2" );
-    // return source;
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    canvas.width  = nearestPowerOf2( source.width );
-    canvas.height = nearestPowerOf2( source.height );
-    
-    if( source instanceof ImageData ){
-      const imageBitmap = await  createImageBitmap( source, 0, 0, canvas.width, canvas.height );
-      context.drawImage(imageBitmap, 0, 0, canvas.width, canvas.height);
-    } else {
-      context.drawImage(source, 0, 0, canvas.width, canvas.height);
-    }
-
-    return canvas;
-    // return context.createImageData( canvas.width, canvas.height );
 
   }
   
