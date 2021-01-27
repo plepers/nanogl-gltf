@@ -7,6 +7,7 @@ import UTF8   from '../lib/utf8-decoder'
 import GltfIO from ".";
 import {AbortSignal} from '@azure/abort-controller'
 import { cancellablePromise, createNativeSignal } from '../lib/cancellation';
+import WebglCapabilities from './WebglCapabilities';
 
 
 /**
@@ -47,7 +48,11 @@ function baseDir( p:string ) : string[]{
 
 class WebImpl implements IOInterface {
 
-
+  capabilities: WebglCapabilities;
+  
+  constructor(){
+    this.capabilities = new WebglCapabilities();
+  }
 
   isDataURI( uri : string ) : Boolean{
     return ( uri.indexOf('data:') === 0 );

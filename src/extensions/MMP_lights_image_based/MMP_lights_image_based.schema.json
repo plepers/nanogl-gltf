@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "MMP_lights_image_based",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "glTFProperty.schema.json"
+    }
+  ],
+  "properties": {
+    "lights": {
+      "allOf": [
+        {
+          "$schema": "http://json-schema.org/draft-04/schema",
+          "title": "MMPLightImageBased",
+          "type": "object",
+          "description": "An image-based lighting environment.",
+          "allOf": [
+            {
+              "$ref": "glTFChildOfRootProperty.schema.json"
+            }
+          ],
+          "properties": {
+            "rotation": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": -1.0,
+                "maximum": 1.0
+              },
+              "minItems": 4,
+              "maxItems": 4,
+              "description": "Quaternion that represents the rotation of the IBL environment.",
+              "default": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            "intensity": {
+              "type": "number",
+              "description": "Brightness multiplier for environment.",
+              "default": 1.0,
+              "minimum": 0.0
+            },
+            "irradianceCoefficients": {
+              "description": "Declares spherical harmonic coefficients for irradiance up to l=2. This is a 9x3 array.",
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "minItems": 9,
+              "maxItems": 9
+            },
+            "specularImage": {
+              "description": "The precomputed specular image id, all mips in one image, encoded in RGBE",
+              "type": "integer"
+            },
+            "specularImageSize": {
+              "type": "integer",
+              "description": "The dimension (in pixels) of a cube face",
+              "minimum": 1
+            },
+            "name": {},
+            "extensions": {},
+            "extras": {}
+          },
+          "required": [
+            "irradianceCoefficients",
+            "specularImage",
+            "specularImageSize"
+          ]
+        }
+      ],
+      "description": "The id of the light referenced by this scene."
+    },
+    "extensions": {},
+    "extras": {}
+  },
+  "required": [
+    "MMPLightImageBased"
+  ]
+}

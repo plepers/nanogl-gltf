@@ -51,7 +51,6 @@ export default class Image implements IElement {
   texImageSource: TexImageSource;
 
   async parse(gltfLoader: GltfLoader, data: Gltf2.IImage): Promise<any> {
-
     if (data.uri) {
       this.uri = data.uri;
 

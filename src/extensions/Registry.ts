@@ -42,6 +42,7 @@ export class ExtensionList {
 class ExtensionsRegistry {
 
   _extensionFactories : Record<string,IExtensionFactory>;
+  _additionalExtensions : IExtensionFactory[];
 
   constructor(){
     this._extensionFactories = {}
@@ -55,6 +56,7 @@ class ExtensionsRegistry {
   
   setupExtensions( loader:GltfLoader, additionalExtensions : IExtensionFactory[] = [] ) : void {
     const res = loader._extensions;
+    this._additionalExtensions = additionalExtensions;
     
     for( const extName in this._extensionFactories ){
       const extInstance = this._extensionFactories[extName].createInstance( loader );
@@ -66,6 +68,8 @@ class ExtensionsRegistry {
       const extInstance = ext.createInstance( loader );
       res.addExtension( extInstance );
     }
+
+    this._additionalExtensions = null;
 
     res.sort();
     

@@ -67,8 +67,51 @@ interface IKHR_LP_LightInstance {
   };
 }
 
+interface LightItemCollection {
+  name: string;
+  index: number; 
+} 
 
+class LightCollection {
 
+  list: Light[];
+
+  _items: Array<LightItemCollection>;
+
+  constructor() {
+    this.list = [];
+    this._items = [];
+  }
+
+  addLight( light: Light, name: string = undefined ) {
+
+    this.list.push( light );
+    this._items.push( {name: name, index: this.list.length - 1} )
+
+  }
+
+  getLightByName( name: string ): Light {
+    let out: Light;
+    for( let i = 0;i < this._items.length;i++ ) {
+      if( this._items[i].name == name ) {
+        out = this.list[this._items[i].index];
+        break;
+      }
+    }
+    return out;
+  }
+
+  getLightsByName( name: string ): Array<Light> {
+    let out: Array<Light> = []
+    for( let i = 0;i < this._items.length;i++ ) {
+      if( this._items[i].name == name ) {
+        out.push( this.list[this._items[i].index] );
+      }
+    }
+    return out;
+  }
+
+}
 
 
 class Instance implements IExtensionInstance {
@@ -78,12 +121,12 @@ class Instance implements IExtensionInstance {
   readonly priority: number = 1;
   
   loader: GltfLoader;
-  lights:Light[]
+  lights: LightCollection;
 
 
   constructor( gltfLoader : GltfLoader) {
     this.loader = gltfLoader;
-    this.lights = []
+    this.lights = new LightCollection();
     gltfLoader.gltf.extras.lights = this.lights;
   }
 
@@ -136,9 +179,10 @@ class Instance implements IExtensionInstance {
     color[2] *= intensity
 
     light._color.set( color )
-
     node.add( light );
-    this.lights.push( light );
+
+    let name = lightData.name;
+    this.lights.addLight(light, name);
     return light;
 
   }
