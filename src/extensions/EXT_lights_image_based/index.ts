@@ -7,7 +7,7 @@ import Scene from "../../elements/Scene";
 import GltfTypes from "../../types/GltfTypes";
 import TextureCube from "nanogl/texture-cube";
 import {GLContext} from "nanogl/types";
-import IblPmrem from "nanogl-pbr/lighting/IblPmrem";
+import IblPmrem from "nanogl-pbr/lighting/IBLPmrem";
 
 const EXT_ID: string = 'EXT_lights_image_based';
 
