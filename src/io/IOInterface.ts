@@ -1,6 +1,8 @@
-
+import WebglCapabilities from "./WebglCapabilities";
 
 export default interface IOInterface {
+
+  capabilities?: WebglCapabilities;
 
   resolveBaseDir( path: string ) : string[];
   resolvePath( path: string, base : string ) : string;

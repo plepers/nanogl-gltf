@@ -79,7 +79,7 @@ export default class Material implements IMaterial {
     
     this._materialPass.version.set( isWebgl2(gl) ? '300 es' : '100' )
 
-    const material = new BaseMaterial( gl, this._materialPass.name );
+    const material = new BaseMaterial( gl, this.name );
     material.addPass( this._materialPass, 'color' )
 
     const normal = primitive.attributes.getSemantic( 'NORMAL')

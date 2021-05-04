@@ -52,7 +52,6 @@ class DefaultExtensionInstance implements IExtensionInstance {
 
   loadElement<P extends Gltf2.Property>(data: P): Promise<ElementOfType<PropertyType<P>>>;
   loadElement(data: Gltf2.Property): Promise<AnyElement> {
-    
     switch (data.gltftype) {
       case GltfTypes.ACCESSOR                : return this.createAccessor             (data);
       case GltfTypes.ACCESSOR_SPARSE         : return this.createAccessorSparse       (data);

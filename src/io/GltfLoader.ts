@@ -178,7 +178,7 @@ export default class GltfLoader {
     for (const ext of extensions) {
       const res = ext.loadElement(data)
       if( res === undefined )
-        throw new Error( "extensiosn should not return undefined")
+        throw new Error( "extension should not return undefined")
       if (res !== null) return res;
     }
     throw new Error( "Unhandled type")
@@ -248,6 +248,7 @@ export default class GltfLoader {
       console.warn(`Gltf version should be "2.0" found "${asset.version}"` );
     } 
 
+    await this._loadElements( this._data.scenes );
     await this._loadElements( this._data.nodes );
     await this._loadElements( this._data.animations );
     await this.resolveElements();
@@ -303,7 +304,6 @@ export default class GltfLoader {
     this.prepareGltfRootProperties( gltfData.scenes     , GltfTypes.SCENE     , null );
     this.prepareGltfRootProperties( gltfData.skins      , GltfTypes.SKIN      , null );
     this.prepareGltfRootProperties( gltfData.textures   , GltfTypes.TEXTURE   , null );
-
 
 
     if( gltfData.animations !== undefined ){
