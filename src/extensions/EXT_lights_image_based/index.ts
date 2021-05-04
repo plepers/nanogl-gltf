@@ -10,6 +10,7 @@ import { GLContext } from "nanogl/types";
 import IblPmrem from "nanogl-pbr/lighting/IBLPmrem";
 import Image from "../../elements/Image";
 
+
 const EXT_ID: string = 'EXT_lights_image_based';
 
 // ======
@@ -158,7 +159,18 @@ class IBLScene extends Scene {
 
 }
 
-
+function imgResolver(
+  surfaces: TexImageSource[][],
+  surfIdx: number,
+  imgIdx: number
+) {
+  const surf = surfaces;
+  const sidx = surfIdx;
+  const iidx = imgIdx;
+  return function(source: Image) {
+    surf[sidx][iidx] = source.texImageSource;
+  }
+}
 
 // ======
 // LOADER
@@ -173,19 +185,6 @@ class IBLLoader {
     }
 
     const images = lightData.specularImages;
-
-    function imgResolver(
-      surfaces: TexImageSource[][],
-      surfIdx: number,
-      imgIdx: number
-    ) {
-      const surf = surfaces;
-      const sidx = surfIdx;
-      const iidx = imgIdx;
-      return function(source: Image) {
-        surf[sidx][iidx] = source.texImageSource;
-      }
-    }
 
     const promises = [];
     for (let i = 0; i < images.length; i++) {
