@@ -57,7 +57,7 @@
     "nanogl": "^2.3.0",
     "nanogl-camera": "^1.1.2",
     "nanogl-node": "^1.2.0",
-    "nanogl-pbr": "^2.5.0",
+    "nanogl-pbr": "git+ssh://git@github.com:FlorentinMonteil/nanogl-pbr.git#next/3.0_ibl_update",
     "nanogl-state": "^1.1.1",
     "nanogl-vao": "^1.1.0",
     "save": "^2.4.0"
