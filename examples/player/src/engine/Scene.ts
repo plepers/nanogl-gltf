@@ -184,7 +184,7 @@ export default class Scene {
     
     const lights = this.gltfScene.extras.lights;
     if( lights ){
-      for (const light  of lights) {
+      for (const light  of lights.list) {
         (light as PunctualLight ).castShadows( true );
         (light as PunctualLight )._shadowmapSize = 2048;
         this.lightSetup.add( light );
@@ -359,7 +359,7 @@ export default class Scene {
       .colorMask(isRgb, isRgb, isRgb, isRgb);
 
 
-    for (var l of lights) {
+    for (var l of lights.list) {
       if (l._castShadows) {
         l.bindShadowmap()
         // fbodebug.debug( l._fbo );
