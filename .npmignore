@@ -1,4 +1,6 @@
 src
 test
 examples
-@types
+build
+karma.conf.js
+tsconfig.json
