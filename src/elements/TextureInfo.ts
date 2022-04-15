@@ -10,9 +10,9 @@ import { Sampler } from 'nanogl-pbr/Input';
 import TexCoord from 'nanogl-pbr/TexCoord';
 
 export interface ITextureInfo {
-  texture : Texture;
-  texCoord: number;
-  createSampler( id : string ) : Sampler;
+  texture : Texture
+  texCoord: number
+  createSampler( id : string ) : Sampler
 }
 
 export abstract class BaseTextureInfo implements ITextureInfo {
@@ -29,7 +29,7 @@ export abstract class BaseTextureInfo implements ITextureInfo {
   createSampler( id : string ) : Sampler {
     if( this._sampler === null ){
       const attrib = Gltf.getSemantics().getAttributeName( `TEXCOORD_${this.texCoord}` )
-      this._sampler = new Sampler( `tex_${name??''}${id}`, TexCoord.create( attrib ) )
+      this._sampler = new Sampler( `tex_${this.name??''}${id}`, TexCoord.create( attrib ) )
       this.texture.glTexturePromise.then( (t)=> this._sampler.set( t ) )
     }
     return this._sampler;

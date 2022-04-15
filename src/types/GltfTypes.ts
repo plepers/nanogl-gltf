@@ -1,5 +1,5 @@
 
-const enum GltfTypes {
+enum GltfTypes {
   
   ACCESSOR                = 'accessors'            ,
   ACCESSOR_SPARSE         = "sparse"               ,
@@ -25,6 +25,6 @@ const enum GltfTypes {
   TEXTURE                 = 'textures'             ,
   TEXTURE_INFO            = 'textureInfo'          ,
   
-};
+}
 
-export default GltfTypes;
+export default GltfTypes

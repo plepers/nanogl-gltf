@@ -49,7 +49,7 @@ class WebImpl implements IOInterface {
 
 
 
-  isDataURI( uri : string ) : Boolean{
+  isDataURI( uri : string ) : boolean{
     return ( uri.indexOf('data:') === 0 );
   }
 
@@ -58,7 +58,7 @@ class WebImpl implements IOInterface {
     if( uri.indexOf('data:') !== 0 ){
       throw new Error('invalid dataURI' )
     }
-    var b64 = uri.substr( uri.indexOf(',')+1 );
+    const b64 = uri.substr( uri.indexOf(',')+1 );
 
     return base64.toByteArray( b64 ).buffer;
   }
@@ -74,7 +74,7 @@ class WebImpl implements IOInterface {
     return baseurl + '/' + path;
   }
 
-  decodeUTF8(buffer: ArrayBuffer, offset : number = 0, length : number = undefined ): string {
+  decodeUTF8(buffer: ArrayBuffer, offset  = 0, length : number = undefined ): string {
     if( length === undefined ) length = buffer.byteLength - offset;
     return UTF8( new Uint8Array( buffer, offset, length ) );
   }
@@ -143,11 +143,11 @@ class WebImpl implements IOInterface {
 
 
 
-  writeResource(path: string, data: string) : Promise<Boolean>{
+  writeResource(path: string, data: string) : Promise<boolean>{
     throw new Error("Method not implemented.");
   }
   
-  writeBinaryResource(path: string, data: ArrayBuffer) : Promise<Boolean>{
+  writeBinaryResource(path: string, data: ArrayBuffer) : Promise<boolean>{
     throw new Error("Method not implemented.");
   }
 

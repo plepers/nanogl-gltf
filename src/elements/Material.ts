@@ -33,14 +33,13 @@ const ONE_MINUS_SRC_ALPHA   = 0x0303;
 
 
 export interface IPbrInputsData {
-  setupPass( pass : StandardPass ):void;
+  setupPass( pass : StandardPass ):void
 }
 
 
 export interface IMaterial extends IElement {
-  readonly gltftype: GltfTypes.MATERIAL;
-  name : string|undefined;
-  createMaterialForPrimitive( gl : GLContext, node : Node, primitive : Primitive ) : BaseMaterial;
+  readonly gltftype: GltfTypes.MATERIAL
+  createMaterialForPrimitive( gl : GLContext, node : Node, primitive : Primitive ) : BaseMaterial
 }
 
 
@@ -52,7 +51,6 @@ export type GltfMaterialPass = MaterialPass & {
 export default class Material implements IMaterial {
 
   readonly gltftype = GltfTypes.MATERIAL;
-  
   name        : undefined | string;
   extras      : any   ;
 
@@ -104,7 +102,7 @@ export default class Material implements IMaterial {
 
   async parse(gltfLoader: GltfLoader, data: Gltf2.IMaterial): Promise<any> {
 
-    this.emissiveFactor = <vec3>new Float32Array(data.emissiveFactor || [0, 0, 0]);
+    this.emissiveFactor = new Float32Array(data.emissiveFactor || [0, 0, 0]) as vec3;
 
     this.alphaMode = data.alphaMode || Gltf2.MaterialAlphaMode.OPAQUE;
     this.alphaCutoff = data.alphaCutoff ?? 0.5;
@@ -146,6 +144,8 @@ export default class Material implements IMaterial {
 
   configureAlpha( pass : StandardPass|UnlitPass ){
     if( this.alphaMode === Gltf2.MaterialAlphaMode.BLEND ){
+
+      pass.glconfig.depthMask( false );
       pass.glconfig.enableBlend()
       pass.glconfig.blendFunc( SRC_ALPHA, ONE_MINUS_SRC_ALPHA );
       pass.mask = Gltf.getRenderConfig().blendedMask;

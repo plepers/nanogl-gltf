@@ -63,8 +63,8 @@ export default class AccessorSparse implements IElement {
     const indices = this.indices;
     const count = indices.count;
     
-    for (var i = 0; i < count; i++) {
-      var j = indices.getScalar( i )
+    for (let i = 0; i < count; i++) {
+      const j = indices.getScalar( i )
       iset.add( j );
       imap.set( j, i );
     }

@@ -17,7 +17,9 @@ const _HAS_CIB: boolean = (window.createImageBitmap !== undefined);
 const GL_REPEAT                         = 0x2901;
 const GL_MIRRORED_REPEAT                = 0x8370;
 
-
+export function filterHasMipmap(filter : GLenum) : boolean {
+  return (filter & (1 << 8)) === (1 << 8);
+}
 
 export function wrapRequirePot(wrap : GLenum ) : boolean {
   return wrap === GL_REPEAT || wrap === GL_MIRRORED_REPEAT;
@@ -97,18 +99,28 @@ export default class Image implements IElement {
 
   }
 
-  async setupTexture(texture: Texture2D, requirePOT : boolean = false, genMipmaps : boolean = false ) {
-    const gl =  texture.gl;
+  public async setupTexture(texture: Texture2D, wrapS : GLenum, wrapT : GLenum, minFilter : GLenum, magFilter: GLenum): Promise<void> {
 
-    let texImageSource = this.texImageSource;
-    if(requirePOT && ( !isPowerOf2(texImageSource.width) || !isPowerOf2(texImageSource.height) ) ){
-      texImageSource = await this.resizeToPOT( texImageSource, texture.gl );
+    const gl = texture.gl;
+
+   let texImageSource = this.texImageSource;
+   if( wrapRequirePot(wrapS) || wrapRequirePot( wrapT ) || filterHasMipmap(minFilter) ){
+     if( !isPowerOf2(texImageSource.width) || !isPowerOf2(texImageSource.height) )
+     texImageSource = await this.resizeToPOT( texImageSource, gl );
     }
 
-    texture.fromImage(texImageSource);
-    if( genMipmaps ){
+    texture.fromImage(this.texImageSource);
+
+    if( filterHasMipmap(minFilter) ){
       gl.generateMipmap( gl.TEXTURE_2D );
     }
+
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapS);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapT);
+
+
   }
 
   async resizeToPOT( source: TexImageSource, gl : GLContext ) : Promise<TexImageSource> {

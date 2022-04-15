@@ -22,48 +22,15 @@ const ETC_EXTS = [
 //   'WEBGL_compressed_texture_astc'
 // ]
 
-
-enum ExtId {
-  DXT,
-  PVR,
-  ETC,
-}
-
-let EXTS : Record<ExtId, any> = null
-
-function _pickExtension(gl : GLContext, array : string[] ) : any {
-  var ext = null;
+function pickExtension(gl: GLContext, array: string[]) {
+  let ext = null;
   for (const extStr of array) {
-      ext = gl.getExtension(extStr);
-      if (ext)
-          break;
+    ext = gl.getExtension(extStr);
+    if (ext) break;
   }
   return ext;
 }
 
-function pickExtension(id : ExtId) {
-
-  if( EXTS === null ){
-    EXTS = {} as Record<ExtId, any>
-
-    let cvs = document.createElement("canvas");
-    let gl = (cvs.getContext('webgl2', {}) ||
-        cvs.getContext('webgl', {}) ||
-        cvs.getContext('experimental-webgl', {}) ||
-        cvs.getContext('webgl')) as GLContext;
-
-    EXTS[ExtId.DXT] = _pickExtension(gl, DXT_EXTS)
-    EXTS[ExtId.PVR] = _pickExtension(gl, PVR_EXTS)
-    EXTS[ExtId.ETC] = _pickExtension(gl, ETC_EXTS)
-    let loseExt = gl.getExtension('WEBGL_lose_context');
-    if (loseExt) {
-      loseExt.loseContext();
-    }
-
-  }
-   
-  return EXTS[id];
-}
 
 export class TextureCodec {
 
@@ -72,7 +39,7 @@ export class TextureCodec {
   compressed: boolean;
   ext: GLenum;
 
-  constructor(parser, compressed, suffix, extension) {
+  constructor(parser: KTXParser, compressed: boolean, suffix: string, extension: number) {
 
     this.parser = parser;
     this.suffix = suffix;
@@ -83,7 +50,7 @@ export class TextureCodec {
   }
 
 
-  transformPath = (basePath) => {
+  transformPath = (basePath: string) => {
     return basePath + this.suffix;
   }
 
@@ -106,12 +73,26 @@ export default class TextureLoader {
 
   constructor() {
 
-    this.DXTCodec = new TextureCodec(new KTXParser(), true, '.dxt.ktx', pickExtension(ExtId.DXT));
-    this.PVRCodec = new TextureCodec(new KTXParser(), true, '.pvr.ktx', pickExtension(ExtId.PVR));
-    this.ETCCodec = new TextureCodec(new KTXParser(), true, '.etc.ktx', pickExtension(ExtId.ETC));
+    let cvs = document.createElement("canvas");
+    let gl = <GLContext>(
+      cvs.getContext('webgl2', {}) ||
+      cvs.getContext('webgl', {}) ||
+      cvs.getContext('experimental-webgl', {}) ||
+      cvs.getContext('webgl'));
+
+    this.DXTCodec = new TextureCodec(new KTXParser(), true, '.dxt.ktx', pickExtension(gl, DXT_EXTS));
+    this.PVRCodec = new TextureCodec(new KTXParser(), true, '.pvr.ktx', pickExtension(gl, PVR_EXTS));
+    this.ETCCodec = new TextureCodec(new KTXParser(), true, '.etc.ktx', pickExtension(gl, ETC_EXTS));
 
     // TODO
     // this.ASTCCodec = new TextureCodec(new KTXParser(), true, '.astc.ktx', pickExtension(gl, ASTC_EXTS));
+
+    const loseExt = gl.getExtension('WEBGL_lose_context');
+    if (loseExt) {
+      loseExt.loseContext();
+    }
+    cvs = null;
+    gl = null;
 
   }
 

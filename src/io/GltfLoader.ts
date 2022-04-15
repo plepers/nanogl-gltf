@@ -166,7 +166,7 @@ export default class GltfLoader {
   }
   
   async _createElement<P extends Gltf2.Property>(data: P): PromiseElementForProperty<P> {
-    let element = await this._createElementInstance( data );
+    const element = await this._createElementInstance( data );
     this.parseCommonGltfProperty( data, element );
     return this._extensionsAccept( data, element );
   }
@@ -178,7 +178,7 @@ export default class GltfLoader {
     for (const ext of extensions) {
       const res = ext.loadElement(data)
       if( res === undefined )
-        throw new Error( "extensiosn should not return undefined")
+        throw new Error( "extension should not return undefined")
       if (res !== null) return res;
     }
     throw new Error( "Unhandled type")

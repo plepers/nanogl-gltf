@@ -101,18 +101,18 @@ export type BaseAccessorData = Gltf2.IAccessor | Gltf2.IAccessorSparseIndices | 
 
 export class BaseAccessor {
 
-  normalized     : boolean      = false;
+  normalized           = false;
   /**
    * bytes offset in the BufferView
    */
-  byteOffset     : number       = 0;
+  byteOffset            = 0;
   /**
    * number of elements 
    */
-  count          : number       = 0;
+  count                 = 0;
 
-  _stride        : number       = 0;
-  _strideElem    : number       = 0;
+  _stride               = 0;
+  _strideElem           = 0;
   componentType  : Gltf2.AccessorComponentType        ;
   type           : Gltf2.AccessorType        ;
   max          ? : number[]    ;
@@ -249,7 +249,7 @@ export class BaseAccessor {
   getRawValue( out:TypedArray, index:number ){
     const offset = this._strideElem * index;
     const ncomps = this.numComps;
-    for (var i = 0; i < ncomps; i++) {
+    for (let i = 0; i < ncomps; i++) {
       out[i] = this._array[i+offset];
     }
   }
@@ -259,7 +259,7 @@ export class BaseAccessor {
     for (let k = 0; k < size; k++) {
       const j = k*ncomps;
       const offset = this._strideElem * (index+k);
-      for (var i = 0; i < ncomps; i++) {
+      for (let i = 0; i < ncomps; i++) {
         out[j+i] = this._array[i+offset];
       }
     }
@@ -269,7 +269,7 @@ export class BaseAccessor {
   _normalize( out:TypedArray, raw:TypedArray ){
     const fn = this._normalizeFunc;
     const ncomps = this.numComps;
-    for (var i = 0; i < ncomps; i++) {
+    for (let i = 0; i < ncomps; i++) {
       out[i] = fn( raw[i] );
     }
   }

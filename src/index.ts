@@ -25,6 +25,7 @@ import { AnyElement, ElementOfType, IElement } from './types/Elements';
 import IRenderable from './renderer/IRenderable';
 import Assert from './lib/assert';
 import IRenderConfig, { DefaultRenderConfig } from './IRenderConfig';
+import Material from './elements/Material';
 
 
 class ElementCollection<T extends AnyElement = AnyElement>{
@@ -33,7 +34,7 @@ class ElementCollection<T extends AnyElement = AnyElement>{
   indexed : T[] = []
   list :  T[] = []
   
-  addElement(element: T, index : number = -1 ){
+  addElement(element: T, index  = -1 ){
     if(index>-1) this.indexed[index] = element  ;
     this.list.push( element);
   }
@@ -203,18 +204,32 @@ export default class Gltf {
   
   getElementByName<T extends GltfTypes>(type: T, name: string): ElementOfType<T> {
     const list = this._getCollection(type).list;
-    for (var el of list) {
+    for (const el of list) {
       if (el.name === name) return el;
     }
     return null;
   }
 
+  getElementsByName<T extends GltfTypes>(type: T, name: string): ElementOfType<T>[] {
+    const list = this._getCollection(type).list;
+    const ouput : ElementOfType<T>[] = [];
+    for (const el of list) {
+      if (el.name === name) ouput.push(el);
+    }
+    return ouput;
+  }
+
+
+  getMesh    ( name:string ): Mesh      { return this.getElementByName( GltfTypes.MESH    , name ) }
+  getMaterial( name:string ): IMaterial { return this.getElementByName( GltfTypes.MATERIAL, name ) }
+  getNode    ( name:string ): Node      { return this.getElementByName( GltfTypes.NODE    , name ) }
+  
   
   private _getCollection<T extends GltfTypes>(type: T): ElementCollection<ElementOfType<T>> {
     return this._collections.get(type) as ElementCollection<ElementOfType<T>>;
   }
   
-  addElement(element: AnyElement, index : number = -1 ) {
+  addElement(element: AnyElement, index  = -1 ) {
     const collection = this._getCollection( element.gltftype );
     collection.addElement( element, index );
     this._elements.push(element);

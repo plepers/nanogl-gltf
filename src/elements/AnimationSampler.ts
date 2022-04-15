@@ -15,7 +15,7 @@ type LerpFunc = (out:TypedArray, a:TypedArray, b:TypedArray, p:number )=>void;
 
 
 
-function cubicSplineInterpolation(out, t, dt, v0, b0, a1, v1) {
+function cubicSplineInterpolation(out: TypedArray, t: number, dt: number, v0: TypedArray, b0: TypedArray, a1: TypedArray, v1: TypedArray ) {
 
   const t2 = t * t;
   const t3 = t * t2;
@@ -27,7 +27,7 @@ function cubicSplineInterpolation(out, t, dt, v0, b0, a1, v1) {
 
   const ncomps = v0.length;
 
-  for (var i = 0; i < ncomps; i++) {
+  for (let i = 0; i < ncomps; i++) {
     out[i] = f0 * v0[i] + f1 * b0[i] + f2 * v1[i] + f3 * a1[i];
   }
 
@@ -173,7 +173,7 @@ class StepInterpolator extends Interpolator {
 function LERP_N(out:TypedArray, a:TypedArray, b:TypedArray, p:number ){
   const n = a.length;
   const invp = 1.0 - p;
-  for (var i = 0; i < n; i++) {
+  for (let i = 0; i < n; i++) {
     out[i] = a[i] * invp + b[i] * p;
   }
 }
@@ -188,7 +188,7 @@ function getLerpFunction( path : Gltf2.AnimationChannelTargetPath, numComps : nu
     case Gltf2.AnimationChannelTargetPath.WEIGHTS:
       return (numComps===1) ? LERP1 : LERP_N;
     case Gltf2.AnimationChannelTargetPath.ROTATION:
-      return quat.slerp;
+      return quat.slerp as unknown as LerpFunc;
         
     case Gltf2.AnimationChannelTargetPath.SCALE:
     case Gltf2.AnimationChannelTargetPath.TRANSLATION:
@@ -348,8 +348,8 @@ export default class AnimationSampler implements IElement {
   input         :Accessor          ;
   output        :Accessor          ;
 
-  minTime : number = 0;
-  maxTime : number = 0;
+  minTime  = 0;
+  maxTime  = 0;
 
   async parse( gltfLoader:GltfLoader, data:Gltf2.IAnimationSampler ) : Promise<any> {
 

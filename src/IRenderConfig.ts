@@ -1,8 +1,8 @@
 
 
 export default interface IRenderConfig {
-  opaqueMask : number;
-  blendedMask : number;
+  opaqueMask : number
+  blendedMask : number
 }
 
 export function DefaultRenderConfig(){

@@ -14,7 +14,7 @@ type Features = keyof typeof kTestImages
 
 async function _check_webp_feature( feature : Features ) : Promise<boolean> {
   return new Promise( (resolve, reject)=>{
-    var img = new Image();
+    const img = new Image();
     img.onload = ()=>resolve((img.width > 0) && (img.height > 0));
     img.onerror = ()=>resolve(false);
     img.src = "data:image/webp;base64," + kTestImages[feature];

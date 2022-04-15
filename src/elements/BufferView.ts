@@ -19,14 +19,14 @@ export default class BufferView implements IElement {
   name        : undefined | string;
   extras      : any   ;
   
-  byteOffset : number = 0;
-  byteLength : number = 0;
-  byteStride : number = 0;
-  target     : number = 0;
+  byteOffset  = 0;
+  byteLength  = 0;
+  byteStride  = 0;
+  target      = 0;
   buffer     : Buffer;
 
   private glBuffer   : WebGLBuffer = null;
-  private glBufferTarget : number = 0;
+  private glBufferTarget  = 0;
 
   async parse( gltfLoader:GltfLoader , data:Gltf2.IBufferView ) : Promise<any> {
 

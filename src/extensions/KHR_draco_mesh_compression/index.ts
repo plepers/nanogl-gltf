@@ -7,10 +7,10 @@ import GltfTypes from "../../types/GltfTypes";
 import DracoPrimitive from "./DracoPrimitive";
 import { IDracoResponse } from "./DecoderAPI";
 
-const EXT_ID : string = 'KHR_draco_mesh_compression';
+const EXT_ID  = 'KHR_draco_mesh_compression';
 
 type DracoExtensionData = {
-  bufferView : number,
+  bufferView : number
   attributes : Record<string, number>
 }
 
@@ -54,7 +54,7 @@ class Instance implements IExtensionInstance {
       attributes : dracoExtData.attributes
     }
     
-    var res : IDracoResponse = await KHR_draco_mesh_compression.dracoDecoder.transcode( request )
+    const res : IDracoResponse = await KHR_draco_mesh_compression.dracoDecoder.transcode( request )
 
     if( res.error ){
       throw new Error( res.error )
@@ -74,7 +74,7 @@ class Instance implements IExtensionInstance {
 export default class KHR_draco_mesh_compression implements IExtensionFactory {
   readonly name: string = EXT_ID;
 
-  static dracoDecoder : DracoDecoder = new DracoDecoder( {
+  static dracoDecoder : any = new DracoDecoder( {
     wasmUrl   : 'https://www.gstatic.com/draco/v1/decoders/draco_decoder_gltf.wasm',
     moduleUrl : 'https://www.gstatic.com/draco/v1/decoders/draco_decoder_gltf.js',
    } );

@@ -6,7 +6,7 @@ import GltfTypes from "../../types/GltfTypes";
 import UnlitMaterial from "./UnlitMaterial";
 
 
-const EXT_ID : string = 'KHR_materials_unlit';
+const EXT_ID  = 'KHR_materials_unlit';
 
 
 class Instance implements IExtensionInstance {

@@ -22,7 +22,7 @@ export default class Animation implements IElement {
   samplers : AnimationSampler[];
   channels : AnimationChannel[];
 
-  duration : number = 0
+  duration  = 0
 
   
   async parse(gltfLoader:GltfLoader, data : Gltf2.IAnimation) : Promise<any> {
@@ -41,7 +41,7 @@ export default class Animation implements IElement {
 
 
   evaluate( t :number ){
-    for (var channel of this.channels ) {
+    for (const channel of this.channels ) {
       channel.evaluate( t );
     }
   }

@@ -10,7 +10,7 @@ import { Sampler } from "nanogl-pbr/Input";
 
 const M3 : mat3 = mat3.create()
 
-const EXT_ID : string = 'KHR_texture_transform';
+const EXT_ID  = 'KHR_texture_transform';
 
 
 function isTextureInfo( element : any ) : asserts element is ITextureInfo {
@@ -87,7 +87,7 @@ class Instance implements IExtensionInstance {
         const attrib = Gltf.getSemantics().getAttributeName( `TEXCOORD_${index}` )
         const tc = TexCoord.createTransformed( attrib, M3 );
       
-        const sampler = new Sampler( `tex${name??''}tt_${_samplerUID++}`, tc )
+        const sampler = new Sampler( `tex${this.name??''}tt_${_samplerUID++}`, tc )
         e._sampler = sampler;
         element.texture.glTexturePromise.then( (t)=> sampler.set( t ) )
       }

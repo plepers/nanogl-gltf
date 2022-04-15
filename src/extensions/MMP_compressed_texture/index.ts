@@ -12,7 +12,7 @@ import TextureLoader from "./TextureLoader";
  * Resolve the compressed supported type
  */
 
-const EXT_ID: string = 'MMP_compressed_texture';
+const EXT_ID = 'MMP_compressed_texture';
 
 class Instance implements IExtensionInstance {
 

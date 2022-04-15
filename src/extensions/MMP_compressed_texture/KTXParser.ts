@@ -2,8 +2,8 @@
 const MAGIC = new Uint8Array([0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A]);
 
 
-function CheckMagic(f) {
-  for (var i = 0; i < 12; i++) {
+function CheckMagic(f: Uint8Array) {
+  for (let i = 0; i < 12; i++) {
     if (f[i] !== MAGIC[i]) return false;
   }
   return true;
@@ -11,10 +11,10 @@ function CheckMagic(f) {
 
 export default interface TextureDefinition{
 
-  width: number,
-  height: number,
-  surfaces: Array<Array<ArrayBufferView>>,
-  format: GLenum,
+  width: number
+  height: number
+  surfaces: Array<Array<ArrayBufferView>>
+  format: GLenum
   cubemap: boolean
   
 }
@@ -66,16 +66,16 @@ export default class Parser {
       surfaces.push([]);
     }
 
-    for (var i = 0; i < numMips; i++) {
+    for (let i = 0; i < numMips; i++) {
       const imageSize = buffer.getUint32(ptr, lendian); ptr += 4;
 
       const imageSizeRounded = imageSize & ~3;
 
-      for (var surfIndex = 0; surfIndex < numSurfs; surfIndex++) {
+      for (let surfIndex = 0; surfIndex < numSurfs; surfIndex++) {
 
         for (var faceIndex = 0; faceIndex < numFaces; faceIndex++) {
 
-          let byteArray = new Uint8Array(buffer.buffer, ptr, imageSizeRounded);
+          const byteArray = new Uint8Array(buffer.buffer, ptr, imageSizeRounded);
           ptr += imageSizeRounded;
           surfaces[faceIndex].push(byteArray);
 

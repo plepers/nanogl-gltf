@@ -1,5 +1,3 @@
-
-
 import Accessor from './Accessor'
 import { IMaterial } from './Material'
 import { GLContext } from 'nanogl/types';
@@ -14,6 +12,7 @@ import BufferView from './BufferView';
 import Gltf from '..';
 import { IElement } from '../types/Elements';
 import Bounds from 'nanogl-pbr/Bounds';
+
 
 
 export class Attribute {
@@ -83,7 +82,7 @@ export class AttributesSet {
 
 
   getSemantic( semantic : string ) : Attribute {
-    for (var a of this._attributes ) {
+    for (const a of this._attributes ) {
       if( a.semantic === semantic ) return a;
     }
     return null;
@@ -98,8 +97,8 @@ export class AttributesSet {
 
     const map : Map<BufferView, BufferInfos> = new Map();
     
-    for (var a of this._attributes ) {
-      var bId = a.accessor.bufferView;
+    for (const a of this._attributes ) {
+      const bId = a.accessor.bufferView;
       if( !map.has( bId ) ){
         map.set( bId, new BufferInfos( a.accessor) );
       }

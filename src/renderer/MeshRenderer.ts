@@ -13,6 +13,7 @@ import Program from "nanogl/program"
 import IRenderable, { IRenderingContext } from "./IRenderable"
 import Bounds from "nanogl-pbr/Bounds"
 import { MorphAttributeType, MorphAttribInfos, MorphAttributeName } from "nanogl-pbr/MorphCode"
+import DepthFormat from 'nanogl-pbr/DepthFormatEnum';
 
 
 
@@ -59,10 +60,11 @@ export default class MeshRenderer implements IRenderable {
    * TODO: if no deformer, a single material instance can be shared between renderers
    */
   setupMaterials(gl : GLContext) {
-    
     for (const primitive of this.mesh.primitives ) {
       const material = primitive.material.createMaterialForPrimitive( gl, this.node, primitive );
-      material.addPass( new DepthPass( gl ), 'depth' );
+      const dp = new DepthPass( gl );
+      dp.depthFormat.set("D_DEPTH");
+      material.addPass( dp, 'depth' );
       this.configureDeformers( material, primitive );
       this.materials.push( material );
     }
@@ -77,7 +79,8 @@ export default class MeshRenderer implements IRenderable {
   configureMorph(material: BaseMaterial, primitive: Primitive) {
 
     if( primitive.targets !== null ){
-
+      
+      // console.log("CONFIGURING MORPH : ", primitive);
       const morphedAttribs = primitive.targets[0].attributes;
       const morphInfos : MorphAttribInfos[] = [];
       

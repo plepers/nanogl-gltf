@@ -2,36 +2,12 @@
 
 const utf8Decoder = (typeof TextDecoder !== 'undefined') ? new TextDecoder('utf-8') : null;
 
-// Exposed functions for testing
-function decodeWithTextDecoder(view) {
-  return utf8Decoder.decode(view);
-}
-
-
-function decodeWithFromCharCode(view) 
-{
-  let result = '';
-  const codePoints = utf8Handler(view);
-  for (let cp of codePoints) {
-    if (cp <= 0xFFFF) {
-      result += String.fromCharCode(cp);
-    } else {
-      cp -= 0x10000;
-      result += String.fromCharCode((cp >> 10) + 0xD800,
-        (cp & 0x3FF) + 0xDC00);
-    }
-
-  }
-  return result;
-}
-
-function inRange(a, min, max) {
+function inRange(a: number, min: number, max: number) {
   return min <= a && a <= max;
 }
 
-
 // This code is inspired by public domain code found here: https://github.com/inexorabletash/text-encoding
-function utf8Handler(utfBytes) {
+function utf8Handler(utfBytes:Uint8Array) {
   
   let codePoint = 0;
   let bytesSeen = 0;
@@ -39,11 +15,11 @@ function utf8Handler(utfBytes) {
   let lowerBoundary = 0x80;
   let upperBoundary = 0xBF;
 
-  let codePoints = [];
-  let length = utfBytes.length;
+  const codePoints = [];
+  const length = utfBytes.length;
 
-  for (var i = 0; i < length; ++i) {
-    var currentByte = utfBytes[i];
+  for (let i = 0; i < length; ++i) {
+    const currentByte = utfBytes[i];
 
     // If bytesNeeded = 0, then we are starting a new character
     if (bytesNeeded === 0) {
@@ -122,6 +98,31 @@ function utf8Handler(utfBytes) {
 
   return codePoints;
 }
+
+// Exposed functions for testing
+function decodeWithTextDecoder(view: Uint8Array) {
+  return utf8Decoder.decode(view);
+}
+
+
+function decodeWithFromCharCode(view:Uint8Array) 
+{
+  let result = '';
+  const codePoints = utf8Handler(view);
+  for (let cp of codePoints) {
+    if (cp <= 0xFFFF) {
+      result += String.fromCharCode(cp);
+    } else {
+      cp -= 0x10000;
+      result += String.fromCharCode((cp >> 10) + 0xD800,
+        (cp & 0x3FF) + 0xDC00);
+    }
+
+  }
+  return result;
+}
+
+
 
 
 const Decoder = (typeof TextDecoder !== 'undefined') ? decodeWithTextDecoder : decodeWithFromCharCode;

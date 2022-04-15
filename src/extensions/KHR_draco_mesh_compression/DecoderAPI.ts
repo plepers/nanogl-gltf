@@ -1,12 +1,12 @@
 
 
 export interface IndicesData {
-  buffer : ArrayBuffer;
-  gltype : number;
+  buffer : ArrayBuffer
+  gltype : number
 }
 
 export interface IAttribute {
-  buffer : ArrayBuffer;
+  buffer : ArrayBuffer
   
   semantic      : string
   componentType : number
@@ -17,7 +17,7 @@ export interface IAttribute {
 }
 
 export interface IDracoGeometry {
-  attributes : IAttribute[];
+  attributes : IAttribute[]
   indices : IndicesData
   numIndices : number
   numVertices : number
@@ -26,11 +26,11 @@ export interface IDracoGeometry {
 type Semantic = string
 
 export interface IDracoRequest {
-  buffer : ArrayBuffer,
-  attributes? : Record<Semantic,number>;
+  buffer : ArrayBuffer
+  attributes? : Record<Semantic,number>
 }
 
 export interface IDracoResponse {
   error? : string
-  geometry : IDracoGeometry;
+  geometry : IDracoGeometry
 }

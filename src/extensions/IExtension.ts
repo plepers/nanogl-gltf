@@ -28,18 +28,18 @@ import { ElementOfType, PropertyType } from "../types/Elements";
 
 export interface IExtensionInstance {
   
-  readonly name : string;
-  readonly priority : number;
+  readonly name : string
+  readonly priority : number
 
-  loadElement<P extends Gltf2.Property>( data : P ) : null | Promise<ElementOfType<PropertyType<P>>>;
+  loadElement<P extends Gltf2.Property>( data : P ) : null | Promise<ElementOfType<PropertyType<P>>>
 
-  acceptElement<P extends Gltf2.Property>( data : P, element : ElementOfType<PropertyType<P>> ) : Promise<ElementOfType<PropertyType<P>>>;
+  acceptElement<P extends Gltf2.Property>( data : P, element : ElementOfType<PropertyType<P>> ) : Promise<ElementOfType<PropertyType<P>>>
 }
 
 
 
 
 export interface IExtensionFactory {
-  readonly name : string;
-  createInstance( gltfLoader : GltfLoader ) : IExtensionInstance;
+  readonly name : string
+  createInstance( gltfLoader : GltfLoader ) : IExtensionInstance
 }

@@ -11,7 +11,7 @@ import { webpSupport } from "./webpSupport";
  * vanilla parser already support arbitrary attributes type and normalization
  */
 
-const EXT_ID : string = 'EXT_texture_webp';
+const EXT_ID  = 'EXT_texture_webp';
 
 class Instance implements IExtensionInstance {
 

@@ -5,14 +5,14 @@ import { AbortSignal } from "@azure/abort-controller"
 
 type Options = {
 
-  baseurl : string;
+  baseurl : string
   /**
    * per loader additional extensions
    * Extensions are merged with global extensions
    */
-  extensions : IExtensionFactory[];
+  extensions : IExtensionFactory[]
 
-  abortSignal : AbortSignal;
+  abortSignal : AbortSignal
   
 }
 

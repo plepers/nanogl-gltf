@@ -13,7 +13,7 @@ import PunctualLight from "nanogl-pbr/lighting/PunctualLight";
 
 const M3 : mat3 = mat3.create()
 
-const EXT_ID : string = 'KHR_lights_punctual';
+const EXT_ID  = 'KHR_lights_punctual';
 
 
 
@@ -67,8 +67,51 @@ interface IKHR_LP_LightInstance {
   };
 }
 
+interface LightItemCollection {
+  name: string;
+  index: number; 
+} 
 
+class LightCollection{
 
+  list: Light[];
+
+  _items: Array<LightItemCollection>;
+  
+  constructor(){
+    this.list = [];
+    this._items = [];
+  }
+
+  addLight(light : Light, name : string = undefined ){
+
+    this.list.push(light);
+    this._items.push({name: name, index: this.list.length - 1})
+    
+  }
+
+  getLightByName(name : string) : Light {
+    let out : Light;
+    for(let i = 0; i < this._items.length; i++){
+      if(this._items[i].name == name){
+        out = this.list[this._items[i].index];
+        break;
+      }
+    }
+    return out;
+  }
+
+  getLightsByName(name : string) : Array<Light> {
+    const out : Array<Light> = []
+    for(let i = 0; i < this._items.length; i++){
+      if(this._items[i].name == name){
+        out.push(this.list[this._items[i].index]);
+      }
+    }
+    return out;
+  }
+  
+}
 
 
 class Instance implements IExtensionInstance {
@@ -78,12 +121,12 @@ class Instance implements IExtensionInstance {
   readonly priority: number = 1;
   
   loader: GltfLoader;
-  lights:Light[]
+  lights: LightCollection;
 
 
   constructor( gltfLoader : GltfLoader) {
     this.loader = gltfLoader;
-    this.lights = []
+    this.lights = new LightCollection();
     gltfLoader.gltf.extras.lights = this.lights;
   }
 
@@ -126,7 +169,7 @@ class Instance implements IExtensionInstance {
     
     const lightData = this._getLightData( iData.light );
 
-    let light : PunctualLight = this._createLightInstance( lightData );
+    const light : PunctualLight = this._createLightInstance( lightData );
 
     const color = lightData.color ?? [1, 1, 1]
     const intensity =  lightData.intensity ?? 1
@@ -136,9 +179,10 @@ class Instance implements IExtensionInstance {
     color[2] *= intensity
 
     light._color.set( color )
-
     node.add( light );
-    this.lights.push( light );
+
+    const name = lightData.name;
+    this.lights.addLight(light, name);
     return light;
 
   }

@@ -18,23 +18,23 @@ export interface IMaterialPbrSpecularGlossiness {
   /**
    * The reflected diffuse factor of the material.
    */
-  diffuseFactor?: number[];
+  diffuseFactor?: number[]
   /**
    * The diffuse texture.
    */
-  diffuseTexture?: Gltf2.ITextureInfo;
+  diffuseTexture?: Gltf2.ITextureInfo
   /**
    * The specular RGB color of the material.
    */
-  specularFactor?: number[];
+  specularFactor?: number[]
   /**
    * The glossiness or smoothness of the material.
    */
-  glossinessFactor?: number;
+  glossinessFactor?: number
   /**
    * The specular-glossiness texture.
    */
-  specularGlossinessTexture?: Gltf2.ITextureInfo;
+  specularGlossinessTexture?: Gltf2.ITextureInfo
 }
 
 

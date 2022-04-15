@@ -18,29 +18,33 @@ export default class CompressedImage extends Image {
       this.resolvedUri = codec.transformPath(this.resolvedUri);
     }
 
-    let rawData = await gltfLoader.gltfIO.loadBinaryResource(this.resolvedUri, gltfLoader.abortSignal);
+    const rawData = await gltfLoader.gltfIO.loadBinaryResource(this.resolvedUri, gltfLoader.abortSignal);
     this.texDataSource = codec.parser.parse(rawData);
 
   }
 
-  public async setupTexture(texture: Texture2D, requirePOT : boolean = false, genMipmaps : boolean = false) {
+  public async setupTexture(texture: Texture2D, wrapS: GLenum, wrapT: GLenum, minFilter: GLenum, magFilter: GLenum) {
 
     const gl = texture.gl;
 
     texture.bind();
 
-    var mips = this.texDataSource.surfaces[0];
-    var fmt = this.texDataSource.format;
-    var w = this.texDataSource.width;
-    var h = this.texDataSource.height;
+    const mips = this.texDataSource.surfaces[0];
+    const fmt = this.texDataSource.format;
+    let w = this.texDataSource.width;
+    let h = this.texDataSource.height;
 
-    for (var i = 0; i < mips.length; i++) {
-      var m = mips[i]
+    for (let i = 0; i < mips.length; i++) {
+      const m = mips[i]
       gl.compressedTexImage2D(gl.TEXTURE_2D, i, fmt, w, h, 0, m);
       w = w >> 1;
       h = h >> 1;
-    };
+    }
 
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapS);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapT);
 
   }
 

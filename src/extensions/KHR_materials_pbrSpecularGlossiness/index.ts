@@ -6,7 +6,7 @@ import GltfTypes from "../../types/GltfTypes";
 import Material from "./PbrSpecularGlossinessMaterial";
 
 
-const EXT_ID : string = 'KHR_materials_pbrSpecularGlossiness';
+const EXT_ID  = 'KHR_materials_pbrSpecularGlossiness';
 
 
 class Instance implements IExtensionInstance {
@@ -42,7 +42,7 @@ class Instance implements IExtensionInstance {
 }
 
 
-export default class KHR_texture_transform implements IExtensionFactory {
+export default class KHR_materials_pbrSpecularGlossiness implements IExtensionFactory {
   readonly name: string = EXT_ID;
   createInstance(gltfLoader: GltfLoader): IExtensionInstance {
     return new Instance(gltfLoader);

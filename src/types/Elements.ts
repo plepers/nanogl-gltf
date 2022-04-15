@@ -31,12 +31,12 @@ import { GLContext } from "nanogl/types";
 
 export interface IElement {
   
-  readonly gltftype : GltfTypes;
-  name        : undefined | string;
-  extras      : any   ;
+  readonly gltftype : GltfTypes
+  name        : undefined | string
+  extras      : any   
   
-  parse( gltfLoader : GltfLoader, data : Gltf2.IProperty ) : Promise<any>;
-  allocateGl?( gl : GLContext ) : void | Promise<any>;
+  parse( gltfLoader : GltfLoader, data : Gltf2.IProperty ) : Promise<any>
+  allocateGl?( gl : GLContext ) : void | Promise<any>
   
 }
 

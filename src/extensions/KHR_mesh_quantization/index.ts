@@ -9,7 +9,7 @@ import GltfLoader from "../../io/GltfLoader";
  * vanilla parser already support arbitrary attributes type and normalization
  */
 
-const EXT_ID : string = 'KHR_mesh_quantization';
+const EXT_ID  = 'KHR_mesh_quantization';
 
 class Instance implements IExtensionInstance {
   readonly name: string = EXT_ID;

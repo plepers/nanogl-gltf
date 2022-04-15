@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable no-unexpected-multiline */
+/* eslint-disable no-undef */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -10,7 +14,7 @@
 })(window, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
-/******/ 	var installedModules = {};
+/******/ 	const installedModules = {};
 /******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
@@ -20,7 +24,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 			return installedModules[moduleId].exports;
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
+/******/ 		const module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
 /******/ 			l: false,
 /******/ 			exports: {}
@@ -67,16 +71,16 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 		if(mode & 1) value = __webpack_require__(value);
 /******/ 		if(mode & 8) return value;
 /******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
-/******/ 		var ns = Object.create(null);
+/******/ 		const ns = Object.create(null);
 /******/ 		__webpack_require__.r(ns);
 /******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
-/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		if(mode & 2 && typeof value != 'string') for(const key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
 /******/ 		return ns;
 /******/ 	};
 /******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
 /******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
+/******/ 		const getter = module && module.__esModule ?
 /******/ 			function getDefault() { return module['default']; } :
 /******/ 			function getModuleExports() { return module; };
 /******/ 		__webpack_require__.d(getter, 'a', getter);
@@ -106,7 +110,7 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DecoderPool", function() { return DecoderPool; });
-/* harmony import */ var _DecoderWorker__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DecoderWorker */ "./src/draco/DecoderWorker.ts");
+/* harmony import */ const _DecoderWorker__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DecoderWorker */ "./src/draco/DecoderWorker.ts");
 //@ts-ignore
 
 let BasisTranscoderBinary = null;
@@ -564,7 +568,7 @@ const WorkerScript = `(${worker})()`;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return DracoDecoder; });
-/* harmony import */ var _DecoderPool__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DecoderPool */ "./src/draco/DecoderPool.ts");
+/* harmony import */ const _DecoderPool__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DecoderPool */ "./src/draco/DecoderPool.ts");
 
 class DracoDecoder {
     constructor(options) {

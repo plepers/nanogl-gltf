@@ -11,8 +11,8 @@ const Semantics = {
 
 
 export interface ISemantics {
-  getMorphedAttributeName(semantic: string, index : number);
-  getAttributeName( semantic:string):string;
+  getMorphedAttributeName(semantic: string, index : number):string
+  getAttributeName( semantic:string):string
 }
 
 
@@ -22,9 +22,9 @@ export class DefaultSemantics implements ISemantics {
     return this.getAttributeName( semantic )+'_mt'+index;
   }
   
-  getAttributeName(semantic: string): string {
+  getAttributeName(semantic: string ): string {
     const [basename, set_index=0] = semantic.split( '_' );
-    const infos = Semantics[basename];
+    const infos = Semantics[basename as keyof typeof Semantics];
 
     if( infos !== undefined ) {
       if( set_index > 0 || infos.indexed )

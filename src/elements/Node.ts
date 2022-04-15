@@ -57,7 +57,7 @@ export default class Node extends NGLNode implements IElement {
     if( data.children !== undefined ){
       const childPromises = data.children.map( (index)=>gltfLoader.getElement(GltfTypes.NODE, index) );
       const children = await Promise.all( childPromises );
-      for (var child of children) {
+      for (const child of children) {
         this.add( child );
       }
     }

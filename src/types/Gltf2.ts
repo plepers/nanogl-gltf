@@ -15,51 +15,51 @@ namespace Gltf2 {
     /**
      * Added befoer parsing by loader
      */
-    uuid : string;
+    uuid : string
 
     /**
      * index of data in gltf data struct
      */
-    elementIndex : number;
+    elementIndex : number
 
     /**
      * the parent property of the element (IGLTF for root elements )
      */
-    elementParent : Property;
+    elementParent : Property
 
     /**
      * Added befoer parsing by loader
      */
-    readonly gltftype : GltfTypes;
+    readonly gltftype : GltfTypes
 
 
 
   }
 
 
-  export interface IAccessor                     { readonly gltftype : GltfTypes.ACCESSOR                ; }
+  export interface IAccessor                     { readonly gltftype : GltfTypes.ACCESSOR                 }
   export interface IAccessorSparse               { readonly gltftype : GltfTypes.ACCESSOR_SPARSE         ; elementParent : IAccessor}
   export interface IAccessorSparseIndices        { readonly gltftype : GltfTypes.ACCESSOR_SPARSE_INDICES ; elementParent : IAccessorSparse}
   export interface IAccessorSparseValues         { readonly gltftype : GltfTypes.ACCESSOR_SPARSE_VALUES  ; elementParent : IAccessorSparse}
-  export interface IAnimation                    { readonly gltftype : GltfTypes.ANIMATION               ; }
+  export interface IAnimation                    { readonly gltftype : GltfTypes.ANIMATION                }
   export interface IAnimationSampler             { readonly gltftype : GltfTypes.ANIMATION_SAMPLER       ; elementParent : IAnimation }
   export interface IAnimationChannel             { readonly gltftype : GltfTypes.ANIMATION_CHANNEL       ; elementParent : IAnimation }
-  export interface IAsset                        { readonly gltftype : GltfTypes.ASSET                   ; }
-  export interface IBuffer                       { readonly gltftype : GltfTypes.BUFFER                  ; }
-  export interface IBufferView                   { readonly gltftype : GltfTypes.BUFFERVIEW              ; }
-  export interface ICamera                       { readonly gltftype : GltfTypes.CAMERA                  ; }
-  export interface IImage                        { readonly gltftype : GltfTypes.IMAGE                   ; }
-  export interface IMaterial                     { readonly gltftype : GltfTypes.MATERIAL                ; }
-  export interface IMesh                         { readonly gltftype : GltfTypes.MESH                    ; }
-  export interface INode                         { readonly gltftype : GltfTypes.NODE                    ; }
-  export interface IMaterialNormalTextureInfo    { readonly gltftype : GltfTypes.NORMAL_TEXTURE_INFO     ; }
-  export interface IMaterialOcclusionTextureInfo { readonly gltftype : GltfTypes.OCCLUSION_TEXTURE_INFO  ; }
-  export interface IMeshPrimitive                { readonly gltftype : GltfTypes.PRIMITIVE               ; }
-  export interface ISampler                      { readonly gltftype : GltfTypes.SAMPLER                 ; }
-  export interface IScene                        { readonly gltftype : GltfTypes.SCENE                   ; }
-  export interface ISkin                         { readonly gltftype : GltfTypes.SKIN                    ; }
-  export interface ITexture                      { readonly gltftype : GltfTypes.TEXTURE                 ; }
-  export interface ITextureInfo                  { readonly gltftype : GltfTypes.TEXTURE_INFO            ; }
+  export interface IAsset                        { readonly gltftype : GltfTypes.ASSET                    }
+  export interface IBuffer                       { readonly gltftype : GltfTypes.BUFFER                   }
+  export interface IBufferView                   { readonly gltftype : GltfTypes.BUFFERVIEW               }
+  export interface ICamera                       { readonly gltftype : GltfTypes.CAMERA                   }
+  export interface IImage                        { readonly gltftype : GltfTypes.IMAGE                    }
+  export interface IMaterial                     { readonly gltftype : GltfTypes.MATERIAL                 }
+  export interface IMesh                         { readonly gltftype : GltfTypes.MESH                     }
+  export interface INode                         { readonly gltftype : GltfTypes.NODE                     }
+  export interface IMaterialNormalTextureInfo    { readonly gltftype : GltfTypes.NORMAL_TEXTURE_INFO      }
+  export interface IMaterialOcclusionTextureInfo { readonly gltftype : GltfTypes.OCCLUSION_TEXTURE_INFO   }
+  export interface IMeshPrimitive                { readonly gltftype : GltfTypes.PRIMITIVE                }
+  export interface ISampler                      { readonly gltftype : GltfTypes.SAMPLER                  }
+  export interface IScene                        { readonly gltftype : GltfTypes.SCENE                    }
+  export interface ISkin                         { readonly gltftype : GltfTypes.SKIN                     }
+  export interface ITexture                      { readonly gltftype : GltfTypes.TEXTURE                  }
+  export interface ITextureInfo                  { readonly gltftype : GltfTypes.TEXTURE_INFO             }
 
 
   export type Property = 
@@ -339,12 +339,12 @@ namespace Gltf2 {
      * Dictionary object with extension-specific objects
      */
     extensions?: {
-      [key: string]: any;
-    };
+      [key: string]: any
+    }
     /**
      * Application-Specific data 
      */
-    extras?: any;
+    extras?: any
   }
   /**
    * glTF Child of Root Property
@@ -353,7 +353,7 @@ namespace Gltf2 {
     /**
      * The user-defined name of this object
      */
-    name?: string;
+    name?: string
   }
   /**
    * Indices of those attributes that deviate from their initialization value
@@ -362,15 +362,15 @@ namespace Gltf2 {
     /**
      * The index of the bufferView with sparse indices. Referenced bufferView can't have ARRAY_BUFFER or ELEMENT_ARRAY_BUFFER target
      */
-    bufferView: number;
+    bufferView: number
     /**
      * The offset relative to the start of the bufferView in bytes. Must be aligned
      */
-    byteOffset?: number;
+    byteOffset?: number
     /**
      * The indices data type.  Valid values correspond to WebGL enums: 5121 (UNSIGNED_BYTE), 5123 (UNSIGNED_SHORT), 5125 (UNSIGNED_INT)
      */
-    componentType: AccessorComponentType;
+    componentType: AccessorComponentType
   }
   /**
    * Array of size accessor.sparse.count times number of components storing the displaced accessor attributes pointed by accessor.sparse.indices
@@ -379,11 +379,11 @@ namespace Gltf2 {
     /**
      * The index of the bufferView with sparse values. Referenced bufferView can't have ARRAY_BUFFER or ELEMENT_ARRAY_BUFFER target
      */
-    bufferView: number;
+    bufferView: number
     /**
      * The offset relative to the start of the bufferView in bytes. Must be aligned
      */
-    byteOffset?: number;
+    byteOffset?: number
   }
   /**
    * Sparse storage of attributes that deviate from their initialization value
@@ -392,15 +392,15 @@ namespace Gltf2 {
     /**
      * The number of attributes encoded in this sparse accessor
      */
-    count: number;
+    count: number
     /**
      * Index array of size count that points to those accessor attributes that deviate from their initialization value. Indices must strictly increase
      */
-    indices: IAccessorSparseIndices;
+    indices: IAccessorSparseIndices
     /**
      * Array of size count times number of components, storing the displaced accessor attributes pointed by indices. Substituted values must have the same componentType and number of components as the base accessor
      */
-    values: IAccessorSparseValues;
+    values: IAccessorSparseValues
   }
 
 
@@ -412,39 +412,39 @@ namespace Gltf2 {
     /**
      * The index of the bufferview
      */
-    bufferView?: number;
+    bufferView?: number
     /**
      * The offset relative to the start of the bufferView in bytes
      */
-    byteOffset?: number;
+    byteOffset?: number
     /**
      * The datatype of components in the attribute
      */
-    componentType: AccessorComponentType;
+    componentType: AccessorComponentType
     /**
      * Specifies whether integer data values should be normalized
      */
-    normalized?: boolean;
+    normalized?: boolean
     /**
      * The number of attributes referenced by this accessor
      */
-    count: number;
+    count: number
     /**
      * Specifies if the attribute is a scalar, vector, or matrix
      */
-    type: AccessorType;
+    type: AccessorType
     /**
      * Maximum value of each component in this attribute
      */
-    max?: number[];
+    max?: number[]
     /**
      * Minimum value of each component in this attribute
      */
-    min?: number[];
+    min?: number[]
     /**
      * Sparse storage of attributes that deviate from their initialization value
      */
-    sparse?: IAccessorSparse;
+    sparse?: IAccessorSparse
   }
   /**
    * Targets an animation's sampler at a node's property
@@ -453,11 +453,11 @@ namespace Gltf2 {
     /**
      * The index of a sampler in this animation used to compute the value for the target
      */
-    sampler: number;
+    sampler: number
     /**
      * The index of the node and TRS property to target
      */
-    target: IAnimationChannelTarget;
+    target: IAnimationChannelTarget
   }
   /**
    * The index of the node and TRS property that an animation channel targets
@@ -466,11 +466,11 @@ namespace Gltf2 {
     /**
      * The index of the node to target
      */
-    node: number;
+    node: number
     /**
      * The name of the node's TRS property to modify, or the weights of the Morph Targets it instantiates
      */
-    path: AnimationChannelTargetPath;
+    path: AnimationChannelTargetPath
   }
   /**
    * Combines input and output accessors with an interpolation algorithm to define a keyframe graph (but not its target)
@@ -479,15 +479,15 @@ namespace Gltf2 {
     /**
      * The index of an accessor containing keyframe input values, e.g., time
      */
-    input: number;
+    input: number
     /**
      * Interpolation algorithm
      */
-    interpolation?: AnimationSamplerInterpolation;
+    interpolation?: AnimationSamplerInterpolation
     /**
      * The index of an accessor, containing keyframe output values
      */
-    output: number;
+    output: number
   }
   /**
    * A keyframe animation
@@ -496,11 +496,11 @@ namespace Gltf2 {
     /**
      * An array of channels, each of which targets an animation's sampler at a node's property
      */
-    channels: IAnimationChannel[];
+    channels: IAnimationChannel[]
     /**
      * An array of samplers that combines input and output accessors with an interpolation algorithm to define a keyframe graph (but not its target)
      */
-    samplers: IAnimationSampler[];
+    samplers: IAnimationSampler[]
   }
   /**
    * Metadata about the glTF asset
@@ -509,19 +509,19 @@ namespace Gltf2 {
     /**
      * A copyright message suitable for display to credit the content creator
      */
-    copyright?: string;
+    copyright?: string
     /**
      * Tool that generated this glTF model.  Useful for debugging
      */
-    generator?: string;
+    generator?: string
     /**
      * The glTF version that this asset targets
      */
-    version: string;
+    version: string
     /**
      * The minimum glTF version that this asset targets
      */
-    minVersion?: string;
+    minVersion?: string
   }
   /**
    * A buffer points to binary geometry, animation, or skins
@@ -530,11 +530,11 @@ namespace Gltf2 {
     /**
      * The uri of the buffer.  Relative paths are relative to the .gltf file.  Instead of referencing an external file, the uri can also be a data-uri
      */
-    uri?: string;
+    uri?: string
     /**
      * The length of the buffer in bytes
      */
-    byteLength: number;
+    byteLength: number
   }
   /**
    * A view into a buffer generally representing a subset of the buffer
@@ -543,23 +543,23 @@ namespace Gltf2 {
     /**
      * The index of the buffer
      */
-    buffer: number;
+    buffer: number
     /**
      * The offset into the buffer in bytes
      */
-    byteOffset?: number;
+    byteOffset?: number
     /**
      * The lenth of the bufferView in bytes
      */
-    byteLength: number;
+    byteLength: number
     /**
      * The stride, in bytes
      */
-    byteStride?: number;
+    byteStride?: number
     /**
      * The target that the GPU buffer should be bound to.
      */
-    target?: 34962 | 34963 | number;
+    target?: 34962 | 34963 | number
   }
   /**
    * An orthographic camera containing properties to create an orthographic projection matrix
@@ -568,19 +568,19 @@ namespace Gltf2 {
     /**
      * The floating-point horizontal magnification of the view. Must not be zero
      */
-    xmag: number;
+    xmag: number
     /**
      * The floating-point vertical magnification of the view. Must not be zero
      */
-    ymag: number;
+    ymag: number
     /**
      * The floating-point distance to the far clipping plane. zfar must be greater than znear
      */
-    zfar: number;
+    zfar: number
     /**
      * The floating-point distance to the near clipping plane
      */
-    znear: number;
+    znear: number
   }
   /**
    * A perspective camera containing properties to create a perspective projection matrix
@@ -589,19 +589,19 @@ namespace Gltf2 {
     /**
      * The floating-point aspect ratio of the field of view
      */
-    aspectRatio?: number;
+    aspectRatio?: number
     /**
      * The floating-point vertical field of view in radians
      */
-    yfov: number;
+    yfov: number
     /**
      * The floating-point distance to the far clipping plane
      */
-    zfar?: number;
+    zfar?: number
     /**
      * The floating-point distance to the near clipping plane
      */
-    znear: number;
+    znear: number
   }
   /**
    * A camera's projection.  A node can reference a camera to apply a transform to place the camera in the scene
@@ -610,15 +610,15 @@ namespace Gltf2 {
     /**
      * An orthographic camera containing properties to create an orthographic projection matrix
      */
-    orthographic?: ICameraOrthographic;
+    orthographic?: ICameraOrthographic
     /**
      * A perspective camera containing properties to create a perspective projection matrix
      */
-    perspective?: ICameraPerspective;
+    perspective?: ICameraPerspective
     /**
      * Specifies if the camera uses a perspective or orthographic projection
      */
-    type: CameraType;
+    type: CameraType
   }
   /**
    * Image data used to create a texture. Image can be referenced by URI or bufferView index. mimeType is required in the latter case
@@ -627,15 +627,15 @@ namespace Gltf2 {
     /**
      * The uri of the image.  Relative paths are relative to the .gltf file.  Instead of referencing an external file, the uri can also be a data-uri.  The image format must be jpg or png
      */
-    uri?: string;
+    uri?: string
     /**
      * The image's MIME type
      */
-    mimeType?: ImageMimeType;
+    mimeType?: ImageMimeType
     /**
      * The index of the bufferView that contains the image. Use this instead of the image's uri property
      */
-    bufferView?: number;
+    bufferView?: number
   }
   /**
    * Material Normal Texture Info
@@ -644,16 +644,16 @@ namespace Gltf2 {
         /**
      * The index of the texture
      */
-    index: number;
+    index: number
     /**
      * The set index of texture's TEXCOORD attribute used for texture coordinate mapping
      */
-    texCoord?: number;
+    texCoord?: number
 
     /**
      * The scalar multiplier applied to each normal vector of the normal texture
      */
-    scale?: number;
+    scale?: number
   }
   /**
    * Material Occlusion Texture Info
@@ -662,16 +662,16 @@ namespace Gltf2 {
         /**
      * The index of the texture
      */
-    index: number;
+    index: number
     /**
      * The set index of texture's TEXCOORD attribute used for texture coordinate mapping
      */
-    texCoord?: number;
+    texCoord?: number
 
     /**
      * A scalar multiplier controlling the amount of occlusion applied
      */
-    strength?: number;
+    strength?: number
   }
   /**
    * A set of parameter values that are used to define the metallic-roughness material model from Physically-Based Rendering (PBR) methodology
@@ -680,23 +680,23 @@ namespace Gltf2 {
     /**
      * The material's base color factor
      */
-    baseColorFactor?: number[];
+    baseColorFactor?: number[]
     /**
      * The base color texture
      */
-    baseColorTexture?: ITextureInfo;
+    baseColorTexture?: ITextureInfo
     /**
      * The metalness of the material
      */
-    metallicFactor?: number;
+    metallicFactor?: number
     /**
      * The roughness of the material
      */
-    roughnessFactor?: number;
+    roughnessFactor?: number
     /**
      * The metallic-roughness texture
      */
-    metallicRoughnessTexture?: ITextureInfo;
+    metallicRoughnessTexture?: ITextureInfo
   }
   /**
    * The material appearance of a primitive
@@ -705,35 +705,35 @@ namespace Gltf2 {
     /**
      * A set of parameter values that are used to define the metallic-roughness material model from Physically-Based Rendering (PBR) methodology. When not specified, all the default values of pbrMetallicRoughness apply
      */
-    pbrMetallicRoughness?: IMaterialPbrMetallicRoughness;
+    pbrMetallicRoughness?: IMaterialPbrMetallicRoughness
     /**
      * The normal map texture
      */
-    normalTexture?: IMaterialNormalTextureInfo;
+    normalTexture?: IMaterialNormalTextureInfo
     /**
      * The occlusion map texture
      */
-    occlusionTexture?: IMaterialOcclusionTextureInfo;
+    occlusionTexture?: IMaterialOcclusionTextureInfo
     /**
      * The emissive map texture
      */
-    emissiveTexture?: ITextureInfo;
+    emissiveTexture?: ITextureInfo
     /**
      * The RGB components of the emissive color of the material. These values are linear. If an emissiveTexture is specified, this value is multiplied with the texel values
      */
-    emissiveFactor?: number[];
+    emissiveFactor?: number[]
     /**
      * The alpha rendering mode of the material
      */
-    alphaMode?: MaterialAlphaMode;
+    alphaMode?: MaterialAlphaMode
     /**
      * The alpha cutoff value of the material
      */
-    alphaCutoff?: number;
+    alphaCutoff?: number
     /**
      * Specifies whether the material is double sided
      */
-    doubleSided?: boolean;
+    doubleSided?: boolean
   }
   /**
    * Geometry to be rendered with the given material
@@ -743,26 +743,26 @@ namespace Gltf2 {
      * A dictionary object, where each key corresponds to mesh attribute semantic and each value is the index of the accessor containing attribute's data
      */
     attributes: {
-      [name: string]: number;
-    };
+      [name: string]: number
+    }
     /**
      * The index of the accessor that contains the indices
      */
-    indices?: number;
+    indices?: number
     /**
      * The index of the material to apply to this primitive when rendering
      */
-    material?: number;
+    material?: number
     /**
      * The type of primitives to render. All valid values correspond to WebGL enums
      */
-    mode?: MeshPrimitiveMode;
+    mode?: MeshPrimitiveMode
     /**
      * An array of Morph Targets, each  Morph Target is a dictionary mapping attributes (only POSITION, NORMAL, and TANGENT supported) to their deviations in the Morph Target
      */
     targets?: {
-      [name: string]: number;
-    }[];
+      [name: string]: number
+    }[]
   }
   /**
    * A set of primitives to be rendered.  A node can contain one mesh.  A node's transform places the mesh in the scene
@@ -771,11 +771,11 @@ namespace Gltf2 {
     /**
      * An array of primitives, each defining geometry to be rendered with a material
      */
-    primitives: IMeshPrimitive[];
+    primitives: IMeshPrimitive[]
     /**
      * Array of weights to be applied to the Morph Targets
      */
-    weights?: number[];
+    weights?: number[]
   }
   /**
    * A node in the node hierarchy
@@ -784,39 +784,39 @@ namespace Gltf2 {
     /**
      * The index of the camera referenced by this node
      */
-    camera?: number;
+    camera?: number
     /**
      * The indices of this node's children
      */
-    children?: number[];
+    children?: number[]
     /**
      * The index of the skin referenced by this node
      */
-    skin?: number;
+    skin?: number
     /**
      * A floating-point 4x4 transformation matrix stored in column-major order
      */
-    matrix?: number[];
+    matrix?: number[]
     /**
      * The index of the mesh in this node
      */
-    mesh?: number;
+    mesh?: number
     /**
      * The node's unit quaternion rotation in the order (x, y, z, w), where w is the scalar
      */
-    rotation?: number[];
+    rotation?: number[]
     /**
      * The node's non-uniform scale, given as the scaling factors along the x, y, and z axes
      */
-    scale?: number[];
+    scale?: number[]
     /**
      * The node's translation along the x, y, and z axes
      */
-    translation?: number[];
+    translation?: number[]
     /**
      * The weights of the instantiated Morph Target. Number of elements must match number of Morph Targets of used mesh
      */
-    weights?: number[];
+    weights?: number[]
   }
   /**
    * Texture sampler properties for filtering and wrapping modes
@@ -825,19 +825,19 @@ namespace Gltf2 {
     /**
      * Magnification filter.  Valid values correspond to WebGL enums: 9728 (NEAREST) and 9729 (LINEAR)
      */
-    magFilter?: TextureMagFilter;
+    magFilter?: TextureMagFilter
     /**
      * Minification filter.  All valid values correspond to WebGL enums
      */
-    minFilter?: TextureMinFilter;
+    minFilter?: TextureMinFilter
     /**
      * S (U) wrapping mode.  All valid values correspond to WebGL enums
      */
-    wrapS?: TextureWrapMode;
+    wrapS?: TextureWrapMode
     /**
      * T (V) wrapping mode.  All valid values correspond to WebGL enums
      */
-    wrapT?: TextureWrapMode;
+    wrapT?: TextureWrapMode
   }
   /**
    * The root nodes of a scene
@@ -846,7 +846,7 @@ namespace Gltf2 {
     /**
      * The indices of each root node
      */
-    nodes: number[];
+    nodes: number[]
   }
   /**
    * Joints and matrices defining a skin
@@ -855,15 +855,15 @@ namespace Gltf2 {
     /**
      * The index of the accessor containing the floating-point 4x4 inverse-bind matrices.  The default is that each matrix is a 4x4 identity matrix, which implies that inverse-bind matrices were pre-applied
      */
-    inverseBindMatrices?: number;
+    inverseBindMatrices?: number
     /**
      * The index of the node used as a skeleton root. When undefined, joints transforms resolve to scene root
      */
-    skeleton?: number;
+    skeleton?: number
     /**
      * Indices of skeleton nodes, used as joints in this skin.  The array length must be the same as the count property of the inverseBindMatrices accessor (when defined)
      */
-    joints: number[];
+    joints: number[]
   }
   /**
    * A texture and its sampler
@@ -872,11 +872,11 @@ namespace Gltf2 {
     /**
      * The index of the sampler used by this texture. When undefined, a sampler with repeat wrapping and auto filtering should be used
      */
-    sampler?: number;
+    sampler?: number
     /**
      * The index of the image used by this texture
      */
-    source: number;
+    source: number
   }
   /**
    * Reference to a texture
@@ -885,11 +885,11 @@ namespace Gltf2 {
     /**
      * The index of the texture
      */
-    index: number;
+    index: number
     /**
      * The set index of texture's TEXCOORD attribute used for texture coordinate mapping
      */
-    texCoord?: number;
+    texCoord?: number
   }
   /**
    * The root object for a glTF asset
@@ -898,71 +898,71 @@ namespace Gltf2 {
     /**
      * An array of accessors. An accessor is a typed view into a bufferView
      */
-    accessors?: IAccessor[];
+    accessors?: IAccessor[]
     /**
      * An array of keyframe animations
      */
-    animations?: IAnimation[];
+    animations?: IAnimation[]
     /**
      * Metadata about the glTF asset
      */
-    asset: IAsset;
+    asset: IAsset
     /**
      * An array of buffers.  A buffer points to binary geometry, animation, or skins
      */
-    buffers?: IBuffer[];
+    buffers?: IBuffer[]
     /**
      * An array of bufferViews.  A bufferView is a view into a buffer generally representing a subset of the buffer
      */
-    bufferViews?: IBufferView[];
+    bufferViews?: IBufferView[]
     /**
      * An array of cameras
      */
-    cameras?: ICamera[];
+    cameras?: ICamera[]
     /**
      * Names of glTF extensions used somewhere in this asset
      */
-    extensionsUsed?: string[];
+    extensionsUsed?: string[]
     /**
      * Names of glTF extensions required to properly load this asset
      */
-    extensionsRequired?: string[];
+    extensionsRequired?: string[]
     /**
      * An array of images.  An image defines data used to create a texture
      */
-    images?: IImage[];
+    images?: IImage[]
     /**
      * An array of materials.  A material defines the appearance of a primitive
      */
-    materials?: IMaterial[];
+    materials?: IMaterial[]
     /**
      * An array of meshes.  A mesh is a set of primitives to be rendered
      */
-    meshes?: IMesh[];
+    meshes?: IMesh[]
     /**
      * An array of nodes
      */
-    nodes?: INode[];
+    nodes?: INode[]
     /**
      * An array of samplers.  A sampler contains properties for texture filtering and wrapping modes
      */
-    samplers?: ISampler[];
+    samplers?: ISampler[]
     /**
      * The index of the default scene
      */
-    scene?: number;
+    scene?: number
     /**
      * An array of scenes
      */
-    scenes?: IScene[];
+    scenes?: IScene[]
     /**
      * An array of skins.  A skin is defined by joints and matrices
      */
-    skins?: ISkin[];
+    skins?: ISkin[]
     /**
      * An array of textures
      */
-    textures?: ITexture[];
+    textures?: ITexture[]
   }
 
 
