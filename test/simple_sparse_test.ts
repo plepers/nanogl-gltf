@@ -1,4 +1,4 @@
-import Gltf from '../src'
+import Gltf from '../src/Gltf'
 import expect from 'expect.js'
 import WebGltfIO from '../src/io/web';
 import GltfTypes from '../src/types/GltfTypes';

@@ -21,11 +21,14 @@ import NanoglNode from 'nanogl-node';
 import { ISemantics, DefaultSemantics } from './Semantics';
 import { IExtensionFactory } from './extensions/IExtension';
 import GltfTypes from './types/GltfTypes';
-import { AnyElement, ElementOfType, IElement } from './types/Elements';
-import IRenderable from './renderer/IRenderable';
-import Assert from './lib/assert';
+import { AnyElement, ElementOfType } from './types/Elements';
 import IRenderConfig, { DefaultRenderConfig } from './IRenderConfig';
-import Material from './elements/Material';
+import Primitive from './elements/Primitive';
+import Texture from './elements/Texture';
+import DepthPass from 'nanogl-pbr/DepthPass';
+import MeshRenderer from './renderer/MeshRenderer';
+import { LightCollection } from './extensions/KHR_lights_punctual';
+import { AbortError, AbortSignal } from '@azure/abort-controller';
 
 
 class ElementCollection<T extends AnyElement = AnyElement>{
@@ -40,6 +43,12 @@ class ElementCollection<T extends AnyElement = AnyElement>{
   }
 }
 
+type GltfExtras = {
+  [key: string]: any;
+} & {
+  lights?: LightCollection
+}
+
 /** Gltf file representation */
 export default class Gltf {
 
@@ -47,6 +56,10 @@ export default class Gltf {
   private static _extensionsRegistry: ExtensionsRegistry = new ExtensionsRegistry();
   private static _semantics    : ISemantics = new DefaultSemantics();
   private static _renderConfig : IRenderConfig = DefaultRenderConfig();
+
+    
+
+
   
   static addExtension(ext: IExtensionFactory) {
     Gltf._extensionsRegistry.addExtension(ext);
@@ -73,12 +86,15 @@ export default class Gltf {
   
   private _elements: AnyElement[];
   private _collections: Map<GltfTypes, ElementCollection>;
-  
-  
+
   readonly root : NanoglNode = new NanoglNode();
-  renderables: IRenderable[];
+  gl: GLContext
+  renderables: MeshRenderer[];
   cameraInstances: NanoCamera[]
-  extras : any = {}
+  depthPass : DepthPass
+
+
+  extras : GltfExtras = {}
 
   constructor( ) {
 
@@ -115,15 +131,21 @@ export default class Gltf {
   }
 
 
-  async allocateGl(gl: GLContext): Promise<any> {
+  async allocate(gl: GLContext, abortSignal:AbortSignal = AbortSignal.none ): Promise<void> {
+    this.gl = gl
 
-    const allocPromises: Promise<any>[] = []
-    for (const element of <IElement[]>this._elements) {
-      const p = element.allocateGl?.(gl);
-      p ?? allocPromises.push(p as Promise<any>);
+
+    this.depthPass = new DepthPass( gl );
+    this.depthPass.depthFormat.set("D_RGB");
+
+    for(const tex of this.textures) {
+      await tex.allocateGl(gl)
+      if( abortSignal.aborted ) throw new AbortError('Aborted')
     }
 
-    await Promise.all(allocPromises);
+    this.primitives.forEach(p=>p.allocateGl(gl))
+    this.nodes.forEach(n=>n.allocateGl(this) )
+
 
     this.renderables = this.nodes
       .map( n=>n.renderable )
@@ -140,8 +162,9 @@ export default class Gltf {
 
   }
 
-  createCameras(){
-    
+
+
+  createCameras() {
     this.cameraInstances = this.nodes
       .filter( n=>n.camera!==undefined )
       .map( n=> {
@@ -153,42 +176,18 @@ export default class Gltf {
   }
 
 
-  get buffers(): Buffer[] {
-    return this._getCollection(GltfTypes.BUFFER).list;
-  }
 
-  get bufferViews(): BufferView[] {
-    return this._getCollection(GltfTypes.BUFFERVIEW).list;
-  }
-
-  get accessors(): Accessor[] {
-    return this._getCollection(GltfTypes.ACCESSOR).list;
-  }
-
-  get animations(): Animation[] {
-    return this._getCollection(GltfTypes.ANIMATION).list;
-  }
-
-  get meshes(): Mesh[] {
-    return this._getCollection(GltfTypes.MESH).list;
-  }
-
-  get nodes(): Node[] {
-    return this._getCollection(GltfTypes.NODE).list;
-  }
-
-  get materials(): IMaterial[] {
-    return this._getCollection(GltfTypes.MATERIAL).list;
-  }
-
-  get cameras(): Camera[] {
-    return this._getCollection(GltfTypes.CAMERA).list;
-  }
-
-  get skins(): Skin[] {
-    return this._getCollection(GltfTypes.SKIN).list;
-  }
-
+  get buffers    (): Buffer    [] {return this._getCollection(GltfTypes.BUFFER    ).list;}
+  get bufferViews(): BufferView[] {return this._getCollection(GltfTypes.BUFFERVIEW).list;}
+  get accessors  (): Accessor  [] {return this._getCollection(GltfTypes.ACCESSOR  ).list;}
+  get animations (): Animation [] {return this._getCollection(GltfTypes.ANIMATION ).list;}
+  get meshes     (): Mesh      [] {return this._getCollection(GltfTypes.MESH      ).list;}
+  get nodes      (): Node      [] {return this._getCollection(GltfTypes.NODE      ).list;}
+  get materials  (): IMaterial [] {return this._getCollection(GltfTypes.MATERIAL  ).list;}
+  get cameras    (): Camera    [] {return this._getCollection(GltfTypes.CAMERA    ).list;}
+  get skins      (): Skin      [] {return this._getCollection(GltfTypes.SKIN      ).list;}
+  get primitives (): Primitive [] {return this._getCollection(GltfTypes.PRIMITIVE ).list;}
+  get textures   (): Texture   [] {return this._getCollection(GltfTypes.TEXTURE   ).list;}
   
   
   
@@ -220,10 +219,11 @@ export default class Gltf {
   }
 
 
-  getMesh    ( name:string ): Mesh      { return this.getElementByName( GltfTypes.MESH    , name ) }
-  getMaterial( name:string ): IMaterial { return this.getElementByName( GltfTypes.MATERIAL, name ) }
-  getNode    ( name:string ): Node      { return this.getElementByName( GltfTypes.NODE    , name ) }
-  
+  getNode     ( name:string ): Node      { return this.getElementByName( GltfTypes.NODE     , name ) }
+  getMesh     ( name:string ): Mesh      { return this.getElementByName( GltfTypes.MESH     , name ) }
+  getMaterial ( name:string ): IMaterial { return this.getElementByName( GltfTypes.MATERIAL , name ) }
+  getAnimation( name:string ): Animation { return this.getElementByName( GltfTypes.ANIMATION, name ) }
+
   
   private _getCollection<T extends GltfTypes>(type: T): ElementCollection<ElementOfType<T>> {
     return this._collections.get(type) as ElementCollection<ElementOfType<T>>;

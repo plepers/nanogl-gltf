@@ -1,6 +1,6 @@
 
 
-import Gltf from '../src'
+import Gltf from '../src/Gltf'
 import expect from 'expect.js'
 import { expectEqualArray } from './test-utils';
 import WebGltfIO from '../src/io/web';

@@ -1,4 +1,4 @@
-import Gltf from '../src'
+import Gltf from '../src/Gltf'
 import expect from 'expect.js'
 import WebGltfIO from '../src/io/web';
 import MaterialOverrideExtension from '../src/extensions/MaterialOverrideExtension';
@@ -20,15 +20,13 @@ describe("MaterialOverrideExtension", function () {
     gl = createContext();
     material = new BaseMaterial(gl);
     const overrides = new MaterialOverrideExtension()
-    overrides.overrides = {
-      'TextureClampMaterialT' : material
-    }
+    overrides.overrideMaterial('TextureClampMaterialT' , material )
 
     return WebGltfIO.loadGltf( 'samples/models/2.0/TextureSettingsTest/glTF/TextureSettingsTest.gltf', {
       extensions : [overrides]
     } ).then( (res)=>{
       gltf=res;
-      return res.allocateGl(gl)
+      return res.allocate(gl)
      } )
   });
 

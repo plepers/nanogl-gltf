@@ -1,4 +1,4 @@
-import Gltf from '../src'
+import Gltf from '../src/Gltf'
 import expect from 'expect.js'
 import WebGltfIO from '../src/io/web';
 import GltfTypes from '../src/types/GltfTypes';
@@ -20,7 +20,7 @@ describe("Node renderable", function () {
       gl = createContext();
       return WebGltfIO.loadGltf('samples/generator/Output/Node_Attribute/Node_Attribute_00.gltf').then( res=>{
         gltf=res 
-        return gltf.allocateGl( gl );
+        return gltf.allocate( gl );
       })
     });
 
@@ -51,7 +51,7 @@ describe("Node renderable", function () {
       gl = createContext();
       return WebGltfIO.loadGltf('samples/models/2.0/Triangle/glTF/Triangle.gltf').then( res=>{
         gltf=res 
-        return gltf.allocateGl( gl );
+        return gltf.allocate( gl );
       })
     });
 

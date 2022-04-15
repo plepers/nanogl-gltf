@@ -11,7 +11,7 @@
     "declaration": true
   },
   "files" : [
-    "src/index.ts"
+    "src/Gltf.ts"
   ],
   "include": [
     "./src/**/*"

@@ -1,5 +1,13 @@
 const Models = [
   {
+    "name": "flower tete",
+    "url": "other/flower/Zoe_Rig_17_Tete_Anime_Bake_01.glb"
+  },
+  {
+    "name": "flower tige",
+    "url": "other/flower/Zoe_Rig_17_Tige_Anime_Bake_01.glb"
+  },
+  {
     "name": "CesiumBoxWebp.gltf",
     "url": "other/Box-Textured-Webp/CesiumBoxWebp.gltf"
   },

@@ -10,6 +10,7 @@ import { GLContext } from 'nanogl/types';
 import Texture2D from 'nanogl/texture-2d';
 import { IElement } from '../types/Elements';
 import Deferred from '../lib/Deferred';
+import { AbortSignal } from '@azure/abort-controller';
 
 
 export default class Texture implements IElement {
@@ -45,7 +46,7 @@ export default class Texture implements IElement {
   }
   
   
-  async allocateGl( gl : GLContext ) : Promise<any> {
+  async allocateGl( gl : GLContext ) : Promise<void> {
     
     let glFormat = gl.RGBA;
     if( this.source.mimeType === Gltf2.ImageMimeType.JPEG )

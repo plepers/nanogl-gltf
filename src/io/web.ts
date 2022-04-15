@@ -45,8 +45,7 @@ function baseDir( p:string ) : string[]{
 
 
 
-class WebImpl implements IOInterface {
-
+export class WebImpl implements IOInterface {
 
 
   isDataURI( uri : string ) : boolean{
@@ -68,17 +67,18 @@ class WebImpl implements IOInterface {
     return baseDir( path );
   }
 
+
   resolvePath(path: string, baseurl: string ): string {
     if( baseurl === undefined || this.isDataURI( path ) )
       return path;  
     return baseurl + '/' + path;
   }
 
+
   decodeUTF8(buffer: ArrayBuffer, offset  = 0, length : number = undefined ): string {
     if( length === undefined ) length = buffer.byteLength - offset;
     return UTF8( new Uint8Array( buffer, offset, length ) );
   }
-  
   
   
   async loadResource(path: string, abortSignal : AbortSignal = AbortSignal.none): Promise<string> {
@@ -87,6 +87,7 @@ class WebImpl implements IOInterface {
     return response.text();
   }
   
+
   async loadBinaryResource(path: string, abortSignal : AbortSignal = AbortSignal.none): Promise<ArrayBuffer> {
     if( this.isDataURI( path ) ){
       return this.decodeDataURI( path );
@@ -108,8 +109,8 @@ class WebImpl implements IOInterface {
     const request = await fetch( uri,  {signal} )
     const blob = await request.blob();
     return this.loadImageBlob( blob, abortSignal );
-  
   }
+
 
   async loadImageBlob( blob : Blob, abortSignal : AbortSignal ) : Promise<TexImageSource> {
     let promise : Promise<TexImageSource>;
@@ -142,11 +143,11 @@ class WebImpl implements IOInterface {
   }
 
 
-
   writeResource(path: string, data: string) : Promise<boolean>{
     throw new Error("Method not implemented.");
   }
   
+
   writeBinaryResource(path: string, data: ArrayBuffer) : Promise<boolean>{
     throw new Error("Method not implemented.");
   }

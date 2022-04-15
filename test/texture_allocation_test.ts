@@ -1,6 +1,5 @@
-import { filterHasMipmap } from "../src/elements/Texture";
 import { describeMulti } from "./test-utils";
-import Gltf from "../src";
+import Gltf from "../src/Gltf";
 import WebGltfIO from '../src/io/web';
 import GltfTypes from "../src/types/GltfTypes";
 import { GLContext } from "nanogl/types";
@@ -36,7 +35,7 @@ describe("Texture", function () {
       gl = createContext();
       return WebGltfIO.loadGltf(path).then( res=>{
         gltf=res 
-        return gltf.allocateGl( gl );
+        return gltf.allocate( gl );
       })
     });
 

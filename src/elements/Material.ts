@@ -16,12 +16,12 @@ import BaseMaterial from 'nanogl-pbr/BaseMaterial';
 import Primitive from './Primitive';
 import Node from './Node';
 import { IElement } from '../types/Elements';
-import Gltf from '..';
+import Gltf from '../Gltf';
 import Flag from 'nanogl-pbr/Flag';
 import { isAllZeros } from '../lib/Utils';
 import UnlitPass from 'nanogl-pbr/UnlitPass';
 import ShaderVersion from 'nanogl-pbr/ShaderVersion';
-import { StandardPass } from 'nanogl-pbr/StandardPass';
+import { StandardMetalness, StandardPass } from 'nanogl-pbr/StandardPass';
 import { MetalnessSurface } from 'nanogl-pbr/PbrSurface';
 
 
@@ -39,7 +39,7 @@ export interface IPbrInputsData {
 
 export interface IMaterial extends IElement {
   readonly gltftype: GltfTypes.MATERIAL
-  createMaterialForPrimitive( gl : GLContext, node : Node, primitive : Primitive ) : BaseMaterial
+  createMaterialForPrimitive( gltf:Gltf, node : Node, primitive : Primitive ) : BaseMaterial
 }
 
 
@@ -48,7 +48,7 @@ export type GltfMaterialPass = MaterialPass & {
 }
 
 
-export default class Material implements IMaterial {
+export abstract class GltfBaseMaterial<TPass extends GltfMaterialPass> implements IMaterial {
 
   readonly gltftype = GltfTypes.MATERIAL;
   name        : undefined | string;
@@ -67,17 +67,18 @@ export default class Material implements IMaterial {
 
 
   
-  protected _materialPass   : GltfMaterialPass
+  protected _materialPass   : TPass
 
-  get materialPass() : GltfMaterialPass {
+  get materialPass() : TPass {
     return this._materialPass;
   }
 
-  createMaterialForPrimitive( gl : GLContext, node : Node, primitive : Primitive ) : BaseMaterial {
-    
+
+  createMaterialForPrimitive( gltf:Gltf, node : Node, primitive : Primitive ) : BaseMaterial {
+    const gl = gltf.gl
     this._materialPass.version.set( isWebgl2(gl) ? '300 es' : '100' )
 
-    const material = new BaseMaterial( gl, this._materialPass.name );
+    const material = new BaseMaterial( gl, this._materialPass.name )
     material.addPass( this._materialPass, 'color' )
 
     const normal = primitive.attributes.getSemantic( 'NORMAL')
@@ -94,6 +95,8 @@ export default class Material implements IMaterial {
       material.inputs.add( vcInput );
     }
 
+    material.addPass( gltf.depthPass, 'depth' );
+    
     return material;
   }
 
@@ -159,7 +162,12 @@ export default class Material implements IMaterial {
     }
   }
 
+  abstract setupMaterials(): void;
 
+
+}
+
+export default class Material extends GltfBaseMaterial<StandardPass> {
 //
   setupMaterials(): void {
     const pass = new StandardPass(this.name);

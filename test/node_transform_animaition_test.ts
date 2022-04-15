@@ -1,4 +1,4 @@
-import Gltf from '../src'
+import Gltf from '../src/Gltf'
 import expect from 'expect.js'
 import Node from '../src/elements/Node';
 import { expectEqualArray } from './test-utils';

@@ -1,8 +1,8 @@
-import { filterHasMipmap } from "../src/elements/Texture";
 import { describeMulti } from "./test-utils";
-import Gltf from "../src";
+import Gltf from "../src/Gltf";
 import WebGltfIO from '../src/io/web';
 import GltfTypes from "../src/types/GltfTypes";
+import { filterHasMipmap } from "../src/elements/Image";
 
 const enum GL_FILTER {
   NEAREST                = 9728,
