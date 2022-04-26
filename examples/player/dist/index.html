@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+  <head>
+    <title>glTF player</title>
+
+    <meta name="viewport" content="maximum-width=1, minimum-width=1, width=device-width">
+
+    <style>
+      html, body {
+        margin : 0;
+        width: 100%;
+        height: 100%;
+        font-family: sans-serif;
+      }
+
+      #gl-canvas {
+        width : 100%;
+        height : 100%;
+      }
+
+      .model-selector-wrapper {
+        padding: 10px;
+        position: absolute;
+      }
+
+      #status {
+        color: white;
+        font-size: 12px;
+      }
+
+      .loader,
+      .loader:after {
+        border-radius: 50%;
+        width: 10em;
+        height: 10em;
+      }
+      .loader {
+        margin: 60px auto;
+        font-size: 10px;
+        position: relative;
+        text-indent: -9999em;
+        border-top: 1.1em solid rgba(255, 255, 255, 0.2);
+        border-right: 1.1em solid rgba(255, 255, 255, 0.2);
+        border-bottom: 1.1em solid rgba(255, 255, 255, 0.2);
+        border-left: 1.1em solid #ffffff;
+        -webkit-transform: translateZ(0);
+        -ms-transform: translateZ(0);
+        transform: translateZ(0);
+        -webkit-animation: load8 1.1s infinite linear;
+        animation: load8 1.1s infinite linear;
+      }
+      @-webkit-keyframes load8 {
+        0% {
+          -webkit-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+        100% {
+          -webkit-transform: rotate(360deg);
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes load8 {
+        0% {
+          -webkit-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+        100% {
+          -webkit-transform: rotate(360deg);
+          transform: rotate(360deg);
+        }
+      }
+
+    </style>
+    
+  </head>
+  <body>
+    <div class='model-selector-wrapper'>
+      <select name="models" id="model-selector"></select>
+      <select name="cameras" id="camera-selector"></select>
+      <input type="checkbox" id="playanims" name="animate" value="animate" checked>
+      <label for="playanims">Play animations</label>
+      <button id='next-model'>next</button>
+      <p id="status"></p>
+      <!-- <div class="loader">Loading...</div> -->
+    </div>
+    <canvas id="gl-canvas"></canvas>
+    <script src="main.js"></script>
+  </body>
+</html>
