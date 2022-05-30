@@ -11,7 +11,7 @@ export function cancellablePromise<T>( p:Promise<T>, signal:AbortSignalLike ) : 
 
 let _createNativeSignal : ( signal:AbortSignalLike ) => AbortSignal|undefined;
 
-if( window.AbortController !== undefined ){
+if( typeof window !== "undefined" && window.AbortController !== undefined ){
 
   _createNativeSignal = ( signal:AbortSignalLike ) => {
     const ctrl = new AbortController();

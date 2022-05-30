@@ -14,7 +14,7 @@ import { cancellablePromise, createNativeSignal } from '../lib/cancellation';
  * make test with small data uri png
  */
 async function checkCreateImageBitmapCapability() : Promise<boolean>{
-  if( window.createImageBitmap === undefined ){
+  if( typeof window === "undefined" || window.createImageBitmap === undefined ){
     return false
   }
   const uri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=";

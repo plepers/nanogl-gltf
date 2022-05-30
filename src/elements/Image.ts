@@ -12,8 +12,6 @@ import Texture2D from 'nanogl/texture-2d';
 import { GLContext } from 'nanogl/types';
 
 
-const _HAS_CIB: boolean = (window.createImageBitmap !== undefined);
-
 const GL_REPEAT                         = 0x2901;
 const GL_MIRRORED_REPEAT                = 0x8370;
 
@@ -131,7 +129,7 @@ export default class Image implements IElement {
     canvas.height = nearestPowerOf2( source.height );
     
     if( source instanceof ImageData ){
-      const imageBitmap = await  createImageBitmap( source, 0, 0, canvas.width, canvas.height, {} );
+      const imageBitmap = await createImageBitmap( source, 0, 0, canvas.width, canvas.height, {} );
       context.drawImage(imageBitmap, 0, 0, canvas.width, canvas.height);
     } else {
       context.drawImage(source, 0, 0, canvas.width, canvas.height);
