@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "Node",
+    "lib": ["ES2017", "DOM"],
+    "target": "ES2017",
+    "module": "ES6",
+    "preserveConstEnums": true,
+    "outDir": "lib",
+    "sourceMap": false,
+    "allowSyntheticDefaultImports": true,
+    "declaration": true
+  },
+  "files" : [
+    "src/Gltf.ts"
+  ],
+  "include": [
+    "./src/**/*"
+    // "test/*_test.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

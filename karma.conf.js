@@ -13,26 +13,27 @@ module.exports = function(config) {
   
       // frameworks to use
       // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-      frameworks: [ 'mocha'],
+      frameworks: [ 'mocha' ],
   
       // mocha custom option
       client: {
         
       },
+
+
   
       // list of files / patterns to load in the browser
       files: [
-        'test/entry_point.js',
-        {pattern: 'test/samples/**/*.*', watched: false, included: false, served: true, nocache: false}
+        'test/*.ts',
+        'src/**/*.ts',
+        {pattern: 'test/samples/**/*.*', watched: false, included: false, served: true, nocache: true}
       ],
   
       proxies: {
-        '/samples/': '/base/test/samples/2.0/'
+        '/samples/': '/base/test/samples/'
       },
 
 
-      webpack: require("./webpack.config"),
-  
   
       // list of files to exclude
       exclude: [
@@ -42,7 +43,56 @@ module.exports = function(config) {
       // preprocess matching files before serving them to the browser
       // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
       preprocessors: {
-        'test/*.js': [ 'webpack' ]
+        'test/**/*.ts': ['webpack']
+      },
+
+      // preprocessors: {
+      //   // add webpack as preprocessor
+      //   'test/*_test.js': ['webpack'],
+      //   'test/**/*_test.js': ['webpack'],
+      // },
+  
+      webpack: {
+        // karma watches the test entry points
+        // (you don't need to specify the entry option)
+        // webpack watches dependencies
+        // webpack configuration
+        mode: 'development',
+        devtool: '(none)',
+
+        module : {
+          rules : [
+          
+            // JS
+            {
+              test: /\.js$/, 
+              use: "babel-loader"
+            },
+            
+            // TS
+            {
+              test: /\.tsx?$/,
+              use:  'ts-loader',
+            },
+
+            // GLSL
+            {
+              test: /\.(vert|frag|glsl)$/,
+              use: 'nanogl-template/lib/compiler'
+            },
+          ]
+            
+        },
+
+        resolve: {
+          extensions: [ '.ts', '.js' ],
+        },
+      },
+  
+      webpackMiddleware: {
+        // webpack-dev-middleware configuration
+        // i. e.
+        stats: 'errors-only',
       },
   
       // test results reporter to use

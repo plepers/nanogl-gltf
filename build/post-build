@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+
+// destination.txt will be created or overwritten by default.
+fs.copyFile('src/extensions/KHR_draco_mesh_compression/draco-decoder.js', 'lib/extensions/KHR_draco_mesh_compression/draco-decoder.js', (err) => {
+  if (err) throw err;
+});
