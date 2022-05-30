@@ -72,12 +72,16 @@ export default class Image implements IElement {
       this.bufferView = await gltfLoader.getElement(GltfTypes.BUFFERVIEW, data.bufferView);
     }
 
+    await this.loadImage(gltfLoader);
+    
+  }
 
-
+  
+  protected async loadImage(gltfLoader: GltfLoader): Promise<void> {
     const blob = await this.loadImageBlob(gltfLoader.abortSignal);
     this.texImageSource = await gltfLoader.gltfIO.loadImageBlob(blob, gltfLoader.abortSignal);
-
   }
+
 
   protected async loadImageBlob(abortSignal: AbortSignalLike): Promise<Blob> {
 

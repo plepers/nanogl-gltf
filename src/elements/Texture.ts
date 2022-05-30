@@ -50,7 +50,7 @@ export default class Texture implements IElement {
     
     let glFormat = gl.RGBA;
     if( this.source.mimeType === Gltf2.ImageMimeType.JPEG )
-      glFormat = gl.RGBA;
+      glFormat = gl.RGB;
 
 
 
