@@ -33,6 +33,9 @@ export default class MeshRenderer {
   
   readonly node: Node;
   readonly mesh: Mesh;
+
+  private _skinDeformers = new Map<Primitive, SkinDeformer>();
+  private _morphDeformers = new Map<Primitive, MorphDeformer>();
   
   materials : BaseMaterial[] = []
   
@@ -41,8 +44,6 @@ export default class MeshRenderer {
   readonly bounds : Bounds = new Bounds();
 
 
-  private _skin : SkinDeformer;
-  private _morph : MorphDeformer;
   
   constructor( gtlf : Gltf, node: Node) {
     Assert.isDefined( node.mesh );
@@ -102,18 +103,18 @@ export default class MeshRenderer {
       
 
       material.inputs.add( morphDeformer );
-      this._morph = morphDeformer;
+      this._morphDeformers.set( primitive, morphDeformer );
 
-      this.setupMorphWeights();
+      this.setupMorphWeights(morphDeformer);
     }
     
   
   }
-  setupMorphWeights() {
+  setupMorphWeights( morph:MorphDeformer) {
     if( this.node.weights ){
-      this._morph.weights = this.node.weights 
+      morph.weights = this.node.weights 
     } else if( this.mesh.weights ){
-      this._morph.weights = this.mesh.weights 
+      morph.weights = this.mesh.weights 
     }
   }
 
@@ -158,7 +159,7 @@ export default class MeshRenderer {
       // add skin deformer
       //material.setSkin ...
       material.inputs.add( skinDeformer );
-      this._skin = skinDeformer;
+      this._skinDeformers.set( primitive, skinDeformer );
     }
     
   }
@@ -177,19 +178,20 @@ export default class MeshRenderer {
     
     const primitives = this.mesh.primitives;
     
-    if( this._skin ){
-      this.node.skin.computeJoints( this.node, this._skin.jointMatrices );
-    }
-    
-    if (this._morph ){
-      this.setupMorphWeights();
-    }
     
     const glstate = GLState.get(gl)
-
+    
     for (let i = 0; i < primitives.length; i++) {
-
       const primitive = primitives[i];
+
+      if( this._skinDeformers.has(primitive) ){
+        this.node.skin.computeJoints( this.node, this._skinDeformers.get(primitive).jointMatrices );
+      }
+      
+      if (this._morphDeformers.has(primitive)) {
+        this.setupMorphWeights( this._morphDeformers.get(primitive) );
+      }
+
       const mat:BaseMaterial = this.materials[i];
       
       if ( !mat.hasPass( passId ) || (mat.mask & mask) === 0)  continue;
