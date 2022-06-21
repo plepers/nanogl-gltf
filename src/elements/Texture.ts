@@ -49,7 +49,7 @@ export default class Texture implements IElement {
   async allocateGl( gl : GLContext ) : Promise<void> {
     
     let glFormat = gl.RGBA;
-    if( this.source.mimeType === Gltf2.ImageMimeType.JPEG )
+    if( this.source.hasAlpha )
       glFormat = gl.RGB;
 
 

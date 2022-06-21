@@ -52,6 +52,14 @@ export default class Image implements IElement {
 
   texImageSource: TexImageSource;
 
+  /**
+   * hint for texture allocation
+   */
+  get hasAlpha(): boolean {
+    return this.mimeType !== Gltf2.ImageMimeType.JPEG
+  }
+
+
   async parse(gltfLoader: GltfLoader, data: Gltf2.IImage): Promise<any> {
 
     if (data.uri) {

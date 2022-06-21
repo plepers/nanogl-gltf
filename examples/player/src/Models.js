@@ -1,11 +1,15 @@
 const Models = [
   {
-    "name": "flower tete",
-    "url": "other/flower/Zoe_Rig_17_Tete_Anime_Bake_01.glb"
+    "name": "Avocado basis",
+    "url": "other/Avocado-basisu/Avocado.gltf"
   },
   {
-    "name": "flower tige",
-    "url": "other/flower/Zoe_Rig_17_Tige_Anime_Bake_01.glb"
+    "name": "thinker",
+    "url": "other/painting/thinker.gltf"
+  },
+  {
+    "name": "Helmet basis",
+    "url": "other/FlightHelmet_basisu_uastc/FlightHelmetUastc.gltf"
   },
   {
     "name": "CesiumBoxWebp.gltf",
