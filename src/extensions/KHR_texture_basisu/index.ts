@@ -1,7 +1,7 @@
 import { AbortSignalLike } from "@azure/abort-controller";
 import Texture2D from "nanogl/texture-2d";
 import { GLContext } from "nanogl/types";
-import Image from "../../elements/Image";
+import Image, { filterHasMipmap } from "../../elements/Image";
 import Texture from "../../elements/Texture";
 import GltfLoader from "../../io/GltfLoader";
 import { createNativeSignal } from "../../lib/cancellation";
@@ -9,8 +9,7 @@ import { ElementOfType, PropertyType, AnyElement } from "../../types/Elements";
 import Gltf2 from "../../types/Gltf2";
 import GltfTypes from "../../types/GltfTypes";
 import { IExtensionFactory, IExtensionInstance } from "../IExtension";
-import { DecodingResponse } from "./basis.types";
-import BasisDecoder from "./decoder";
+import { DecodingResponse, IBasisDecoder } from "./basis.types";
 
 const EXT_ID = 'KHR_texture_basisu';
 
@@ -26,7 +25,7 @@ class BasisImage extends Image {
     return false
   }
 
-  constructor( private _decoder : BasisDecoder ){
+  constructor( private _decoder : IBasisDecoder ){
     super()
   }
 
@@ -39,11 +38,8 @@ class BasisImage extends Image {
 
     if (this.bufferView) {
       // mimeType is guaranted here
-      const arrayView = new Uint8Array(
-        this.bufferView.buffer._bytes,
-        this.bufferView.getByteOffset(),
-        this.bufferView.byteLength
-      );
+      const ptr = this.bufferView.getByteOffset()
+      return this.bufferView.buffer._bytes.slice( ptr, ptr + this.bufferView.byteLength );
     } else {
       // assume uri is defained as uri or data uri
       const signal = createNativeSignal(abortSignal)
@@ -112,10 +108,10 @@ class BasisImage extends Image {
       }
     }
 
-    // if (webglFormat.uncompressed && mipLevels.length == 1) {
-    //   gl.generateMipmap(gl.TEXTURE_2D);
-    // }
-
+    
+    if ( filterHasMipmap(minFilter) && webglFormat.uncompressed && mipLevels.length == 1) {
+      gl.generateMipmap(gl.TEXTURE_2D);
+    }
   }
 
 }
@@ -144,7 +140,7 @@ class Instance implements IExtensionInstance {
 
   loader: GltfLoader;
 
-  constructor(gltfLoader: GltfLoader, private _decoder : BasisDecoder ) {
+  constructor(gltfLoader: GltfLoader, private _decoder : IBasisDecoder ) {
     this.loader = gltfLoader;
   }
 
@@ -170,15 +166,11 @@ class Instance implements IExtensionInstance {
 
 export default class KHR_texture_basisu implements IExtensionFactory {
   readonly name: string = EXT_ID;
-
-
-  private _decoder : BasisDecoder 
   
-  constructor( workerUrl: string ){
-    this._decoder = new BasisDecoder(workerUrl)
+  constructor( readonly decoder: IBasisDecoder ){
   }
 
   createInstance(gltfLoader: GltfLoader): IExtensionInstance {
-    return new Instance(gltfLoader, this._decoder);
+    return new Instance(gltfLoader, this.decoder);
   }
 }

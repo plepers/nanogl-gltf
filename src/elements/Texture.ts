@@ -26,6 +26,7 @@ export default class Texture implements IElement {
 
 
   private _glTextureDeferred : Deferred<Texture2D> = new Deferred();
+  private _defaultTextureFilter : GLenum
 
   get glTexturePromise() : Promise<Texture2D> {
     return this._glTextureDeferred.promise;
@@ -43,6 +44,9 @@ export default class Texture implements IElement {
       this.source = await gltfLoader.getElement( GltfTypes.IMAGE, data.source );
     }
 
+    this._defaultTextureFilter = gltfLoader.defaultTextureFilter;
+
+    
   }
   
   
@@ -53,15 +57,14 @@ export default class Texture implements IElement {
       glFormat = gl.RGB;
 
 
-
-    let minFilter : GLenum = gl.LINEAR
+    let minFilter : GLenum = this._defaultTextureFilter
     let magFilter : GLenum = gl.LINEAR
 
     let wrapS : GLenum = gl.REPEAT
     let wrapT : GLenum = gl.REPEAT
 
     if( this.sampler ){
-      minFilter = this.sampler.minFilter ?? gl.LINEAR
+      minFilter = this.sampler.minFilter ?? minFilter
       magFilter = this.sampler.magFilter ?? gl.LINEAR
       wrapS = this.sampler.wrapS
       wrapT = this.sampler.wrapT

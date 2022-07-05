@@ -13,6 +13,12 @@ type Options = {
   extensions : IExtensionFactory[]
 
   abortSignal : AbortSignal
+
+  /**
+   * texture's minFilter to use when sampler dosn't specify one
+   * default to gl.LINEAR
+   */
+  defaultTextureFilter : GLenum
   
 }
 
