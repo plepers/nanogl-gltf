@@ -50,6 +50,7 @@ const MAGIC      = 0x46546C67; // "glTF"
 const JSON_MAGIC = 0x4E4F534A; // "JSON"
 const GLB_HEADER_SIZE = 20;
 
+const GL_LINEAR = 9729;
 
 
 export default class GltfLoader {
@@ -74,6 +75,7 @@ export default class GltfLoader {
   _propertyMaps  : Map<GltfTypes, Gltf2.Property[]> = new Map();
 
   readonly abortSignal: AbortSignal;
+  readonly defaultTextureFilter : GLenum
 
 
   constructor(gltfIO: IOInterface, url: string, options : GltfLoaderOptions = {} ) {
@@ -83,9 +85,11 @@ export default class GltfLoader {
     this._baseUrl = options.baseurl;
 
     this.abortSignal = options.abortSignal ?? AbortSignal.none;
+    this.defaultTextureFilter = options.defaultTextureFilter ?? GL_LINEAR;
 
-    if( this._baseUrl === undefined )
+    if( this._baseUrl === undefined ){
       [this._baseUrl, this._url] = gltfIO.resolveBaseDir( this._url );
+    }
 
     this.gltf = new Gltf();
     this._data = null;

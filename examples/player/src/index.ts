@@ -1,7 +1,8 @@
 import GLView from "./engine/GLView";
 import Scene from "./engine/Scene";
 import _Models from './Models'
-import Gltf from "nanogl-gltf";
+import Gltf from "nanogl-gltf/Gltf";
+
 
 type Mentry = {
   name : string,

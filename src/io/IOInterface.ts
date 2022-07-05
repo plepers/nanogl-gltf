@@ -1,3 +1,4 @@
+import { AbortSignal } from "@azure/abort-controller"
 
 
 export default interface IOInterface {

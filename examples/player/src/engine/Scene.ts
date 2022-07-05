@@ -1,5 +1,5 @@
 
-import GLState        from 'nanogl-state'
+import GLState        from 'nanogl-state/GLState'
 import Node           from 'nanogl-node'
 import Camera         from 'nanogl-camera'
 
@@ -14,9 +14,9 @@ import { GLContext } from 'nanogl/types'
 import PerspectiveLens from 'nanogl-camera/perspective-lens'
 import { mat4, vec3 } from 'gl-matrix'
 import { Passes, Masks } from './Passes'
-import Gltf from 'nanogl-gltf'
+import Gltf from 'nanogl-gltf/Gltf'
 import GltfIO from "nanogl-gltf/io/web";
-import GLConfig from 'nanogl-state/config'
+import GLConfig from 'nanogl-state/GLConfig'
 import Program from 'nanogl/program'
 import Bounds, { BoundingSphere } from 'nanogl-pbr/Bounds'
 
@@ -26,11 +26,13 @@ import KHR_materials_pbrSpecularGlossiness from 'nanogl-gltf/extensions/KHR_mate
 import KHR_lights_punctual                 from 'nanogl-gltf/extensions/KHR_lights_punctual'
 import KHR_materials_unlit                 from 'nanogl-gltf/extensions/KHR_materials_unlit'
 import KHR_mesh_quantization               from 'nanogl-gltf/extensions/KHR_mesh_quantization'
+import KHR_texture_basisu               from 'nanogl-gltf/extensions/KHR_texture_basisu'
 import EXT_texture_webp                    from 'nanogl-gltf/extensions/EXT_texture_webp'
 import LightSetup from 'nanogl-pbr/lighting/LightSetup'
 import { AbortController } from '@azure/abort-controller'
 import PunctualLight from 'nanogl-pbr/lighting/PunctualLight'
 import DepthPass from 'nanogl-pbr/DepthPass'
+import { lightIsShadowMappedLight } from 'nanogl-pbr/lighting/Light'
 
    
 
@@ -44,6 +46,7 @@ Gltf.addExtension( new KHR_lights_punctual                () );
 Gltf.addExtension( new KHR_materials_unlit                () );
 Gltf.addExtension( new KHR_mesh_quantization              () );
 Gltf.addExtension( new EXT_texture_webp                   () );
+Gltf.addExtension( new KHR_texture_basisu                 ( "./basis/basis.worker.js") );
 
 
 export default class Scene {
@@ -161,19 +164,24 @@ export default class Scene {
     }
 
     this.abortCtrl = new AbortController();
-    this.gltfScene = await GltfIO.loadGltf( url, {abortSignal:this.abortCtrl.signal} );
-    await this.gltfScene.allocateGl( this.gl )
-    this.root.add( this.gltfScene.root );
+    console.log("A");
+    
+    const gltfScene = await GltfIO.loadGltf( url, {abortSignal:this.abortCtrl.signal} );
+    console.log("B");
+    await gltfScene.allocate( this.gl )
+    console.log("C");
+    this.root.add( gltfScene.root );
+    this.gltfScene = gltfScene
     this.computeBounds()
     this.setupMaterials()
     this.initCamera()
 
     this.animationTime = 0;
     this.animationDuration = 0;
-    for( const anim of this.gltfScene.animations ){
+    for( const anim of gltfScene.animations ){
       this.animationDuration = Math.max( this.animationDuration, anim.duration );
     }
-    this._selectedCamera = this.gltfScene.cameraInstances.length-1;
+    this._selectedCamera = gltfScene.cameraInstances.length-1;
     return this.gltfScene;
   }
 
@@ -184,9 +192,9 @@ export default class Scene {
     
     const lights = this.gltfScene.extras.lights;
     if( lights ){
-      for (const light  of lights) {
-        (light as PunctualLight ).castShadows( true );
-        (light as PunctualLight )._shadowmapSize = 2048;
+      for (const light  of lights.list) {
+        (light as PunctualLight ).castShadows = true;
+        (light as PunctualLight ).shadowmapSize = 2048;
         this.lightSetup.add( light );
       }
     }
@@ -337,7 +345,7 @@ export default class Scene {
 
   renderGltfScene( camera : Camera, mask : Masks, passId : Passes = Passes.DEFAULT, cfg?: GLConfig ){
     for (const renderable of this.gltfScene.renderables ) {
-      renderable.render( this, camera, mask, passId, cfg )
+      renderable.render( this.gl, camera, mask, passId, cfg )
     }
     // this.gltfScene.renderables[5].render( this, camera, mask, passId, cfg )
   }
@@ -359,8 +367,8 @@ export default class Scene {
       .colorMask(isRgb, isRgb, isRgb, isRgb);
 
 
-    for (var l of lights) {
-      if (l._castShadows) {
+    for (var l of lights.list) {
+      if ( lightIsShadowMappedLight(l) &&  l.castShadows) {
         l.bindShadowmap()
         // fbodebug.debug( l._fbo );
         gl.clearColor(1, 1, 1, 1);
@@ -369,7 +377,7 @@ export default class Scene {
         glstate.push(config);
 
         // render
-        this.renderGltfScene( l._camera, Masks.OPAQUE, Passes.DEPTH, config )
+        this.renderGltfScene( l.getCamera(), Masks.OPAQUE, Passes.DEPTH, config )
 
 
         glstate.pop();

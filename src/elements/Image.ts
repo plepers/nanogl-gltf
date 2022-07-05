@@ -50,6 +50,14 @@ export default class Image implements IElement {
 
   texImageSource: TexImageSource;
 
+  /**
+   * hint for texture allocation
+   */
+  get hasAlpha(): boolean {
+    return this.mimeType !== Gltf2.ImageMimeType.JPEG
+  }
+
+
   async parse(gltfLoader: GltfLoader, data: Gltf2.IImage): Promise<any> {
 
     if (data.uri) {
@@ -70,12 +78,16 @@ export default class Image implements IElement {
       this.bufferView = await gltfLoader.getElement(GltfTypes.BUFFERVIEW, data.bufferView);
     }
 
+    await this.loadImage(gltfLoader);
+    
+  }
 
-
+  
+  protected async loadImage(gltfLoader: GltfLoader): Promise<void> {
     const blob = await this.loadImageBlob(gltfLoader.abortSignal);
     this.texImageSource = await gltfLoader.gltfIO.loadImageBlob(blob, gltfLoader.abortSignal);
-
   }
+
 
   protected async loadImageBlob(abortSignal: AbortSignalLike): Promise<Blob> {
 
