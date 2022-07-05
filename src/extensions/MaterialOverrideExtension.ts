@@ -70,41 +70,6 @@ class OverrideMaterial implements IMaterial {
 
 
 
-/**
- * IMaterial used as proxy for an original IMaterial, but replace the color pass of the created BaseMaterial with it's own pass
- * used to implement `MaterialOverrideExtension.overridePass()`
- */
-class OverrideMaterialPass implements IMaterial {
-
-  readonly gltftype: GltfTypes.MATERIAL = GltfTypes.MATERIAL;
-  name: string | undefined;
-  extras: any;
-
-  private readonly _material: BaseMaterial;
-  
-  constructor( private passFactory : PassOverrideFactory, private data : Gltf2.IMaterial, private initialMaterial: IMaterial ){}
-
-  createMaterialForPrimitive(gltf:Gltf, node: Node, primitive: Primitive ): BaseMaterial {
-    const material = this.initialMaterial.createMaterialForPrimitive(gltf, node, primitive);
-    const pass = invokePassFactory( this.passFactory, {
-      data: this.data,
-      gltf,
-      node,
-      primitive
-    }, material )
-    if( pass ){
-      material.addPass( pass );
-    }
-    return material;  
-  }
-
-  parse(gltfLoader: GltfLoader, data: Gltf2.IProperty): Promise<any> {
-    return null;
-  }
-  
-}
-
-
 
 class MaterialOverrideExtensionInstance implements IExtensionInstance {
 
@@ -148,14 +113,33 @@ class MaterialOverrideExtensionInstance implements IExtensionInstance {
     return null;
   }
 
+
+
+  /**
+   * overwrite `createMaterialForPrimitive()` method of original material so it will return the given pass
+   */
   createOverridePassMaterial(data: Gltf2.IMaterial, material: IMaterial): Promise<IMaterial> {
     const passFactory = this.ext.passes.get( data.name ) || this.ext.passes.get( '' );
     if( passFactory !== undefined ){
-      const el = new OverrideMaterialPass( passFactory, data, material );
-      return Promise.resolve(el);
+      const baseFunc = material.createMaterialForPrimitive
+      material.createMaterialForPrimitive = ( gltf: Gltf, node : Node, primitive : Primitive ) => {
+        const m = baseFunc.apply( material, [gltf, node, primitive]);
+        const pass = invokePassFactory( passFactory, {
+          data,
+          gltf,
+          node,
+          primitive
+        }, m )
+        if( pass ){
+          m.addPass( pass );
+        }
+        return m;  
+      }
     }
     return null;
   }
+
+
 
 
 }
