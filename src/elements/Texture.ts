@@ -52,9 +52,9 @@ export default class Texture implements IElement {
   
   async allocateGl( gl : GLContext ) : Promise<void> {
     
-    let glFormat = gl.RGBA;
+    let glFormat = gl.RGB;
     if( this.source.hasAlpha )
-      glFormat = gl.RGB;
+      glFormat = gl.RGBA;
 
 
     let minFilter : GLenum = this._defaultTextureFilter
