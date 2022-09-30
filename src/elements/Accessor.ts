@@ -111,8 +111,21 @@ export class BaseAccessor {
    */
   count                 = 0;
 
+  /**
+   * stride in bytes between values
+   */
   _stride               = 0;
+
+  /**
+   * stride in elements between values
+   */
   _strideElem           = 0;
+
+  /**
+   * offset in the bufferview in elements
+   */
+  _offsetElem           = 0;
+
   componentType  : Gltf2.AccessorComponentType        ;
   type           : Gltf2.AccessorType        ;
   max          ? : number[]    ;
@@ -202,7 +215,7 @@ export class BaseAccessor {
    * @param {number} index 
    */
   getRawScalar( index:number ):number{
-    const offset = this._strideElem * index;
+    const offset = this._offsetElem + this._strideElem * index;
     return this._array[offset];
   }
 
@@ -247,7 +260,7 @@ export class BaseAccessor {
   }
 
   getRawValue( out:TypedArray, index:number ){
-    const offset = this._strideElem * index;
+    const offset = this._offsetElem + this._strideElem * index;
     const ncomps = this.numComps;
     for (let i = 0; i < ncomps; i++) {
       out[i] = this._array[i+offset];
@@ -258,7 +271,7 @@ export class BaseAccessor {
     const ncomps = this.numComps;
     for (let k = 0; k < size; k++) {
       const j = k*ncomps;
-      const offset = this._strideElem * (index+k);
+      const offset = this._offsetElem + this._strideElem * (index+k);
       for (let i = 0; i < ncomps; i++) {
         out[j+i] = this._array[i+offset];
       }
@@ -316,13 +329,18 @@ export default class Accessor extends BaseAccessor implements IElement {
         this._strideElem  = this._stride / Arr.BYTES_PER_ELEMENT;
         Assert.isTrue( this._strideElem === Math.round( this._strideElem ) );
       }
+
+      this._offsetElem = this.byteOffset / Arr.BYTES_PER_ELEMENT;
       
-      this._array = new Arr( this.bufferView.buffer._bytes, this.byteOffset + this.bufferView.getByteOffset(), this.count * this._strideElem );
+
+      this._array = new Arr( this.bufferView.buffer._bytes, this.bufferView.getByteOffset(), this.count * this._strideElem );
 
     } else {
       this.bufferView     = null;
       this._stride        = 0;
       this._strideElem    = 0;
+      this._offsetElem    = 0;
+
       this._array = this.createElementHolder();
     }
 
