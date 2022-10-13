@@ -2,7 +2,7 @@ import Node from "../elements/Node"
 import Mesh from "../elements/Mesh"
 import Primitive from "../elements/Primitive"
 import Camera from 'nanogl-camera'
-import BaseMaterial from 'nanogl-pbr/BaseMaterial'
+import Material from 'nanogl-pbr/Material'
 import MorphDeformer from 'nanogl-pbr/MorphDeformer'
 import SkinDeformer, { SkinAttributeSet } from 'nanogl-pbr/SkinDeformer'
 import { GLContext } from "nanogl/types"
@@ -37,7 +37,7 @@ export default class MeshRenderer {
   private _skinDeformers = new Map<Primitive, SkinDeformer>();
   private _morphDeformers = new Map<Primitive, MorphDeformer>();
   
-  materials : BaseMaterial[] = []
+  materials : Material[] = []
   
   glconfig? : GLConfig;
 
@@ -68,12 +68,12 @@ export default class MeshRenderer {
 
   }
 
-  configureDeformers(material: BaseMaterial, primitive: Primitive) {
+  configureDeformers(material: Material, primitive: Primitive) {
     this.configureSkin ( material, primitive );
     this.configureMorph( material, primitive );
   }
 
-  configureMorph(material: BaseMaterial, primitive: Primitive) {
+  configureMorph(material: Material, primitive: Primitive) {
 
     if( primitive.targets !== null ){
       
@@ -118,7 +118,7 @@ export default class MeshRenderer {
     }
   }
 
-  configureSkin(material: BaseMaterial, primitive: Primitive) {
+  configureSkin(material: Material, primitive: Primitive) {
     
     if( this.node.skin ){
       
@@ -192,7 +192,7 @@ export default class MeshRenderer {
         this.setupMorphWeights( this._morphDeformers.get(primitive) );
       }
 
-      const mat:BaseMaterial = this.materials[i];
+      const mat:Material = this.materials[i];
       
       if ( !mat.hasPass( passId ) || (mat.mask & mask) === 0)  continue;
       

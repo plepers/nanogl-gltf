@@ -12,7 +12,7 @@ import Gltf2 from '../types/Gltf2';
 import GltfLoader from '../io/GltfLoader';
 import GltfTypes from '../types/GltfTypes';
 import Input from 'nanogl-pbr/Input';
-import BaseMaterial from 'nanogl-pbr/BaseMaterial';
+import {default as BaseMaterial}  from 'nanogl-pbr/Material';
 import Primitive from './Primitive';
 import Node from './Node';
 import { IElement } from '../types/Elements';

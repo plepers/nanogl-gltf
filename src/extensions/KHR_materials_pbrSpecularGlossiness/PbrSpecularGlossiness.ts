@@ -12,6 +12,7 @@ import   GltfLoader    from '../../io/GltfLoader'        ;
 import   Gltf2         from '../../types/Gltf2'          ;
 import { isAllOnes   } from '../../lib/Utils'            ;
 import   GltfTypes     from '../../types/GltfTypes'      ;
+import { ColorSpace } from 'nanogl-pbr/ColorSpace';
 
 
 export interface IMaterialPbrSpecularGlossiness {
@@ -74,20 +75,22 @@ export default class PbrSpecularGlossiness {
 
     if (this.diffuseTexture) {
       const diffuseSampler = this.diffuseTexture.createSampler('diffuse')
+      diffuseSampler.colorspace = ColorSpace.SRGB
       surface.baseColor.attach( diffuseSampler, 'rgb')
       pass.alpha      .attach( diffuseSampler, 'a')
     }
-
+    
     if( ! isAllOnes( this.diffuseFactor ) ){
       const cFactor = new Uniform( 'uBasecolorFactor', 4 );
       cFactor.set( ...this.diffuseFactor )
       surface.baseColorFactor.attach(cFactor, 'rgb' )
       pass.alphaFactor      .attach(cFactor, 'a')
     }
-
-
+    
+    
     if (this.specularGlossinessTexture) {
       const mrSampler = this.specularGlossinessTexture.createSampler('specgloss')
+      mrSampler.colorspace = ColorSpace.SRGB
       surface.specular  .attach(mrSampler, 'rgb')
       surface.glossiness.attach(mrSampler, 'a')
     }
