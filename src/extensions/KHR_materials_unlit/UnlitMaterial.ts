@@ -20,13 +20,13 @@ export default class UnlitMaterial extends GltfBaseMaterial<UnlitPass> {
       const metalicRoughness : PbrMetallicRoughness = this.pbrInputsData as PbrMetallicRoughness;
 
       if( metalicRoughness.baseColorTexture )
-      if (metalicRoughness.baseColorTexture) {
+      if( metalicRoughness.baseColorTexture ) {
         const baseColorSampler = metalicRoughness.baseColorTexture.createSampler('basecolor')
         pass.baseColor.attach(baseColorSampler, 'rgb')
         pass.alpha    .attach(baseColorSampler, 'a')
       }
 
-      if( ! isAllOnes( metalicRoughness.baseColorFactor ) ){
+      if( !isAllOnes( metalicRoughness.baseColorFactor ) ){
         const cFactor = new Uniform( 'uBasecolorFactor', 4 );
         cFactor.set( ...metalicRoughness.baseColorFactor )
         pass.baseColorFactor.attach(cFactor, 'rgb' )

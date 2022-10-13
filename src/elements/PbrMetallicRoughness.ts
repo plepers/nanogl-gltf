@@ -9,6 +9,7 @@ import { isAllOnes } from '../lib/Utils';
 import { Uniform } from 'nanogl-pbr/Input';
 import { StandardPass } from 'nanogl-pbr/StandardPass';
 import { MetalnessSurface } from 'nanogl-pbr/PbrSurface';
+import { ColorSpace } from 'nanogl-pbr/ColorSpace';
 
 
 export default class PbrMetallicRoughness {
@@ -46,8 +47,10 @@ export default class PbrMetallicRoughness {
 
     if (this.baseColorTexture) {
       const baseColorSampler = this.baseColorTexture.createSampler( 'basecolor' )
+      baseColorSampler.colorspace = ColorSpace.SRGB
+      
       surface.baseColor.attach(baseColorSampler, 'rgb')
-      pass.alpha    .attach(baseColorSampler, 'a')
+      pass.alpha       .attach(baseColorSampler, 'a')
     }
 
     if( ! isAllOnes( this.baseColorFactor ) ){
@@ -60,6 +63,8 @@ export default class PbrMetallicRoughness {
 
     if (this.metallicRoughnessTexture) {
       const mrSampler = this.metallicRoughnessTexture.createSampler( 'metalRough' )
+      mrSampler.colorspace = ColorSpace.LINEAR
+      
       surface.metalness.attach(mrSampler, 'b')
       surface.roughness.attach(mrSampler, 'g')
     }

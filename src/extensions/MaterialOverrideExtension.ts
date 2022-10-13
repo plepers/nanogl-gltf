@@ -4,7 +4,7 @@ import Gltf2 from "../types/Gltf2";
 import { ElementOfType, PropertyType, AnyElement } from "../types/Elements";
 import GltfTypes from "../types/GltfTypes";
 import { IMaterial } from "../elements/Material";
-import BaseMaterial from "nanogl-pbr/BaseMaterial";
+import Material from "nanogl-pbr/Material";
 import { GLContext } from "nanogl/types";
 import Primitive from "../elements/Primitive";
 import Node from "../elements/Node";
@@ -19,19 +19,19 @@ type MaterialOverrideFactoryContext = {
   primitive: Primitive
 }
 
-type MaterialOverrideFactory = BaseMaterial | (( ctx: MaterialOverrideFactoryContext )=>BaseMaterial);
-type PassOverrideFactory = MaterialPass | (( ctx: MaterialOverrideFactoryContext, material: BaseMaterial )=>MaterialPass|null);
+type MaterialOverrideFactory = Material | (( ctx: MaterialOverrideFactoryContext )=>Material);
+type PassOverrideFactory = MaterialPass | (( ctx: MaterialOverrideFactoryContext, material: Material )=>MaterialPass|null);
 
 
 
-function invokeMaterialFactory( factory: MaterialOverrideFactory, ctx: MaterialOverrideFactoryContext ): BaseMaterial {
+function invokeMaterialFactory( factory: MaterialOverrideFactory, ctx: MaterialOverrideFactoryContext ): Material {
   if ( factory instanceof Function ) {
     return factory( ctx );
   }
   return factory;
 }
 
-function invokePassFactory( factory: PassOverrideFactory, ctx: MaterialOverrideFactoryContext, material: BaseMaterial ): MaterialPass|null {
+function invokePassFactory( factory: PassOverrideFactory, ctx: MaterialOverrideFactoryContext, material: Material ): MaterialPass|null {
   if ( factory instanceof Function ) {
     return factory( ctx, material );
   }
@@ -53,7 +53,7 @@ class OverrideMaterial implements IMaterial {
   
   constructor( private materialFactory : MaterialOverrideFactory, private data : Gltf2.IMaterial ){}
 
-  createMaterialForPrimitive(gltf:Gltf, node: Node, primitive: Primitive ): BaseMaterial {
+  createMaterialForPrimitive(gltf:Gltf, node: Node, primitive: Primitive ): Material {
     return invokeMaterialFactory( this.materialFactory, {
       data: this.data,
       gltf,
