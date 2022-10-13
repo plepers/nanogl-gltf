@@ -1,6 +1,6 @@
 {
   "name": "nanogl-gltf",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "description": "gltf loader",
   "scripts": {
     "test": "karma start",
@@ -57,7 +57,7 @@
     "nanogl": "^2.3.0",
     "nanogl-camera": "^1.1.2",
     "nanogl-node": "^1.2.0",
-    "nanogl-pbr": "3.0.0-beta.15",
+    "nanogl-pbr": "3.0.0-beta.16",
     "nanogl-pf": "^1.1.1",
     "nanogl-state": "^2.1.0",
     "nanogl-vao": "^1.1.0",

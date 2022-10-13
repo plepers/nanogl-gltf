@@ -3,7 +3,7 @@ import expect from 'expect.js'
 import WebGltfIO from '../src/io/web';
 import MaterialOverrideExtension from '../src/extensions/MaterialOverrideExtension';
 import GltfTypes from '../src/types/GltfTypes';
-import BaseMaterial from 'nanogl-pbr/BaseMaterial';
+import BaseMaterial from 'nanogl-pbr/Material';
 import { GLContext } from 'nanogl/types';
 import {createContext, destroyContext} from './glcontext-utils'
 import MeshRenderer from '../src/renderer/MeshRenderer';
