@@ -40,7 +40,7 @@
     "karma-typescript-es6-transform": "^4.1.1",
     "karma-webpack": "^4.0.2",
     "mkdirp": "^1.0.3",
-    "mocha": "^6.2.2",
+    "mocha": "^10.2.0",
     "nanogl-template": "git+ssh://git@github.com/plepers/nanogl-template.git#develop",
     "remove-flow-types-loader": "^1.1.0",
     "replace-ext": "^1.0.0",
