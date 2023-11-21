@@ -6,7 +6,8 @@
     "test": "karma start",
     "build": "tsc && ./build/post-build",
     "player": "webpack-dev-server --config examples/player/webpack.config.js",
-    "models": "node examples/player/make-model-list.js"
+    "models": "node examples/player/make-model-list.js",
+    "docs": "typedoc && del docs/** '!docs/data.json'"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,7 @@
     "@types/expect.js": "^0.3.29",
     "@types/mocha": "^5.2.7",
     "babel-loader": "^8.0.6",
+    "del-cli": "^5.0.0",
     "expect.js": "^0.3.1",
     "glob": "^7.1.6",
     "json-schema-to-typescript": "^8.0.0",
@@ -36,7 +38,7 @@
     "karma-chrome-launcher": "^3.1.0",
     "karma-mocha": "^1.3.0",
     "karma-sauce-launcher": "^2.0.2",
-    "karma-typescript": "^4.1.1",
+    "karma-typescript": "^5.2.0",
     "karma-typescript-es6-transform": "^4.1.1",
     "karma-webpack": "^4.0.2",
     "mkdirp": "^1.0.3",
@@ -45,7 +47,9 @@
     "remove-flow-types-loader": "^1.1.0",
     "replace-ext": "^1.0.0",
     "ts-loader": "^6.2.1",
-    "typescript": "^3.7.4",
+    "typedoc": "^0.23.24",
+    "typedoc-plugin-rename-defaults": "^0.6.4",
+    "typescript": "^4.6.2",
     "webpack": "^4.41.4",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.10.1"

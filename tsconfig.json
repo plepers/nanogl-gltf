@@ -19,5 +19,12 @@
   ],
   "exclude": [
     "node_modules"
-  ]
+  ],
+  "typedocOptions": {
+	  "entryPoints": "src",
+	  "entryPointStrategy": "expand",
+	  "out": "docs",
+	  "json": "docs/data.json",
+	  "githubPages": false
+  }
 }
