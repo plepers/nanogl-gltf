@@ -49,7 +49,11 @@ export default class Texture implements IElement {
     
   }
   
-  
+  /**
+   * Setup the gl.TEXTURE_2D with minFilter, magFilter, wrapS and wrapT, depending on the sampler's options.
+   * This allocates the texture memory and uploads the image data to the GPU so it can be used in a shader.
+   * @param gl GL context
+   */
   async allocateGl( gl : GLContext ) : Promise<void> {
     
     let glFormat = gl.RGB;

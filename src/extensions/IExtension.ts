@@ -38,7 +38,10 @@ export interface IExtensionInstance {
 
 
 
-
+/**
+ * The implementation of an extension factory.
+ * Passing by factories instead of direct instances allow to pass additional parameters to the extension and keep the extension instance simple.
+ */
 export interface IExtensionFactory {
   readonly name : string
   createInstance( gltfLoader : GltfLoader ) : IExtensionInstance
