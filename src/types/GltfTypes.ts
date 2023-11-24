@@ -1,4 +1,7 @@
 
+/**
+ * List of all the types that a gltf file object can contain
+ */
 enum GltfTypes {
   
   ACCESSOR                = 'accessors'            ,

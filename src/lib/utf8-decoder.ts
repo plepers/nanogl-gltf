@@ -123,8 +123,11 @@ function decodeWithFromCharCode(view:Uint8Array)
 }
 
 
-
-
+/**
+ * Decode a buffer encoded as UTF-8
+ * @param view Buffer to decode
+ * @returns Decoded string
+ */
 const Decoder = (typeof TextDecoder !== 'undefined') ? decodeWithTextDecoder : decodeWithFromCharCode;
 // const Decoder =  decodeWithFromCharCode;
 

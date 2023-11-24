@@ -15,14 +15,28 @@ import { GLContext } from 'nanogl/types';
 const GL_REPEAT                         = 0x2901;
 const GL_MIRRORED_REPEAT                = 0x8370;
 
+/**
+ * Check if a minFilter mode needs mipmaps.
+ * Returns false if the minFilter is GL_NEAREST or GL_LINEAR.
+ * @param filter Filtering mode to check
+ */
 export function filterHasMipmap(filter : GLenum) : boolean {
   return (filter & (1 << 8)) === (1 << 8);
 }
 
+/**
+ * Check if a wrap mode requires the texture to be a POT (Power Of Two) texture.
+ * Returns true if the wrap mode is GL_REPEAT or GL_MIRRORED_REPEAT.
+ * @param wrap Wrap mode to check
+ */
 export function wrapRequirePot(wrap : GLenum ) : boolean {
   return wrap === GL_REPEAT || wrap === GL_MIRRORED_REPEAT;
 }
 
+/**
+ * Check if a number is a power of 2, useful for texture resize before GPU upload as GPUs usually prefer POT (Power Of Two) textures.
+ * @param n Number to check
+ */
 export function isPowerOf2(n : number ) : boolean {
   return (n != 0 && (n & (n-1)) === 0);
 }
