@@ -10,24 +10,68 @@ import { IElement } from '../types/Elements';
 
 type ELEMENT_ARRAY_BUFFER = 0x8893 
 type ARRAY_BUFFER = 0x8892
-type ArrayBufferTarget = ELEMENT_ARRAY_BUFFER | ARRAY_BUFFER
 
+/**
+ * Target of a BufferView, either ARRAY_BUFFER / 34962 (indicating that the data should be used for vertex attributes)
+ * or ELEMENT_ARRAY_BUFFER / 34963 (indicating that the data should be used for vertex indices).
+ */
+export type ArrayBufferTarget = ELEMENT_ARRAY_BUFFER | ARRAY_BUFFER
+
+/**
+ * The BufferView element is a view into a Buffer, representing a slice of it,
+ * as a Buffer is often used to contain large quantities of different datas not related to each other.
+ * A BufferView allows to access only a part of a Buffer and to simplify its access.
+ */
 export default class BufferView implements IElement {
 
   readonly gltftype : GltfTypes.BUFFERVIEW = GltfTypes.BUFFERVIEW;
-
   name        : undefined | string;
   extras      : any   ;
   
+  /**
+   * Offset of this BufferView in the associated Buffer, in bytes
+   */
   byteOffset  = 0;
+
+  /**
+   * Length of this BufferView in the associated Buffer, in bytes
+   */
   byteLength  = 0;
+
+  /**
+   * Stride of this BufferView in the associated Buffer, in bytes
+   */
   byteStride  = 0;
+
+  /**
+   * Target of this BufferView, may be used to infer the type of the data,
+   * either 34962 (used for vertex attributes) or 34963 (used for vertex indices).
+   */
   target      = 0;
+
+  /**
+   * Associated Buffer element
+   */
   buffer     : Buffer;
 
+  /**
+   * WebGLBuffer created from the associated BufferView data, used when calling getWebGLBuffer()
+   */
   private glBuffer   : WebGLBuffer = null;
+
+  /**
+   * WebGLBufferTarget stored when calling getWebGLBuffer()
+   */
   private glBufferTarget  = 0;
 
+
+  /**
+   * Parse the BufferView data, load the associated Buffer element and sets the byteOffset, byteLength, byteStride and target attributes.
+   * 
+   * Is async as it needs to wait for the buffer data to be loaded.
+   * @param gltfLoader GLTFLoader to use
+   * @param data Data to parse
+   */
   async parse( gltfLoader:GltfLoader , data:Gltf2.IBufferView ) : Promise<any> {
 
     const {
@@ -46,12 +90,19 @@ export default class BufferView implements IElement {
 
   }
 
-
+  /**
+   * Get the offset of this BufferView in the associated Buffer, in bytes.
+   * Adds the byteOffset of the Buffer if any.
+   */
   getByteOffset():number{
     return this.byteOffset + this.buffer._byteOffset;
   }
 
-
+  /**
+   * Create a WebGLBuffer from the associated BufferView data.
+   * @param gl GL context to create the WebGLBuffer
+   * @param inferedTarget Target to use for the WebGLBuffer
+   */
   getWebGLBuffer( gl:GLContext, inferedTarget : ArrayBufferTarget ) : WebGLBuffer {
 
     if( this.target !== 0 && this.target !== inferedTarget ){
@@ -83,9 +134,4 @@ export default class BufferView implements IElement {
     return this.glBuffer;
   }
 
- 
-
 }
-
- 
-

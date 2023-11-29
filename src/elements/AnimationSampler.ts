@@ -311,23 +311,49 @@ function InterpolatorFactory(sampler:AnimationSampler, path : Gltf2.AnimationCha
 
 
 
-
+/**
+ * A class providing a method to evaluate an AnimationSampler at a given time, using the proper interpolation algorithm.
+ */
 export class SamplerEvaluator {
 
+  /**
+   * AnimationSampler to evaluate
+   */
   sampler: AnimationSampler;
+
+  /**
+   * Number of element to animate (1 for translation, rotation and scale ; number of morph targets for weights)
+   */
   numElements: number;
+
+  /**
+   * Interpolator to use to evaluate the AnimationSampler, with an interpolation algorithm depending on the AnimationSampler interpolation property
+   */
   interpolator: Interpolator;
 
+  /**
+   * @param sampler AnimationSampler to evaluate
+   * @param path Node's property to animate
+   * @param numElements Number of element to animate (1 for translation, rotation and scale ; number of morph targets for weights)
+   */
   constructor( sampler : AnimationSampler, path : Gltf2.AnimationChannelTargetPath, numElements : number ){
     this.sampler = sampler;
     this.numElements = numElements;
     this.interpolator  = InterpolatorFactory( sampler, path, numElements );
   }
 
+  /**
+   * Evaluate the proper value at a given time depending on the interpolation algorithm, and store the result in the out TypedArray
+   * @param out TypedArray to store the result
+   * @param t Time to evaluate
+   */
   evaluate(out:TypedArray, t:number) {
     this.interpolator.evaluate( out, t );
   }
 
+  /**
+   * Create a TypedArray to store the result of the AnimationSampler output Accessor
+   */
   createElementHolder():TypedArray {
     return this.sampler.output.createElementHolderArray( this.numElements );
   }
@@ -335,22 +361,49 @@ export class SamplerEvaluator {
 }
 
 
-
+/**
+ * The AnimationSampler element is used to define the interpolation between keyframes of an AnimationChannel.
+ */
 export default class AnimationSampler implements IElement {
 
   readonly gltftype : GltfTypes.ANIMATION_SAMPLER = GltfTypes.ANIMATION_SAMPLER
-
   name        : undefined | string;
   extras      : any   ;
 
 
+  /**
+   * Interpolation type to use between keyframes. Default to LINEAR
+   */
   interpolation :Gltf2.AnimationSamplerInterpolation ;
+
+  /**
+   * Input Accessor, containing the time values of the keyframes
+   */
   input         :Accessor          ;
+
+  /**
+   * Output Accessor, containing the values of the keyframes
+   */
   output        :Accessor          ;
 
+  /**
+   * Start time of the Animation
+   */
   minTime  = 0;
+
+  /**
+   * End time of the Animation
+   */
   maxTime  = 0;
 
+
+  /**
+   * Parse the AnimationSampler data, load the input and output Accessors, and set the minTime and maxTime with the length of input Accessor.
+   * 
+   * Is async as it needs to wait for the input and output Accessors to be created.
+   * @param gltfLoader GLTFLoader to use
+   * @param data Data to parse
+   */
   async parse( gltfLoader:GltfLoader, data:Gltf2.IAnimationSampler ) : Promise<any> {
 
     this.input  = await gltfLoader.getElement( GltfTypes.ACCESSOR, data.input );
@@ -362,7 +415,11 @@ export default class AnimationSampler implements IElement {
     this.maxTime = this.input.getRawScalar(this.input.count-1);
   }
 
-
+  /**
+   * Create a SamplerEvaluator for this AnimationSampler, with the given path and number of elements.
+   * @param path Node's property to animate
+   * @param numElements Number of element to animate (1 for translation, rotation and scale ; number of morph targets for weights)
+   */
   createEvaluator( path: Gltf2.AnimationChannelTargetPath, numElements : number ):SamplerEvaluator {
     return new SamplerEvaluator( this, path, numElements );
   }

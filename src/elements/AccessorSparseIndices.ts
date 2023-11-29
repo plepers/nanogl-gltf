@@ -5,12 +5,23 @@ import { BaseAccessor, getArrayForDataType } from "./Accessor";
 import Assert from "../lib/assert";
 import { IElement } from "../types/Elements";
 
+
+/**
+ * The AccessorSparseIndices element is an Accessor that contains the indices of the vertices that are sparse.
+ */
 export default class AccessorSparseIndices extends BaseAccessor implements IElement {
 
   readonly gltftype : GltfTypes.ACCESSOR_SPARSE_INDICES = GltfTypes.ACCESSOR_SPARSE_INDICES;
   name        : undefined | string;
   extras      : any   ;
 
+  /**
+   * Parse the AccessorSparseIndices data, load the BufferView element and store only the part that is needed in _array attribute.
+   * 
+   * Is async as it needs to wait for the BufferView to be created.
+   * @param gltfLoader GLTFLoader to use
+   * @param data Data to parse
+   */
   async parse( gltfLoader : GltfLoader, data : Gltf2.IAccessorSparseIndices ) : Promise<any> {
 
     const sparseData : Gltf2.IAccessorSparse = data.elementParent as Gltf2.IAccessorSparse;

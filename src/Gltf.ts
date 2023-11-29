@@ -195,6 +195,7 @@ export default class Gltf {
 
   /**
    * Get the Gltf ready to be used in a WebGL context.
+   * Generally the first method called after loading the Gltf.
    * This will allocate all the needed textures to the GPU, create the renderables, cameras, and initialize buffers for primitives.
    * @param gl GL context
    * @param abortSignal Abort signal if you want to be able to cancel the request at any time
