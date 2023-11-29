@@ -8,21 +8,54 @@ import { IElement } from "../types/Elements";
 import { GLContext } from "nanogl/types";
 import { TypedArray } from "../types/TypedArray";
 
-export default class AccessorSparse implements IElement {
 
+/**
+ * The AccessorSparse element contains the indices and new values of the vertices that are sparse.
+ * A sparse vertex is a vertex that differs from the default value of the Accessor.
+ */
+export default class AccessorSparse implements IElement {
 
   readonly gltftype : GltfTypes.ACCESSOR_SPARSE = GltfTypes.ACCESSOR_SPARSE;
   name        : undefined | string;
   extras      : any   ;
 
+
+  /**
+   * Accessor element, parent of this AccessorSparse
+   */
   accessor:Accessor;
+
+  /**
+   * AccessorSparseIndices element, containing indices of the vertices that are sparse
+   */
   indices :AccessorSparseIndices;
+
+  /**
+   * AccessorSparseValues element, containing new values of the vertices that are sparse
+   */
   values  :AccessorSparseValues;
 
+
+  /**
+   * Set of indices of the vertices that are sparse
+   */
   indicesSet:Set<number>;
+
+  /**
+   * Map of indices of the vertices that are sparse, to the index of the vertex in the sparse data
+   */
   indicesMap:Map<number, number>;
 
   
+  /**
+   * Parse the AccessorSparse data, load the corresponding Accessor, AccessorSparseIndices and AccessorSparseValues elements.
+   * Initialize the indicesSet and indicesMap.
+   * 
+   * Is async as it needs to wait for the Accessor, AccessorSparseIndices and AccessorSparseValues to be created.
+   * @param gltfLoader GLTFLoader to use
+   * @param data Data to parse
+   * @param args Additional arguments, unused here
+   */
   async parse( gltfLoader : GltfLoader, data : Gltf2.IAccessorSparse, ...args : any ) : Promise<any> {
 
     this.accessor = await gltfLoader.getElement( GltfTypes.ACCESSOR, data.elementParent.elementIndex );
@@ -72,8 +105,11 @@ export default class AccessorSparse implements IElement {
   }
   
 
-
-
+  /**
+   * Get the element value at the given index and store it in the given TypedArray
+   * @param out TypedArray to store the value in
+   * @param index Index of the vertex to get
+   */
   getRawValue( out:TypedArray, index: number ){
     const isSparse = this.indicesSet.has( index );
     if( isSparse ){
@@ -98,7 +134,10 @@ export default class AccessorSparse implements IElement {
   //   }
   // }
 
-  
+  /**
+   * Get the raw scalar at the given index
+   * @param index Index of the vertex to get
+   */
   getRawScalar(index:number) : number {
     const isSparse = this.indicesSet.has( index );
     if( isSparse ){
@@ -108,7 +147,5 @@ export default class AccessorSparse implements IElement {
     }
 
   }
-
-
 
 }

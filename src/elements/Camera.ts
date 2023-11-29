@@ -11,28 +11,44 @@ import PerspectiveLens from 'nanogl-camera/perspective-lens';
 import OrthographicLens from 'nanogl-camera/ortho-lens';
 
 
-type ProjectionData = Gltf2.ICameraPerspective | Gltf2.ICameraOrthographic;
+/**
+ * Either a Perspective or Orthographic projection data
+ */
+export type ProjectionData = Gltf2.ICameraPerspective | Gltf2.ICameraOrthographic;
 
 
-
+/**
+ * The Camera element only contains a perspective or orthographic lens object, used to render the scene.
+ */
 export default class Camera implements IElement {
 
-  
   readonly gltftype : GltfTypes.CAMERA = GltfTypes.CAMERA;
-
   name        : undefined | string;
   extras      : any   ;
   
+  /**
+   * Type of the camera, either perspective or orthographic
+   */
   type : Gltf2.CameraType;
+
+  /**
+   * Either a Perspective or Orthographic projection data
+   */
   projectionData : ProjectionData;
 
+  /**
+   * nanogl-camera lens object, either a PerspectiveLens or OrthographicLens
+   */
   lens : ICameraLens;
 
+  /**
+   * Parse the Camera data, create the nanogl-camera lens object
+   * @param gltfLoader GLTFLoader to use, unused here
+   * @param data Data to parse
+   */
   parse( gltfLoader:GltfLoader, data: Gltf2.ICamera ) : Promise<any>{
 
-
     this.type = data.type;
-  
 
     switch( this.type ){
       
@@ -53,10 +69,12 @@ export default class Camera implements IElement {
 
     return Promise.resolve();
 
-
   }
 
- 
+  /**
+   * Create a PerspectiveLens from the glTF data
+   * @param data Data coming from the glTF file, containing the perspective data
+   */
   createPerpective( data : Gltf2.ICameraPerspective ) : ICameraLens {
     const lens = new PerspectiveLens();
     lens.near = data.znear
@@ -66,6 +84,10 @@ export default class Camera implements IElement {
     return lens;
   }
 
+  /**
+   * Create an OrthographicLens from the glTF data
+   * @param data Data coming from the glTF file, containing the orthographic data
+   */
   createOrtho( data : Gltf2.ICameraOrthographic ){
     const lens = new OrthographicLens();
     lens.near = data.znear
@@ -77,25 +99,4 @@ export default class Camera implements IElement {
     return lens;
   }
   
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

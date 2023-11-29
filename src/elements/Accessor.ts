@@ -14,6 +14,9 @@ import { TypedArrayConstructor, TypedArray } from '../types/TypedArray';
 type normalizeFunc = (n:number)=>number;
 
 
+/**
+ * GLSL name for Accessor types
+ */
 export enum AccessorGlslType {
   float = "float",
   vec2  = "vec2",
@@ -48,7 +51,10 @@ function getNormalizeFunction( t:Gltf2.AccessorComponentType ) : normalizeFunc
   }
 }
 
-
+/**
+ * Get the TypedArray constructor for the given component type
+ * @param t Component type
+ */
 export function getArrayForDataType( t:Gltf2.AccessorComponentType ) : TypedArrayConstructor
 {
   switch (t) {
@@ -96,52 +102,107 @@ function getGlslTypeForComponentType( t:Gltf2.AccessorType )
 }  
 
 
-
+/**
+ * Base type for Accessor, AccessorSparseIndices and AccessorSparseValues data
+ */
 export type BaseAccessorData = Gltf2.IAccessor | Gltf2.IAccessorSparseIndices | Gltf2.IAccessorSparseValues;
 
+
+/**
+ * Base class for Accessor, AccessorSparseIndices and AccessorSparseValues, as they share a lot of attributes and methods and only differ in the way they are parsed.
+ */
 export class BaseAccessor {
 
-  normalized           = false;
   /**
-   * bytes offset in the BufferView
+   * Whether the Element to hold is normalized or not
+   */
+  normalized           = false;
+
+  /**
+   * Bytes offset in the BufferView
    */
   byteOffset            = 0;
+
   /**
-   * number of elements 
+   * Number of elements in the BufferView
    */
   count                 = 0;
 
   /**
-   * stride in bytes between values
+   * Stride in bytes between values, if different values are interleaved in the BufferView
    */
   _stride               = 0;
 
   /**
-   * stride in elements between values
+   * Stride in elements count between values, if different values are interleaved in the BufferView
    */
   _strideElem           = 0;
 
+
+  /**
+   * Type of each value in this Accessor's BufferView (UNSIGNED_BYTE, FLOAT, ...)
+   */
   componentType  : Gltf2.AccessorComponentType        ;
+
+  /**
+   * Type of each element in this Accessor (SCALAR, VEC3, ...)
+   */
   type           : Gltf2.AccessorType        ;
+
+  /**
+   * Maximum value of each element in this Accessor
+   */
   max          ? : number[]    ;
+
+  /**
+   * Minimum value of each element in this Accessor
+   */
   min          ? : number[]    ;
+
+  /**
+   * BufferView element containing the data
+   */
   bufferView     : BufferView   ;
+
+  /**
+   * Empty TypedArray used to store the value of a normalized element when calling getValue()
+   */
   _valueHolder   : TypedArray   ;
+
+  /**
+   * TypedArray containing the data, the slice of BufferView that is needed
+   */
   _array         : TypedArray   ;
+
+  /**
+   * Function to normalize the data, based on the componentType
+   */
   _normalizeFunc : normalizeFunc;
+
+  /**
+   * Sparse element containing the sparse data, if any
+   */
   sparse         : AccessorSparse|null  ;
 
 
 
-
+  /**
+   * Number of components for this accessor type (1 for SCALAR, 3 for VEC3, 16 for MAT4, ...).
+   */
   get numComps(){
     return getSizeForComponentType(this.type);
   }
 
+  /**
+   * Number of bytes for each element in this accessor, based on the componentType.
+   */
   get bytesPerElem(){
     return getBytesLengthForDataType(this.componentType);
   }
 
+  /**
+   * GLSL type for this accessor, based on the accessor type.
+   */
   get glslType() : AccessorGlslType {
     return getGlslTypeForComponentType( this.type );
   }
@@ -157,9 +218,10 @@ export class BaseAccessor {
   }
 
 
-  
   /**
-   * 
+   * Create an empty TypedArray for this accessor, to hold 1 element. Will be a Float32Array if normalized.
+   * Useful when we need to create an array but we don't have the data yet.
+   * @param normalized Whether the Element to hold is normalized or not. Default to this.normalized.
    */
   createElementHolder(normalized : boolean = this.normalized) : TypedArray{
     if( normalized ) 
@@ -168,9 +230,11 @@ export class BaseAccessor {
       return new (getArrayForDataType(this.componentType))(this.numComps);
   }
 
-  
   /**
-   * @return {TypedArray} 
+   * Create an empty TypedArray of a certain size for this accessor, to hold multiple elements. Will be a Float32Array if normalized.
+   * Useful when we need to create an array but we don't have the data yet.
+   * @param size Size of the array to create
+   * @param normalized Whether the Element to hold is normalized or not. Default to this.normalized.
    */
   createElementHolderArray( size : number, normalized : boolean = this.normalized) : TypedArray{
     if( normalized ) 
@@ -180,12 +244,10 @@ export class BaseAccessor {
   }
 
 
-
-
   /**
    * Copy accessor value at the given index to output array
-   * @param {number} index 
-   * @param {boolean} normalized 
+   * @param index Index of the value to copy
+   * @param normalized Whether the value should be normalized or not before returning it
    */
   getScalar( index :number, normalized : boolean = this.normalized ):number{
     
@@ -207,7 +269,7 @@ export class BaseAccessor {
 
   /**
    * Copy accessor value at the given index to output array. Skip sparse resolve
-   * @param {number} index 
+   * @param index Index of the value to copy
    */
   getRawScalar( index:number ):number{
     const offset = this._strideElem * index;
@@ -217,10 +279,10 @@ export class BaseAccessor {
 
 
   /**
-   * Copy accessor value at the given index to output array
-   * @param {TypedArray} out output value
-   * @param {number} index 
-   * @param {boolean} normalized 
+   * Copy accessor value of a whole element at the given index to output array (for example, if it's a VEC3, copy 3 values)
+   * @param out TypedArray to store the value in
+   * @param index Index of the value to get
+   * @param normalized Whether the value should be normalized or not before returning it
    */
   getValue( out:TypedArray, index:number, normalized:boolean = this.normalized ){
 
@@ -238,6 +300,12 @@ export class BaseAccessor {
 
   }
 
+  /**
+   * Copy multiple elements of the accessor to the output array
+   * @param out TypedArray to store the values in
+   * @param index Index of the first value to get
+   * @param size Number of values to get
+   */
   getValues( out:TypedArray, index:number, size : number ){
 
     if( this.sparse !== null ){
@@ -254,6 +322,11 @@ export class BaseAccessor {
 
   }
 
+  /**
+   * Copy accessor value of a whole element at the given index to output array (for example, if it's a VEC3, copy 3 values). Skip sparse resolve
+   * @param out TypedArray to store the value in
+   * @param index Index of the value to get
+   */
   getRawValue( out:TypedArray, index:number ){
     const offset = this._strideElem * index;
     const ncomps = this.numComps;
@@ -262,6 +335,12 @@ export class BaseAccessor {
     }
   }
 
+  /**
+   * Copy multiple elements of the accessor to the output array. Skip sparse resolve
+   * @param out TypedArray to store the values in
+   * @param index Index of the first value to get
+   * @param size Number of values to get
+   */
   getRawValues( out:TypedArray, index:number, size : number ){
     const ncomps = this.numComps;
     for (let k = 0; k < size; k++) {
@@ -274,6 +353,11 @@ export class BaseAccessor {
   }
 
 
+  /**
+   * Normalize the given raw value and store it in out
+   * @param out TypedArray to store the value in
+   * @param raw TypedArray to normalize
+   */
   _normalize( out:TypedArray, raw:TypedArray ){
     const fn = this._normalizeFunc;
     const ncomps = this.numComps;
@@ -285,15 +369,24 @@ export class BaseAccessor {
 }
 
 
-
+/**
+ * The Accessor element refers to a BufferView and describe the layout of data in it (type, length, max, min, ...).
+ */
 export default class Accessor extends BaseAccessor implements IElement {
 
   readonly gltftype : GltfTypes.ACCESSOR = GltfTypes.ACCESSOR;
   name        : undefined | string;
   extras      : any   ;
 
+  /**
+   * Parse the Accessor data, load the BufferView element and store only the part that is needed in _array attribute.
+   * If the Accessor contains sparse data, load the Sparse element and store it in sparse attribute.
+   * 
+   * Is async as it needs to wait for the BufferView to be created, if needed.
+   * @param gltfLoader GLTFLoader to use
+   * @param data Data to parse
+   */
   async parse( gltfLoader:GltfLoader, data:Gltf2.IAccessor ) : Promise<any>{
-
       
     const { 
       byteOffset  = 0,
@@ -308,8 +401,6 @@ export default class Accessor extends BaseAccessor implements IElement {
     this.type           = data.type;
     this.max            = data.max;
     this.min            = data.min;
-    
-    
     
     
     if( data.bufferView !== undefined ){

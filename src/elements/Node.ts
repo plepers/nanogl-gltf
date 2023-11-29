@@ -12,22 +12,49 @@ import { IElement } from '../types/Elements';
 import Gltf from '../Gltf';
 
 
-
+/**
+ * The Node element is a node in the scene graph, it contains a transformation matrix or a translation/scale vectors & scale quaternion, and can be used to control a camera, a skin, a mesh, or children nodes.
+ */
 export default class Node extends NGLNode implements IElement {
 
-
   readonly gltftype : GltfTypes.NODE = GltfTypes.NODE;
-
   name        : undefined | string;
   extras      : any   ;
 
+  /**
+   * If the node is used to control a camera, this is the Camera element
+   */
   camera?     : Camera;
+
+  /**
+   * If the node is used to control a skin, this is the Skin element
+   */
   skin?       : Skin;
+
+  /**
+   * If the node is used to control a mesh, this is the Mesh element
+   */
   mesh?       : Mesh;
+
+  /**
+   * If the node is used to control a mesh with morph targets, this is the weights array
+   */
   weights?    : Float32Array = null;
 
+  /**
+   * If the node is used to control a mesh, this is the MeshRenderer element, used to render the mesh
+   */
   renderable? : MeshRenderer;
 
+
+  /**
+   * Parse the Node data, apply the transformation matrix or the translation/scale vectors & scale quaternion,
+   * link the camera, skin and mesh elements and weights array if needed, and add children nodes to this node.
+   * 
+   * Is async as it needs to wait for all possible Camera, Skin, Mesh and children Nodes elements to be created.
+   * @param gltfLoader GLTFLoader to use
+   * @param data Data to parse
+   */
   async parse( gltfLoader:GltfLoader, data: Gltf2.INode ){
     // super.parse();
     // this.uuid         = data.uuid;
@@ -88,6 +115,12 @@ export default class Node extends NGLNode implements IElement {
     
   }
 
+  /**
+   * Find a child Node by name.
+   * 
+   * It will search only at the first level of children, not recursively. If you want to search recursively, use findDescendant.
+   * @param name Name of the child Node to find
+   */
   findChild( name : string ) : Node|undefined {
     for (let i = 0; i < this._children.length; i++) {
       const child = this._children[i] as Node;
@@ -96,6 +129,12 @@ export default class Node extends NGLNode implements IElement {
     return undefined;
   }
   
+  /**
+   * Find a descendant Node by name.
+   * 
+   * It will search recursively in all levels of the children nodes.
+   * @param name Name of the descendant Node to find
+   */
   findDescendant( name : string ) : Node|undefined {
     let res = this.findChild( name );
     if( res === undefined ){
@@ -108,6 +147,10 @@ export default class Node extends NGLNode implements IElement {
     return res;
   }
   
+  /**
+   * If the Node has a Mesh, creates a MeshRenderer and stores it to the renderable attribute, getting the Node ready to be rendered.
+   * @param gltf The Gltf object which this Node belongs to
+   */
   allocateGl( gltf : Gltf ) : void {
     
     if( this.mesh ){
@@ -116,9 +159,4 @@ export default class Node extends NGLNode implements IElement {
     
   }
 
- 
-  
-
 }
-
-
