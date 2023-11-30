@@ -70,7 +70,7 @@ export default class PbrMetallicRoughness {
 
   /**
    * Setup the PbrMetallicRoughness data on a nanogl-pbr StandardPass by attaching baseColor
-   * and metallicRoughness textures with samplers and their strength factors.
+   * and metallicRoughness textures with samplers and their strength factors. It uses a nanogl-pbr MetalnessSurface.
    * @param pass Pass to setup
    */
   setupPass( pass : StandardPass ){

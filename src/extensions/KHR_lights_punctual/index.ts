@@ -67,15 +67,28 @@ interface IKHR_LP_LightInstance {
   };
 }
 
-interface LightItemCollection {
+/**
+ * Interface representing a light with its name and index in a list
+ */
+export interface LightItemCollection {
   name: string;
   index: number; 
 } 
 
+
+/**
+ * Class to manage a collection of lights
+ */
 export class LightCollection{
 
+  /**
+   * List of lights
+   */
   list: Light[];
 
+  /**
+   * List of lights with their name and index in the list
+   */
   _items: Array<LightItemCollection>;
   
   constructor(){
@@ -83,6 +96,11 @@ export class LightCollection{
     this._items = [];
   }
 
+  /**
+   * Add a light to the collection
+   * @param light Light to add
+   * @param name Light's name
+   */
   addLight(light : Light, name : string = undefined ){
 
     this.list.push(light);
@@ -90,6 +108,10 @@ export class LightCollection{
     
   }
 
+  /**
+   * Get a light from this collection by its name
+   * @param name Light's name to get
+   */
   getLightByName(name : string) : Light {
     let out : Light;
     for(let i = 0; i < this._items.length; i++){
@@ -101,6 +123,10 @@ export class LightCollection{
     return out;
   }
 
+  /**
+   * Get a list of lights from this collection by their name
+   * @param name Lights' name to get
+   */
   getLightsByName(name : string) : Array<Light> {
     const out : Array<Light> = []
     for(let i = 0; i < this._items.length; i++){
@@ -206,7 +232,12 @@ class Instance implements IExtensionInstance {
 }
 
 
-export default class KHR_texture_transform implements IExtensionFactory {
+/**
+ * This extension allows to define in a glTF file a set of lights that can be used by the scene.
+ * The 3 possible types of lights (directional, spot and point) will be created as nanogl-pbr DirectionalLight,
+ * SpotLight and PointLight, and added to the Node they are linked to.
+ */
+export default class KHR_lights_punctual implements IExtensionFactory {
   readonly name: string = EXT_ID;
   createInstance(gltfLoader: GltfLoader): IExtensionInstance {
     return new Instance(gltfLoader);

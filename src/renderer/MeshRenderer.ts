@@ -27,24 +27,43 @@ function assertSemanticCanBeMorphed( s : string ) : asserts s is MorphAttributeN
 
 
 
-
+/**
+ * A MeshRenderer is a renderable object that contains a mesh and its rendering properties.
+ */
 export default class MeshRenderer {
 
-  
+  /**
+   * The node that contains the mesh
+   */
   readonly node: Node;
+
+  /**
+   * The mesh to render
+   */
   readonly mesh: Mesh;
 
   private _skinDeformers = new Map<Primitive, SkinDeformer>();
   private _morphDeformers = new Map<Primitive, MorphDeformer>();
   
+  /**
+   * All the materials used by this Mesh's primitives
+   */
   materials : Material[] = []
   
+  /**
+   * Custom GLConfig to use when rendering this mesh
+   */
   glconfig? : GLConfig;
 
+  /**
+   * The bounds of this mesh
+   */
   readonly bounds : Bounds = new Bounds();
 
-
-  
+  /**
+   * @param gtlf GLTF file where this mesh comes from
+   * @param node Node that contains this mesh
+   */  
   constructor( gtlf : Gltf, node: Node) {
     Assert.isDefined( node.mesh );
     this.node = node;
@@ -53,11 +72,12 @@ export default class MeshRenderer {
     this.setupMaterials( gtlf );
     this.computeBounds();
   }
-  
+
+
+  // TODO: if no deformer, a single material instance can be shared between renderers
   /**
-   * for each primitives, create a material based on primitive's material pass
-   * if skin or morph target are present, deformers are set on the created material
-   * TODO: if no deformer, a single material instance can be shared between renderers
+   * For each primitives, create a material based on primitive's material pass.
+   * If skin or morph targets are present, deformers are set on the created material.
    */
   setupMaterials(gtlf : Gltf) {
     for (const primitive of this.mesh.primitives ) {
@@ -68,11 +88,21 @@ export default class MeshRenderer {
 
   }
 
+  /**
+   * Configure the SkinDeformers and MorphDeformers on the material, if the node has skinning or the primitive has morph targets.
+   * @param material Material to configure
+   * @param primitive Primitive to get the skinning data and morph targets from
+   */
   configureDeformers(material: Material, primitive: Primitive) {
     this.configureSkin ( material, primitive );
     this.configureMorph( material, primitive );
   }
 
+  /**
+   * If the primitive has morph targets, create a nanogl-pbr MorphDeformer and add it to the material.
+   * @param material Material on which the MorphDeformer will be added
+   * @param primitive Primitive to get the morph targets from
+   */
   configureMorph(material: Material, primitive: Primitive) {
 
     if( primitive.targets !== null ){
@@ -110,6 +140,11 @@ export default class MeshRenderer {
     
   
   }
+
+  /**
+   * Get the morph weights from the node or the mesh and set them on the nanogl-pbr MorphDeformer.
+   * @param morph MorphDeformer to set the weights on
+   */
   setupMorphWeights( morph:MorphDeformer) {
     if( this.node.weights ){
       morph.weights = this.node.weights 
@@ -118,6 +153,11 @@ export default class MeshRenderer {
     }
   }
 
+  /**
+   * If the node has skinning, create a nanogl-pbr SkinDeformer and add it to the material.
+   * @param material Material on which the SkinDeformer will be added
+   * @param primitive Primitive to get the skinning data from (joints and weights)
+   */
   configureSkin(material: Material, primitive: Primitive) {
     
     if( this.node.skin ){
@@ -164,6 +204,9 @@ export default class MeshRenderer {
     
   }
 
+  /**
+   * Compute the bounds of the mesh by merging the bounds of all its primitives.
+   */
   computeBounds() {
     this.bounds.copyFrom( this.mesh.primitives[0].bounds )
     for (const primitive of this.mesh.primitives ) {
@@ -172,7 +215,14 @@ export default class MeshRenderer {
   }
 
   
-
+  /**
+   * Render the mesh.
+   * @param gl GLContext to use for rendering
+   * @param camera Camera from which the mesh will be rendered
+   * @param mask Render mask to use (Opaque, Blended, ...)
+   * @param passId ID of the current rendering pass (Color, Depth, ...)
+   * @param glconfig Custom GLConfig to use for rendering
+   */
   render( gl:GLContext, camera:Camera, mask:number, passId : string,  glconfig?:GLConfig ) : void {
 
     
@@ -231,11 +281,17 @@ export default class MeshRenderer {
   }
 
 
+  /**
+   * Draw a primitive with a program.
+   * Low-level function, binding the Primitive's VAO before rendering, and unbinding it after.
+   * @param camera Camera to use for rendering, unused here
+   * @param prg Program to bind for rendering
+   * @param sub Primitive to render
+   */
   drawCall( camera:Camera, prg:Program, sub:Primitive ) {
     sub.bindVao( prg );
     sub.render();
     sub.unbindVao();
   }
-
 
 }

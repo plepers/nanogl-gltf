@@ -33,7 +33,7 @@ export class ExtensionList {
   }
 
   /**
-   * Sort extensions _list by priority
+   * Sort extensions _list by priority, highest priority first
    */
   sort(){
     this._list.sort( (a,b)=>b.priority-a.priority );
@@ -101,8 +101,6 @@ class ExtensionsRegistry {
     }
 
     res.sort();
-    
-
     
   }
 

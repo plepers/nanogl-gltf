@@ -8,8 +8,8 @@ import GltfTypes from '../types/GltfTypes';
 import { IElement } from '../types/Elements';
 
 
-type ELEMENT_ARRAY_BUFFER = 0x8893 
-type ARRAY_BUFFER = 0x8892
+export type ELEMENT_ARRAY_BUFFER = 0x8893 
+export type ARRAY_BUFFER = 0x8892
 
 /**
  * Target of a BufferView, either ARRAY_BUFFER / 34962 (indicating that the data should be used for vertex attributes)

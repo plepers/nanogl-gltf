@@ -7,10 +7,6 @@ import Image from "../../elements/Image";
 import CompressedImage from "./CompressedImage";
 import TextureLoader from "./TextureLoader";
 
-/**
- * Load ktx textures into image
- * Resolve the compressed supported type
- */
 
 const EXT_ID = 'MMP_compressed_texture';
 
@@ -53,6 +49,10 @@ class Instance implements IExtensionInstance {
 }
 
 
+/**
+ * Load ktx textures into image.
+ * Resolve the compressed supported type
+ */
 export default class MMP_compressed_texture implements IExtensionFactory {
   readonly name: string = EXT_ID;
   createInstance(gltfLoader: GltfLoader): IExtensionInstance {

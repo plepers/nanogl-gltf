@@ -32,11 +32,29 @@ function pickExtension(gl: GLContext, array: string[]) {
 }
 
 
+/**
+ * This class is used to load compressed textures, and is Codec-specific (DXT, PVR, ETC)
+ */
 export class TextureCodec {
 
+  /**
+   * Parser used to parse the compressed texture
+   */
   parser: KTXParser;
+
+  /**
+   * Suffix of the compressed texture (ex: .dxt.ktx)
+   */
   suffix: string;
+
+  /**
+   * Is the texture compressed
+   */
   compressed: boolean;
+
+  /**
+   * Browser extension needed to load the texture (ex: WEBGL_compressed_texture_s3tc for DXT texture, or mozilla/webkit equivalent)
+   */
   ext: GLenum;
 
   constructor(parser: KTXParser, compressed: boolean, suffix: string, extension: number) {
@@ -49,12 +67,17 @@ export class TextureCodec {
 
   }
 
-
+  /**
+   * Transform the path of the texture to load to add the suffix
+   * @param basePath Path of the texture to load
+   */
   transformPath = (basePath: string) => {
     return basePath + this.suffix;
   }
 
-
+  /**
+   * Check if the browser supports the extension needed to load the texture
+   */
   isSupported() {
     return !!this.ext || (!this.compressed);
   }
@@ -62,12 +85,26 @@ export class TextureCodec {
 }
 
 
+/**
+ * Class used to load compressed KTX textures (DXT, PVR, ETC)
+ */
 export default class TextureLoader {
 
-
+  /**
+   * Codec for DXT textures
+   */
   DXTCodec: TextureCodec
+
+  /**
+   * Codec for PVR textures
+   */
   PVRCodec: TextureCodec
+
+  /**
+   * Codec for ETC textures
+   */
   ETCCodec: TextureCodec
+
   // TODO
   // ASTCCodec: TextureCodec
 
@@ -96,6 +133,9 @@ export default class TextureLoader {
 
   }
 
+  /**
+   * Check if the browser supports any of the compressed texture formats
+   */
   hasCodec() {
 
     return this.DXTCodec.isSupported() ||
@@ -104,6 +144,10 @@ export default class TextureLoader {
 
   }
 
+  /**
+   * Get the codec that is supported by the browser
+   * Test order is DXT, then PVR, finally ETC
+   */
   getCodec() {
 
     // TODO
@@ -122,6 +166,5 @@ export default class TextureLoader {
     }
 
   }
-
 
 }
