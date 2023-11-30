@@ -7,7 +7,7 @@ import GltfTypes from '../types/GltfTypes';
 import { IElement } from '../types/Elements';
 import { TypedArray } from '../types/TypedArray';
 
-type applyFunc = (node:Node, value:TypedArray)=>void
+export type applyFunc = (node:Node, value:TypedArray)=>void
 
 
 

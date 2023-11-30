@@ -30,7 +30,7 @@ const defaultMaterialData : Gltf2.IMaterial = {
 }
 
 
-class PendingElement {
+export class PendingElement {
 
   readonly data : Gltf2.IProperty;
   readonly promise : Promise<AnyElement>
@@ -39,8 +39,6 @@ class PendingElement {
     this.data = data;
     this.promise = element;
   }
-
-  
 
 }
 

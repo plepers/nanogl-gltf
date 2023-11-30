@@ -164,9 +164,17 @@ class Instance implements IExtensionInstance {
 
 }
 
+
+/**
+ * This extension allows Textures to use the basisu format and Images to have an uri with a .ktx2 extension.
+ * This format is useful to reduce texture size and memory usage.
+ */
 export default class KHR_texture_basisu implements IExtensionFactory {
   readonly name: string = EXT_ID;
   
+  /**
+   * @param decoder The decoder to use to decode the basis file
+   */
   constructor( readonly decoder: IBasisDecoder ){
   }
 

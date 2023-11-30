@@ -9,6 +9,10 @@ function CheckMagic(f: Uint8Array) {
   return true;
 }
 
+
+/**
+ * Definition of a texture as parsed from a KTX file
+ */
 export default interface TextureDefinition{
 
   width: number
@@ -20,9 +24,15 @@ export default interface TextureDefinition{
 }
 
 
+/**
+ * Helper class to parse KTX files
+ */
 export default class Parser {
 
-
+  /**
+   * Parse a KTX file
+   * @param source The KTX file as an ArrayBuffer
+   */
   parse = (source: ArrayBuffer) => {
 
     const magic = new Uint8Array(source, 0, 12);

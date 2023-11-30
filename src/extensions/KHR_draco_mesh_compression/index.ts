@@ -71,9 +71,19 @@ class Instance implements IExtensionInstance {
 
 }
 
+
+
+/**
+ * This extension allows to use Draco compressed Mesh.
+ * It replaces the Mesh's primitives with DracoPrimitives, that acts exactly the same but are loaded from Draco compressed data.
+ * Draco compression can be useful to reduce loading time and memory usage.
+ */
 export default class KHR_draco_mesh_compression implements IExtensionFactory {
   readonly name: string = EXT_ID;
 
+  /**
+   * DracoDecoder, to decode draco compressed data
+   */
   static dracoDecoder : any = new DracoDecoder( {
     wasmUrl   : 'https://www.gstatic.com/draco/v1/decoders/draco_decoder_gltf.wasm',
     moduleUrl : 'https://www.gstatic.com/draco/v1/decoders/draco_decoder_gltf.js',

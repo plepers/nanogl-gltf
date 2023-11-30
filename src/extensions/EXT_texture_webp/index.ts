@@ -47,7 +47,12 @@ class Instance implements IExtensionInstance {
 }
 
 
-export default class KHR_texture_transform implements IExtensionFactory {
+/**
+ * This extension allows texture to use webp format for images, for browsers that support it.
+ * It replaces the Texture's PNG/JPEG source Image with the webp source Image.
+ * If the browser does not support webp, this extension will do nothing.
+ */
+export default class EXT_texture_webp implements IExtensionFactory {
   readonly name: string = EXT_ID;
   createInstance(gltfLoader: GltfLoader): IExtensionInstance {
     return new Instance(gltfLoader);

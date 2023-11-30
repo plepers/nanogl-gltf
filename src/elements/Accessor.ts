@@ -11,7 +11,7 @@ import { TypedArrayConstructor, TypedArray } from '../types/TypedArray';
 
 
 
-type normalizeFunc = (n:number)=>number;
+export type normalizeFunc = (n:number)=>number;
 
 
 /**

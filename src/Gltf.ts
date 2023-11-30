@@ -151,7 +151,15 @@ export default class Gltf {
    */
   gl: GLContext
   renderables: MeshRenderer[];
+
+  /**
+   * Array of all cameras of this Gltf, created as Camera from nanogl-camera
+   */
   cameraInstances: NanoCamera[]
+
+  /**
+   * Depth pass of this Gltf
+   */
   depthPass : DepthPass
 
   /**
@@ -196,7 +204,8 @@ export default class Gltf {
   /**
    * Get the Gltf ready to be used in a WebGL context.
    * Generally the first method called after loading the Gltf.
-   * This will allocate all the needed textures to the GPU, create the renderables, cameras, and initialize buffers for primitives.
+   * This will allocate all the needed textures to the GPU, create the renderables, cameras, initialize buffers for primitives,
+   * and create Cameras from nanogl-camera.
    * @param gl GL context
    * @param abortSignal Abort signal if you want to be able to cancel the request at any time
    */
@@ -232,7 +241,10 @@ export default class Gltf {
   }
 
 
-
+  /**
+   * Filter all gltf Nodes to get only the ones that are cameras, and create a Camera from nanogl-camera for each of them,
+   * added as child of the Node, storing them in cameraInstances
+   */
   createCameras() {
     this.cameraInstances = this.nodes
       .filter( n=>n.camera!==undefined )
@@ -243,7 +255,6 @@ export default class Gltf {
        } )
       
   }
-
 
 
   get buffers    (): Buffer    [] {return this._getCollection(GltfTypes.BUFFER    ).list;}
