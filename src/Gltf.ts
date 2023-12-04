@@ -150,6 +150,10 @@ export default class Gltf {
    * GL context of this Gltf
    */
   gl: GLContext
+
+  /**
+   * Array of all renderables of this Gltf, created as MeshRenderer
+   */
   renderables: MeshRenderer[];
 
   /**
