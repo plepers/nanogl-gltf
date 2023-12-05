@@ -11,19 +11,41 @@ import { IElement } from '../types/Elements';
 
 const M4 = mat4.create()
 
+
+/**
+ * The Skin element contains the joints nodes and inverse bind matrices used to animate a mesh.
+ */
 export default class Skin implements IElement {
 
   readonly gltftype: GltfTypes.SKIN = GltfTypes.SKIN;
-
   name: undefined | string;
   extras: any;
 
+
+  /**
+   * Array of inverse bind matrices, one for each joint
+   */
   inverseBindMatrices: mat4[];
+
+  /**
+   * Root node of the skeleton
+   */
   skeletonRoot: Node;
+
+  /**
+   * Array of all joints nodes
+   */
   joints: Node[];
 
 
-
+  /**
+   * Parse the Skin data.
+   * 
+   * Is async as it needs to wait for all the skeleton root and joints Nodes,
+   * and the possible inverseBindMatrices Accessor to be created.
+   * @param gltfLoader GLTFLoader to use
+   * @param data Data to parse
+   */
   async parse(gltfLoader: GltfLoader, data: Gltf2.ISkin) {
 
     const jointPromises = data.joints.map(idx => gltfLoader.getElement(GltfTypes.NODE, idx))
@@ -42,7 +64,11 @@ export default class Skin implements IElement {
 
   }
 
-
+  /**
+   * Compute the joints matrices, used to animate the skin.
+   * @param skinnedNode Skinned node to compute the joints matrices for
+   * @param jointMatrices Joints matrices to compute
+   */
   computeJoints(skinnedNode: Node, jointMatrices: mat4[]) {
     if (jointMatrices.length !== this.joints.length) {
       throw new Error("Skin.computeJoints(), jointMatrices size must match joints size")
@@ -60,4 +86,3 @@ export default class Skin implements IElement {
   }
 
 }
-

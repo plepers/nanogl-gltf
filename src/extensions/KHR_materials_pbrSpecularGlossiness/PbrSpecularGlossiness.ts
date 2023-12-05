@@ -15,41 +15,80 @@ import   GltfTypes     from '../../types/GltfTypes'      ;
 import { ColorSpace } from 'nanogl-pbr/ColorSpace';
 
 
+/**
+ * Data interface for PbrSpecularGlossiness
+ */
 export interface IMaterialPbrSpecularGlossiness {
+
   /**
    * The reflected diffuse factor of the material.
    */
   diffuseFactor?: number[]
+
   /**
    * The diffuse texture.
    */
   diffuseTexture?: Gltf2.ITextureInfo
+
   /**
    * The specular RGB color of the material.
    */
   specularFactor?: number[]
+
   /**
    * The glossiness or smoothness of the material.
    */
   glossinessFactor?: number
+
   /**
    * The specular-glossiness texture.
    */
   specularGlossinessTexture?: Gltf2.ITextureInfo
+
 }
 
 
+
+/**
+ * The PbrSpecularGlossiness element contains the base properties for a PBR material, using the specular-glossiness workflow.
+ */
 export default class PbrSpecularGlossiness {
 
 
+  /**
+   * The reflected diffuse factor of the material. Default to [1, 1, 1, 1]
+   */
   diffuseFactor              : vec4       ;
+
+  /**
+   * The specular RGB color of the material. Default to [1, 1, 1]
+   */
   specularFactor             : vec3       ;
+
+  /**
+   * The glossiness or smoothness of the material. Default to 1
+   */
   glossinessFactor           : number     ;
+
+  /**
+   * The diffuse TextureInfo.
+   */
   diffuseTexture           ? : TextureInfo;
+
+  /**
+   * The specular-glossiness TextureInfo.
+   */
   specularGlossinessTexture? : TextureInfo;
   
 
 
+  /**
+   * Parse the PbrSpecularGlossiness data, filling the class properties.
+   * 
+   * Is async as it may need to wait for diffuseTexture and specularGlossinessTexture to be loaded.
+   * @param gltfLoader GLTFLoader to use
+   * @param data Data to parse
+   */
   async parse( gltfLoader:GltfLoader, data: IMaterialPbrSpecularGlossiness ) : Promise<any>{
 
     this.diffuseFactor = <vec4> new Float32Array(data.diffuseFactor || [1,1,1,1]);
@@ -68,6 +107,12 @@ export default class PbrSpecularGlossiness {
 
   }
 
+
+  /**
+   * Setup the PbrSpecularGlossiness data on a nanogl-pbr StandardPass by attaching diffuse (on surface.baseColor)
+   * and specularGlossiness textures with samplers and their strength factors. It uses a nanogl-pbr SpecularSurface.
+   * @param pass Pass to setup
+   */
   setupPass( pass : StandardPass ){
 
     const surface = new SpecularSurface() 

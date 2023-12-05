@@ -43,7 +43,12 @@ class Instance implements IExtensionInstance {
 }
 
 
-export default class KHR_texture_transform implements IExtensionFactory {
+/**
+ * This extension defines an unlint shading model for use in glTF 2.0 materials, as an alternative to PBR shading.
+ * The Unlit material is a constantly shaded surface that is independent of lighting.
+ * It could be useful for performance issues or for a cartoonish look.
+ */
+export default class KHR_materials_unlit implements IExtensionFactory {
   readonly name: string = EXT_ID;
   createInstance(gltfLoader: GltfLoader): IExtensionInstance {
     return new Instance(gltfLoader);

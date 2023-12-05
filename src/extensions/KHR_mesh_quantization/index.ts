@@ -24,7 +24,10 @@ class Instance implements IExtensionInstance {
 }
 
 
-export default class KHR_texture_transform implements IExtensionFactory {
+/**
+ * This extension currently do nothing.
+ */
+export default class KHR_mesh_quantization implements IExtensionFactory {
   readonly name: string = EXT_ID;
   createInstance(gltfLoader: GltfLoader): IExtensionInstance {
     return new Instance();

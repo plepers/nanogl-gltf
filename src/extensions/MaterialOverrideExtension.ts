@@ -12,15 +12,42 @@ import Gltf from "../Gltf";
 import MaterialPass from "nanogl-pbr/MaterialPass";
 
 
-type MaterialOverrideFactoryContext = {
+/**
+ * Context object passed to material and pass override factories, if needed when overriding a material or pass
+ */
+export type MaterialOverrideFactoryContext = {
+
+  /**
+   * The gltf material data to override
+   */
   data: Gltf2.IMaterial
+
+  /**
+   * The gltf object containing the material
+   */
   gltf:Gltf
+
+  /**
+   * The node containing the primitive
+   */
   node: Node
+
+  /**
+   * The primitive which will use the material
+   */
   primitive: Primitive
+
 }
 
-type MaterialOverrideFactory = Material | (( ctx: MaterialOverrideFactoryContext )=>Material);
-type PassOverrideFactory = MaterialPass | (( ctx: MaterialOverrideFactoryContext, material: Material )=>MaterialPass|null);
+/**
+ * Simple material or material override factory function returning a Material
+ */
+export type MaterialOverrideFactory = Material | (( ctx: MaterialOverrideFactoryContext )=>Material);
+
+/**
+ * Simple pass or pass override factory function returning a MaterialPass
+ */
+export type PassOverrideFactory = MaterialPass | (( ctx: MaterialOverrideFactoryContext, material: Material )=>MaterialPass|null);
 
 
 
@@ -67,7 +94,6 @@ class OverrideMaterial implements IMaterial {
   }
   
 }
-
 
 
 
@@ -139,24 +165,33 @@ class MaterialOverrideExtensionInstance implements IExtensionInstance {
     return null;
   }
 
-
-
-
 }
 
+
+
+/**
+ * This extension allows all materials and their passes to be overriden by custom code at load time.
+ * Useful to add custom shading, completely replace a material, add Chunk effect to every materials of a GLTF, ...
+ */
 export default class MaterialOverrideExtension implements IExtensionFactory {
-  
   
   readonly name: string = 'material_override';
   
+  /**
+   * Map of material override factories
+   */
   readonly materials: Map<string, MaterialOverrideFactory> = new Map();
+
+  /**
+   * Map of pass override factories
+   */
   readonly passes: Map<string, PassOverrideFactory> = new Map();
 
   /**
-   * Add Material Override
-   * gltf material with the given name will be replaced by the one craete by th given factory
-   * @param name the name of the gltf material to override, if empty string the given material will be used as default override
-   * @param m 
+   * Add Material Override.
+   * Gltf material with the given name will be replaced by the one created by the given material factory
+   * @param name The name of the gltf material to override, if empty string the given material will be used as default override
+   * @param m Material factory to use to create the override material
    */
   overrideMaterial( name:string | "", m: MaterialOverrideFactory ): void {
     this.assertNotExist( name )
@@ -164,16 +199,20 @@ export default class MaterialOverrideExtension implements IExtensionFactory {
   }
   
   /**
-   * Add Pass Override
-   * the Color pass of the overideen material will be replaced by the given pass
-   * @param name the name of the material to override, if empty string is given, the pass will be applied to all materials
-   * @param m 
+   * Add Pass Override.
+   * The Color pass of the overriden material will be replaced by the one created by the given pass factory
+   * @param name The name of the material to override, if empty string is given, the pass will be applied to all materials
+   * @param p Pass factory to use to create the override pass
    */
   overridePass( name:string | "", p: PassOverrideFactory ): void {
     this.assertNotExist(name)
     this.passes.set( name, p )
   }
   
+  /**
+   * Check that the given name is not already used by a material or pass override
+   * @param name Material or pass name to check
+   */
   private assertNotExist(name:string){
     if( this.materials.has( name )) throw `material override for "${name}" already exist`
     if( this.passes.has( name )) throw `pass override for "${name}" already exist`
@@ -182,6 +221,5 @@ export default class MaterialOverrideExtension implements IExtensionFactory {
   createInstance(gltfLoader: GltfLoader): IExtensionInstance {
     return new MaterialOverrideExtensionInstance(gltfLoader, this);
   }
-
 
 }

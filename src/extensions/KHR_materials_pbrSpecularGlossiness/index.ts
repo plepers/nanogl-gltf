@@ -42,6 +42,14 @@ class Instance implements IExtensionInstance {
 }
 
 
+/**
+ * In PBR materials, two workflows exist for specifying the surface appearance of a material:
+ * - Metallic-Roughness workflow, defined natively in nanogl-gltf with PbrMetallicRoughness element,
+ * - Specular-Glossiness workflow, defined with this extension.
+ * 
+ * This extension allows Materials to be defined using the specular-glossiness workflow, with diffuseTexture as the base color,
+ * and specularGlossinessTexture containing the specular and glossiness data.
+ */
 export default class KHR_materials_pbrSpecularGlossiness implements IExtensionFactory {
   readonly name: string = EXT_ID;
   createInstance(gltfLoader: GltfLoader): IExtensionInstance {

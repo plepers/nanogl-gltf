@@ -32,41 +32,89 @@ const SRC_ALPHA             = 0x0302;
 const ONE_MINUS_SRC_ALPHA   = 0x0303;
 
 
+/**
+ * Interface for PbrMaterials that needs a method to setup a nanogl-pbr StandardPass
+ */
 export interface IPbrInputsData {
   setupPass( pass : StandardPass ):void
 }
 
 
+/**
+ * Base interface for Material classes, adding a method to base Element interface to create a nanogl-pbr Material object.
+ */
 export interface IMaterial extends IElement {
   readonly gltftype: GltfTypes.MATERIAL
   createMaterialForPrimitive( gltf:Gltf, node : Node, primitive : Primitive ) : BaseMaterial
 }
 
 
+/**
+ * A simple nanogl-pbr MaterialPass but with a shader version attribute
+ */
 export type GltfMaterialPass = MaterialPass & {
   version : ShaderVersion
 }
 
 
+/**
+ * The GltfBaseMaterial element contains the base properties and methods for all Material classes coming from a glTF file
+ */
 export abstract class GltfBaseMaterial<TPass extends GltfMaterialPass> implements IMaterial {
 
   readonly gltftype = GltfTypes.MATERIAL;
   name        : undefined | string;
   extras      : any   ;
 
+  /**
+   * PbrMetallicRoughness element, containing the base color, metallic, roughness and metallicRoughnessTexture properties.
+   */
   pbrMetallicRoughness?: PbrMetallicRoughness;
+
+  /**
+   * Normal texture
+   */
   normalTexture?: NormalTextureInfo;
+
+  /**
+   * Occlusion texture
+   */
   occlusionTexture?: OcclusionTextureInfo;
+
+  /**
+   * Emissive texture
+   */
   emissiveTexture?: TextureInfo;
+
+  /**
+   * Emissive factor, defining the strength applied on emissiveTexture. Default to [0,0,0]
+   */
   emissiveFactor: vec3;
+
+  /**
+   * Alpha rendering mode (OPAQUE, MASK or BLEND). Default to OPAQUE
+   */
   alphaMode: Gltf2.MaterialAlphaMode;
+
+  /**
+   * Alpha cutoff value used when alphaMode is MASK. Default to 0.5
+   */
   alphaCutoff: number;
+
+  /**
+   * Whether the material will be rendered on double sides. Default to false
+   */
   doubleSided: boolean;
 
+  /**
+   * Copy of pbrMetallicRoughness, used to setup the StandardPass
+   */
   pbrInputsData : IPbrInputsData;
 
 
-  
+  /**
+   * Pass used to render the material, created in setupMaterials()
+   */
   protected _materialPass   : TPass
 
   get materialPass() : TPass {
@@ -74,6 +122,12 @@ export abstract class GltfBaseMaterial<TPass extends GltfMaterialPass> implement
   }
 
 
+  /**
+   * Create a nanogl-pbr Material object for a given Primitive, using the Pass created in setupMaterials().
+   * @param gltf GLTF where the Primitive comes from
+   * @param node Parent Node of the Primitive, unused here
+   * @param primitive Primitive to create the Material for
+   */
   createMaterialForPrimitive( gltf:Gltf, node : Node, primitive : Primitive ) : BaseMaterial {
     const gl = gltf.gl
     this._materialPass.version.set( isWebgl2(gl) ? '300 es' : '100' )
@@ -102,7 +156,15 @@ export abstract class GltfBaseMaterial<TPass extends GltfMaterialPass> implement
 
   
 
-
+  /**
+   * Parse the Material data, fill the emissiveFactor, alphaMode, alphaCutoff and doubleSided properties,
+   * create the PbrMetallicRoughness, NormalTexture, OcclusionTexture and EmissiveTexture elements if needed,
+   * and call the setupMaterials() method.
+   * 
+   * Is async as it may need to wait for PbrMetallicRoughness, NormalTexture, OcclusionTexture and EmissiveTexture elements to be created.
+   * @param gltfLoader GLTFLoader to use
+   * @param data Data to parse
+   */
   async parse(gltfLoader: GltfLoader, data: Gltf2.IMaterial): Promise<any> {
 
     this.emissiveFactor = new Float32Array(data.emissiveFactor || [0, 0, 0]) as vec3;
@@ -130,6 +192,11 @@ export abstract class GltfBaseMaterial<TPass extends GltfMaterialPass> implement
 
   }
 
+  /**
+   * Parse the PbrMetallicRoughness data, filling the pbrMetallicRoughness property with a new PbrMetallicRoughness element.
+   * @param gltfLoader GLTFLoader to use
+   * @param data Data to parse
+   */
   async parsePbrInputsData( gltfLoader: GltfLoader, data: Gltf2.IMaterial ) : Promise<any>{
     if (data.pbrMetallicRoughness !== undefined) {
       this.pbrInputsData = this.pbrMetallicRoughness = new PbrMetallicRoughness()
@@ -137,6 +204,11 @@ export abstract class GltfBaseMaterial<TPass extends GltfMaterialPass> implement
     }
   }
 
+  /**
+   * Configure PBR Surface for a given Pass with this Material's options.
+   * If this.pbrInputsData is defined, call its setupPass() method, otherwise set a MetalnessSurface.
+   * @param pass Pass to configure
+   */
   configurePbrSurface( pass : StandardPass ){
     if (this.pbrInputsData !== undefined) {
       this.pbrInputsData.setupPass( pass );
@@ -145,6 +217,11 @@ export abstract class GltfBaseMaterial<TPass extends GltfMaterialPass> implement
     }
   }
 
+  /**
+   * Configure alpha rendering mode for a given Pass with this Material's options
+   * (depth mask, blend, blendFunc, mask, alphaMode and alphaCutoff uniform)
+   * @param pass Pass to configure
+   */
   configureAlpha( pass : StandardPass|UnlitPass ){
     if( this.alphaMode === Gltf2.MaterialAlphaMode.BLEND ){
 
@@ -162,13 +239,23 @@ export abstract class GltfBaseMaterial<TPass extends GltfMaterialPass> implement
     }
   }
 
+  /**
+   * Abstract class to setup the nanogl-pbr MaterialPass (enable depth test, cullface, alphaMode, attach textures samplers and factors, ...)
+   */
   abstract setupMaterials(): void;
-
 
 }
 
+
+/**
+ * Basic PBR implementation of GltfBaseMaterial using a nanogl-pbr StandardPass
+ */
 export default class Material extends GltfBaseMaterial<StandardPass> {
-//
+
+  /**
+   * Creates a StandardPass and attach emissive, normal and occlusion textures with samplers and their strength factors.
+   * Also configure alpha rendering mode and PBR surface.
+   */
   setupMaterials(): void {
     const pass = new StandardPass(this.name);
 
@@ -217,5 +304,3 @@ export default class Material extends GltfBaseMaterial<StandardPass> {
   }
 
 }
-
-
