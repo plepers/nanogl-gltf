@@ -28,22 +28,40 @@ import GltfLoader from "../io/GltfLoader";
 import { GLContext } from "nanogl/types";
 
 
-
+/**
+ * Interface that every Gltf element must implement (Buffer, Accessor, Mesh, ...)
+ */
 export interface IElement {
   
+  /**
+   * Type of this element
+   */
   readonly gltftype : GltfTypes
+
+  /**
+   * Name of this element
+   */
   name        : undefined | string
+
+  /**
+   * Extras of this element (custom additional data that can be added to every gltf property)
+   */
   extras      : any   
   
+  /**
+   * Method called by the loader just after initialization to parse the data coming from the .gltf file and setup the element accordingly.
+   * 
+   * For example, if it's a Buffer it will load the buffer data from the given uri and store it, if it's a Camera it will create the corresponding lens.
+   * @param gltfLoader Element's loader, it can be used to load other elements (for example a Mesh could load its Primitives, a Material could load its textures).
+   * @param data Data coming from the .gltf file
+   */
   parse( gltfLoader : GltfLoader, data : Gltf2.IProperty ) : Promise<any>
   
 }
 
-
-
-
-
-
+/**
+ * Type that wraps all possible Gltf elements, they all implements IElement and represents a GltfType
+ */
 export type AnyElement = 
   Accessor              |
   AccessorSparse        |
@@ -72,15 +90,45 @@ export type AnyElement =
   // PbrMetallicRoughness  |
   
 
-
+/**
+ * Gltf element determined by its GltfType
+ * @typeParam T GltfType of the element
+ * @typeParam E Corresponding Gltf element returned
+ */
 export type ElementOfType<T extends GltfTypes, E extends AnyElement = AnyElement> = E extends { gltftype : T } ? E : never;
+
+/**
+ * Gltf property determined by its GltfType
+ * @typeParam T GltfType of the element
+ * @typeParam E Corresponding Gltf property returned
+ */
 export type PropertyOfType<T extends GltfTypes, E extends Gltf2.Property = Gltf2.Property> = E extends { gltftype : T } ? E : never;
 
 
+/**
+ * Gltf type determined by a given Gltf property
+ * @typeParam T Gltf property
+ * @typeParam E Corresponding Gltf type returned
+ */
 export type PropertyType<T extends Gltf2.Property> = T extends { gltftype : infer E } ? E : never;
+
+/**
+ * Gltf type determined by a given Gltf element
+ * @typeParam T Gltf element
+ * @typeParam E Corresponding Gltf type returned
+ */
 export type ElementType<T extends AnyElement> = T extends { gltftype : infer E } ? E : never;
 
 
+/**
+ * Gltf element determined by a given Gltf property
+ * @typeParam T Gltf property
+ */
 export type ElementForProperty        <T extends Gltf2.Property> = ElementOfType<PropertyType<T>>
+
+/**
+ * Gltf element determined by a given Gltf property, wrapped in a Promise
+ * @typeParam T Gltf property
+ */
 export type PromiseElementForProperty <T extends Gltf2.Property> = Promise<ElementOfType<PropertyType<T>>>
 

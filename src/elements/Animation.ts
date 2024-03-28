@@ -10,21 +10,38 @@ import { IElement } from '../types/Elements';
 import { GLContext } from 'nanogl/types';
 
 
-
-
+/**
+ * The Animation element contains the data to animate a node, linking with samplers and channels.
+ */
 export default class Animation implements IElement {
 
   readonly gltftype : GltfTypes.ANIMATION = GltfTypes.ANIMATION;
-
   name        : undefined | string;
   extras      : any   ;
 
+  /**
+   * Array of samplers used to sample the animation values and keyframes
+   */
   samplers : AnimationSampler[];
+
+  /**
+   * Array of channels used to animate the nodes
+   */
   channels : AnimationChannel[];
 
+  /**
+   * Duration of the animation
+   */
   duration  = 0
 
   
+  /**
+   * Parse the Animation data, creates the samplers and channels.
+   * 
+   * Is async as it needs to wait for all the samplers and channels to be created.
+   * @param gltfLoader GLTFLoader to use
+   * @param data Data to parse
+   */
   async parse(gltfLoader:GltfLoader, data : Gltf2.IAnimation) : Promise<any> {
 
     const samplerPromises = data.samplers.map( (data)=>gltfLoader._loadElement(data) );
@@ -39,18 +56,20 @@ export default class Animation implements IElement {
     
   }
 
-
+  /**
+   * Evaluate the animation at a given time, updating the nodes properties.
+   * It evaluates each channel, which in turn evaluates the sampler and apply the value to the node.
+   * @param t Time to evaluate the animation at
+   */
   evaluate( t :number ){
     for (const channel of this.channels ) {
       channel.evaluate( t );
     }
   }
 
-
   getChannel(i:number):AnimationChannel {
     return this.channels[i];
   }
-
 
   getSampler(i:number):AnimationSampler {
     return this.samplers[i];

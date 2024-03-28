@@ -13,27 +13,59 @@ import Deferred from '../lib/Deferred';
 import { AbortSignal } from '@azure/abort-controller';
 
 
+/**
+ * The Texture element contains the image data and sampler used to sample the texture.
+ * It also contains the nanogl Texture2D object, used to render the texture in a WebGL context.
+ */
 export default class Texture implements IElement {
 
   readonly gltftype : GltfTypes.TEXTURE = GltfTypes.TEXTURE;
-
   name        : undefined | string;
   extras      : any   ;
   
+
+  /**
+   * Sampler element used to sample the texture
+   */
   sampler:Sampler
+
+  /**
+   * Image element used as the texture data
+   */
   source: Image;
+
+  /**
+   * nanogl Texture2D object, used to render the texture in a WebGL context, create by allocateGl()
+   */
   glTexture : Texture2D;
 
 
+  /**
+   * Deferred object used to wait for the glTexture to be created
+   */
   private _glTextureDeferred : Deferred<Texture2D> = new Deferred();
+
+  /**
+   * Texture's minFilter to use when the sampler doesn't specify one
+   */
   private _defaultTextureFilter : GLenum
 
+
+  /**
+   * Promise that resolves when the glTexture is created, useful for classes that need to wait for the texture to be ready.
+   */
   get glTexturePromise() : Promise<Texture2D> {
     return this._glTextureDeferred.promise;
   }
 
 
-
+  /**
+   * Parse the Texture data, create the Sampler and Image elements
+   * 
+   * Is async as it needs to wait for the Sampler and Image to be created.
+   * @param gltfLoader GLTFLoader to use
+   * @param data Data to parse
+   */
   async parse( gltfLoader:GltfLoader, data: Gltf2.ITexture ){
 
     if( data.sampler !== undefined ){
@@ -46,10 +78,13 @@ export default class Texture implements IElement {
 
     this._defaultTextureFilter = gltfLoader.defaultTextureFilter;
 
-    
   }
   
-  
+  /**
+   * Setup the gl.TEXTURE_2D with minFilter, magFilter, wrapS and wrapT, depending on the sampler's options.
+   * This allocates the texture memory and uploads the image data to the GPU so it can be used in a shader.
+   * @param gl GL context
+   */
   async allocateGl( gl : GLContext ) : Promise<void> {
     
     let glFormat = gl.RGB;
@@ -86,6 +121,4 @@ export default class Texture implements IElement {
 
   }
   
-
 }
-

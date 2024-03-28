@@ -4,8 +4,17 @@ import { isAllOnes } from "../../lib/Utils";
 import PbrMetallicRoughness from "../../elements/PbrMetallicRoughness";
 import { Uniform } from "nanogl-pbr/Input";
 
+
+/**
+ * Simple material using nanogl-pbr UnlitPass.
+ * An Unlit shading is a shading that does not use lighting, metallic, roughness, ... but only a baseColor.
+ */
 export default class UnlitMaterial extends GltfBaseMaterial<UnlitPass> {
 
+  /**
+   * Creates a nanogl-pbr UnlitPass and attach basecolor texture with sampler and its strength factor, if defined.
+   * Also configure alpha rendering mode.
+   */
   setupMaterials(): void {
     const pass = new UnlitPass(this.name);
 

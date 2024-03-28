@@ -9,11 +9,20 @@ import Gltf from "../../Gltf";
 import GltfTypes from "../../types/GltfTypes";
 
 
+/**
+ * A Primitive using Draco compressed geometry
+ */
 export default class DracoPrimitive extends Primitive {
 
+  /**
+   * Draco geometry data
+   */
   geometry: IDracoGeometry;
   
-
+  /**
+   * Pass geometry data to the primitive
+   * @param geometry Draco geometry data
+   */
   setDatas(geometry: IDracoGeometry ) {
     this.geometry = geometry;
 

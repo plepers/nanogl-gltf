@@ -5,10 +5,23 @@ import TextureLoader from "./TextureLoader";
 import TextureDefinition from "./KTXParser";
 import Texture2D from "nanogl/texture-2d";
 
+
+/**
+ * An image that contains compressed texture data, needing an extra parsing step before being able to setup the texture
+ */
 export default class CompressedImage extends Image {
 
+  /**
+   * The data source parsed from the compressed texture, used to setup the texture
+   */
   texDataSource: TextureDefinition;
 
+  /**
+   * 
+   * @param gltfLoader GLTF loader to use
+   * @param data Data to parse
+   * @param texLoader Texture loader to use
+   */
   async parseCompressed(gltfLoader: GltfLoader, data: Gltf2.IImage, texLoader: TextureLoader): Promise<any> {
 
     const codec = texLoader.getCodec();

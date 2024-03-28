@@ -115,6 +115,10 @@ class Instance implements IExtensionInstance {
 }
 
 
+/**
+ * This extension allows to merge multiple small low-resolution textures into one atlas texture.
+ * It adds offset, rotation and scale properties to TextureInfo.
+ */
 export default class KHR_texture_transform implements IExtensionFactory {
   readonly name: string = EXT_ID;
   createInstance(gltfLoader: GltfLoader): IExtensionInstance {

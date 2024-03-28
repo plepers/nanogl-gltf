@@ -12,17 +12,45 @@ import { MetalnessSurface } from 'nanogl-pbr/PbrSurface';
 import { ColorSpace } from 'nanogl-pbr/ColorSpace';
 
 
+/**
+ * The PbrMetallicRoughness element contains the base properties for a PBR material, using the metallic-roughness workflow.
+ */
 export default class PbrMetallicRoughness {
 
-
+  /**
+   * Factors applied to each color channel of the baseColorTexture. Default to [1, 1, 1, 1]
+   */
   baseColorFactor          : vec4       ;
+
+  /**
+   * Factor for the metalness of the material. Default to 1
+   */
   metallicFactor           : number     ;
+
+  /**
+   * Factor for the roughness of the material. Default to 1
+   */
   roughnessFactor          : number     ;
+
+  /**
+   * Base color texture for the material
+   */
   baseColorTexture?        : TextureInfo;
+
+  /**
+   * Metallic-roughness texture for the material. Metallic will be sampled from the B channel, roughness from the G channel.
+   * If R or A channels are present, they will be ignored.
+   */
   metallicRoughnessTexture?: TextureInfo;
   
 
-
+  /**
+   * Parse the PbrMetallicRoughness data, filling the class properties.
+   * 
+   * Is async as it may need to wait for baseColorTexture and metallicRoughnessTexture to be loaded.
+   * @param gltfLoader GLTFLoader to use
+   * @param data Data to parse
+   */
   async parse( gltfLoader:GltfLoader, data: Gltf2.IMaterialPbrMetallicRoughness ) : Promise<any>{
 
     this.baseColorFactor = <vec4> new Float32Array(data.baseColorFactor || [1,1,1,1]);
@@ -40,6 +68,11 @@ export default class PbrMetallicRoughness {
 
   }
 
+  /**
+   * Setup the PbrMetallicRoughness data on a nanogl-pbr StandardPass by attaching baseColor
+   * and metallicRoughness textures with samplers and their strength factors. It uses a nanogl-pbr MetalnessSurface.
+   * @param pass Pass to setup
+   */
   setupPass( pass : StandardPass ){
 
     const surface = new MetalnessSurface() 
@@ -81,4 +114,3 @@ export default class PbrMetallicRoughness {
   }
 
 }
-

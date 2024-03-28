@@ -31,7 +31,10 @@ const _testResultPromise : Promise<boolean> = Promise.all([
   return results.every(v=>v)
 })
 
-
+/**
+ * Check if the browser supports WebP image format.
+ * Returns true only if lossy, lossless, alpha and animated WebP are supported.
+ */
 export function webpSupport() : Promise<boolean>{
   return _testResultPromise;
 }
