@@ -29,6 +29,7 @@ import DepthPass from 'nanogl-pbr/DepthPass';
 import MeshRenderer from './renderer/MeshRenderer';
 import { LightCollection } from './extensions/KHR_lights_punctual';
 import { AbortError, AbortSignal } from '@azure/abort-controller';
+import type Scene from './elements/Scene';
 
 
 /**
@@ -272,6 +273,7 @@ export default class Gltf {
   get skins      (): Skin      [] {return this._getCollection(GltfTypes.SKIN      ).list;}
   get primitives (): Primitive [] {return this._getCollection(GltfTypes.PRIMITIVE ).list;}
   get textures   (): Texture   [] {return this._getCollection(GltfTypes.TEXTURE   ).list;}
+  get scenes     (): Scene     [] {return this._getCollection(GltfTypes.SCENE     ).list;}
   
   /**
    * Get all elements of this Gltf, unordered and unfiltered
@@ -320,6 +322,7 @@ export default class Gltf {
   getMesh     ( name:string ): Mesh      { return this.getElementByName( GltfTypes.MESH     , name ) }
   getMaterial ( name:string ): IMaterial { return this.getElementByName( GltfTypes.MATERIAL , name ) }
   getAnimation( name:string ): Animation { return this.getElementByName( GltfTypes.ANIMATION, name ) }
+  getScene    ( name:string ): Scene     { return this.getElementByName( GltfTypes.SCENE    , name ) }
 
   /**
    * Get full collection of a specific type
