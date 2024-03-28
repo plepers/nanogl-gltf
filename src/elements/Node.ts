@@ -46,6 +46,11 @@ export default class Node extends NGLNode implements IElement {
    */
   renderable? : MeshRenderer;
 
+  /**
+   * The initial transform of this node as defined in the gltf file
+   */
+  restMatrix  : mat4 = mat4.create();
+
 
   /**
    * Parse the Node data, apply the transformation matrix or the translation/scale vectors & scale quaternion,
@@ -112,6 +117,8 @@ export default class Node extends NGLNode implements IElement {
     this.name = data.name ?? (this.mesh?.name )
 
     this.invalidate();
+    this.updateMatrix();
+    this.restMatrix.set( this._matrix );
     
   }
 
