@@ -340,6 +340,7 @@ export default class GltfLoader {
       console.warn(`Gltf version should be "2.0" found "${asset.version}"` );
     } 
 
+    await this._loadElements( this._data.scenes );
     await this._loadElements( this._data.nodes );
     await this._loadElements( this._data.animations );
     await this.resolveElements();
