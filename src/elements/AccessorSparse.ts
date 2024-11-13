@@ -52,7 +52,7 @@ export default class AccessorSparse implements IElement {
   setAccessor(accessor: Accessor) {
     this.accessor = accessor;
   }
-
+  
   
   /**
    * Parse the AccessorSparse data, load the corresponding Accessor, AccessorSparseIndices and AccessorSparseValues elements.
