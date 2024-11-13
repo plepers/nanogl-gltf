@@ -46,6 +46,13 @@ export default class AccessorSparse implements IElement {
    */
   indicesMap:Map<number, number>;
 
+  /**
+   * set by accessor owning this sparse
+   */
+  setAccessor(accessor: Accessor) {
+    this.accessor = accessor;
+  }
+
   
   /**
    * Parse the AccessorSparse data, load the corresponding Accessor, AccessorSparseIndices and AccessorSparseValues elements.
@@ -57,8 +64,6 @@ export default class AccessorSparse implements IElement {
    * @param args Additional arguments, unused here
    */
   async parse( gltfLoader : GltfLoader, data : Gltf2.IAccessorSparse, ...args : any ) : Promise<any> {
-
-    this.accessor = await gltfLoader.getElement( GltfTypes.ACCESSOR, data.elementParent.elementIndex );
 
     this.indices = await gltfLoader._loadElement( data.indices );
     this.values = await gltfLoader._loadElement( data.values );
