@@ -434,7 +434,10 @@ export default class Accessor extends BaseAccessor implements IElement {
     this.sparse = null;
     if( data.sparse !== undefined ){
       // can't await sparse here because of cyclic dependency ( => sparse await accessor)
-      gltfLoader._loadElement( data.sparse ).then( sparse=>this.sparse=sparse );
+      gltfLoader._loadElement( data.sparse ).then( sparse=>{
+        sparse.setAccessor(this);
+        this.sparse=sparse
+      });
     }
 
     this._valueHolder = this.createElementHolder();
