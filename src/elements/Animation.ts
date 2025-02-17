@@ -48,7 +48,7 @@ export default class Animation implements IElement {
     this.samplers = await Promise.all( samplerPromises );
 
     for (const sampler of this.samplers) {
-      this.duration = Math.max( sampler.maxTime );
+      this.duration = Math.max( sampler.maxTime, this.duration );
     }
 
     const channelPromises = data.channels.map( (data)=>gltfLoader._loadElement(data) );
