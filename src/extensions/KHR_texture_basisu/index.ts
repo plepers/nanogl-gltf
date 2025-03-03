@@ -112,6 +112,9 @@ class BasisImage extends Image {
     if ( filterHasMipmap(minFilter) && webglFormat.uncompressed && mipLevels.length == 1) {
       gl.generateMipmap(gl.TEXTURE_2D);
     }
+
+    this._decodePromise = null;
+    
   }
 
 }
