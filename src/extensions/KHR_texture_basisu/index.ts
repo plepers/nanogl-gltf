@@ -13,6 +13,13 @@ import { DecodingResponse, IBasisDecoder } from "./basis.types";
 
 const EXT_ID = 'KHR_texture_basisu';
 
+export type BasisImageOptions = {
+  /**
+   *  Keep the decoded promise after texture setup, if false, gpu resource will be removed from the heap 
+   *  @default true
+   **/
+  keepDecoded?: boolean
+}
 
 class BasisImage extends Image {
 
@@ -25,7 +32,7 @@ class BasisImage extends Image {
     return false
   }
 
-  constructor( private _decoder : IBasisDecoder ){
+  constructor( private _decoder : IBasisDecoder, private options?: BasisImageOptions) {
     super()
   }
 
@@ -113,7 +120,9 @@ class BasisImage extends Image {
       gl.generateMipmap(gl.TEXTURE_2D);
     }
 
-    this._decodePromise = null;
+    if(this.options && !this.options.keepDecoded) {
+      this._decodePromise = null;
+    }
     
   }
 
@@ -135,6 +144,7 @@ class BasisTexture extends Texture {
 
 }
 
+
 class Instance implements IExtensionInstance {
 
 
@@ -143,7 +153,7 @@ class Instance implements IExtensionInstance {
 
   loader: GltfLoader;
 
-  constructor(gltfLoader: GltfLoader, private _decoder : IBasisDecoder ) {
+  constructor(gltfLoader: GltfLoader, private _decoder : IBasisDecoder, private options: BasisImageOptions) {
     this.loader = gltfLoader;
   }
 
@@ -155,7 +165,7 @@ class Instance implements IExtensionInstance {
   loadElement<P extends Gltf2.Property>(data: P): Promise<ElementOfType<PropertyType<P>>>;
   loadElement(data: Gltf2.Property): Promise<AnyElement> {
     if (data.gltftype === GltfTypes.IMAGE && (data.mimeType as string === 'image/ktx2' || data.uri?.endsWith('ktx2'))) {
-      const basisImg = new BasisImage(this._decoder)
+      const basisImg = new BasisImage(this._decoder, this.options)
       return basisImg.parse(this.loader, data).then(() => basisImg)
     }
     if (data.gltftype === GltfTypes.TEXTURE && data.extensions && data.extensions[EXT_ID]) {
@@ -174,14 +184,21 @@ class Instance implements IExtensionInstance {
  */
 export default class KHR_texture_basisu implements IExtensionFactory {
   readonly name: string = EXT_ID;
+
+  options: BasisImageOptions = { 
+    keepDecoded: true 
+  };
   
   /**
    * @param decoder The decoder to use to decode the basis file
    */
-  constructor( readonly decoder: IBasisDecoder ){
+  constructor( readonly decoder: IBasisDecoder, options?: BasisImageOptions ) {
+
+    this.options = {...this.options, ...options };
+
   }
 
   createInstance(gltfLoader: GltfLoader): IExtensionInstance {
-    return new Instance(gltfLoader, this.decoder);
+    return new Instance(gltfLoader, this.decoder, this.options);
   }
 }
