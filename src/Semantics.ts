@@ -52,16 +52,18 @@ export class DefaultSemantics implements ISemantics {
    * @param semantic Attribute semantic
    */
   getAttributeName(semantic: string ): string {
-    const [basename, set_index=0] = semantic.split( '_' );
+    const [basename, str_index] = semantic.split( '_' );
+    const set_index = Number(str_index);
     const infos = Semantics[basename as keyof typeof Semantics];
 
     if( infos !== undefined ) {
       if( set_index > 0 || infos.indexed )
-        return infos.attrib+set_index;
+        return infos.attrib+str_index;
       return infos.attrib
     }
-    throw new Error(`Invalid Semantic ${semantic}`)
-    // return semantic;
+
+    return semantic;
+
   }
 
 }
